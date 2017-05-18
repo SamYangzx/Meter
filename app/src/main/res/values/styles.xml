@@ -1,0 +1,36 @@
+<resources xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="PickerStyle">
+        <item name="android:layout_width">@dimen/general_picker_width</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_margin">@dimen/general_padding</item>
+        <item name="android:layout_marginBottom">0dp</item>
+    </style>
+
+    <style name="GeneralButtonBottomStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:padding">@dimen/general_padding</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="GeneralLayoutStyle">
+        <item name="android:layout_margin">@dimen/general_margin</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:minWidth">@dimen/general_layout_min_width</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+
+</resources>

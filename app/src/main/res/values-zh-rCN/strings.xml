@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">仪表测量器</string>
+    <string name="sample_unit">采样值单位</string>
+    <string name="meter_unit">测量点单位</string>
+    <string name="start">开始</string>
+    <string name="end">检测结束</string>
+    <string name="step">步长</string>
+    <string name="tap">档位</string>
+    <string name="jinhui">进回</string>
+    <string name="cancel">取消</string>
+    <string name="center">确定</string>
+    <string name="check_point">检测点</string>
+    <string name="load">加载</string>
+    <string name="reset">清零</string>
+    <string name="sample_value">采样值</string>
+    <string name="speed">快慢</string>
+</resources>

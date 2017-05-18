@@ -1,0 +1,28 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+
+    <!--General padding begin-->
+    <dimen name="general_padding">16dp</dimen>
+    <dimen name="general_margin">16dp</dimen>
+
+    <!--General padding end-->
+
+    <!--picker width begin-->
+    <dimen name="general_picker_width">50dp</dimen>
+
+    <!--picker width end-->
+
+
+    <!--general layout begin-->
+    <dimen name="general_layout_min_width">50dp</dimen>
+
+    <!--general layout end-->
+
+    <!--button -->
+    <dimen name="general_button_width">50dp</dimen>
+    <dimen name="general_button_hight">50dp</dimen>
+
+
+</resources>

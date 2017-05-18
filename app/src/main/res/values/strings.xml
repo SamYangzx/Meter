@@ -1,0 +1,81 @@
+<resources>
+    <string name="app_name">Meter</string>
+    <string name="sample_unit">Sample unit</string>
+    <string name="meter_unit">Meter unit</string>
+    <string name="start">Start</string>
+    <string name="end">End</string>
+    <string name="step">Step</string>
+    <string name="tap">Tap</string>
+    <string name="jinhui">jinhui</string>
+    <string name="sample_value">Sample</string>
+    <string name="speed">Speed</string>
+    <string name="load">Load</string>
+    <string name="check_point">Check point</string>
+    <string name="reset">Reset</string>
+    <string name="center">Center</string>
+    <string name="cancel">Cancel</string>
+
+    <string-array name="sample_unit_array">
+        <item>m/s</item>
+        <item>N/s</item>
+        <item>N/m2</item>
+        <item>Pa</item>
+        <item>m</item>
+    </string-array>
+
+    <string-array name="measure_unit_array">
+        <item>a/s</item>
+        <item>b/s</item>
+        <item>s</item>
+        <item>N</item>
+        <item>ms</item>
+    </string-array>
+
+
+    <string-array name="step_array">
+        <item>0.01</item>
+        <item>0.1</item>
+        <item>1</item>
+        <item>10</item>
+        <item>100</item>
+    </string-array>
+
+    <string-array name="tap_array">
+        <item>A</item>
+        <item>B</item>
+        <item>C</item>
+        <item>D</item>
+    </string-array>
+
+    <string-array name="jinhui_array">
+        <item>进程2</item>
+        <item>进程1</item>
+        <item>回程1</item>
+        <item>回程2</item>
+    </string-array>
+
+
+    <string-array name="speed_array">
+        <item>-10%</item>
+        <item>-5%</item>
+        <item>-2%</item>
+        <item>-1%</item>
+        <item>0</item>
+        <item>1%</item>
+        <item>2%</item>
+        <item>5%</item>
+        <item>10%</item>
+    </string-array>
+
+    <string-array name="check_array">
+        <item>-10</item>
+        <item>-5</item>
+        <item>-2</item>
+        <item>-1</item>
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>5</item>
+        <item>10</item>
+    </string-array>
+</resources>
