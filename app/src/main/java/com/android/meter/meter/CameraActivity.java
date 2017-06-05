@@ -18,8 +18,11 @@ package com.android.meter.meter;
 
 import android.Manifest;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -44,6 +47,8 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.android.meter.meter.camera.AspectRatioFragment;
+import com.android.meter.meter.util.FileUtil;
+import com.android.meter.meter.util.TimeUtil;
 import com.google.android.cameraview.AspectRatio;
 import com.google.android.cameraview.CameraView;
 
@@ -62,7 +67,7 @@ public class CameraActivity extends AppCompatActivity implements
         ActivityCompat.OnRequestPermissionsResultCallback,
         AspectRatioFragment.Listener {
 
-    private static final String TAG = "MainActivity";
+    private static final String TAG = "CameraActivity";
 
     private static final int REQUEST_CAMERA_PERMISSION = 1;
 
@@ -91,6 +96,7 @@ public class CameraActivity extends AppCompatActivity implements
     private CameraView mCameraView;
 
     private Handler mBackgroundHandler;
+    private Context mContext;
 
     private View.OnClickListener mOnClickListener = new View.OnClickListener() {
         @Override
@@ -101,6 +107,9 @@ public class CameraActivity extends AppCompatActivity implements
                         mCameraView.takePicture();
                     }
                     break;
+                case R.id.take_picture_complete:
+                    startActivity(new Intent(mContext, MeasureSetActivity.class));
+                    break;
             }
         }
     };
@@ -109,6 +118,7 @@ public class CameraActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mContext = this;
         mCameraView = (CameraView) findViewById(R.id.camera);
         if (mCameraView != null) {
             mCameraView.addCallback(mCallback);
@@ -117,6 +127,11 @@ public class CameraActivity extends AppCompatActivity implements
         if (fab != null) {
             fab.setOnClickListener(mOnClickListener);
         }
+        FloatingActionButton completeFab = (FloatingActionButton) findViewById(R.id.take_picture_complete);
+        if (completeFab != null){
+            completeFab.setOnClickListener(mOnClickListener);
+        }
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
@@ -166,7 +181,7 @@ public class CameraActivity extends AppCompatActivity implements
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-            @NonNull int[] grantResults) {
+                                           @NonNull int[] grantResults) {
         switch (requestCode) {
             case REQUEST_CAMERA_PERMISSION:
                 if (permissions.length != 1 || grantResults.length != 1) {
@@ -252,20 +267,22 @@ public class CameraActivity extends AppCompatActivity implements
         @Override
         public void onPictureTaken(CameraView cameraView, final byte[] data) {
             Log.d(TAG, "onPictureTaken " + data.length);
-            Toast.makeText(cameraView.getContext(), R.string.picture_taken, Toast.LENGTH_SHORT)
+            Toast.makeText(cameraView.getContext(),  TimeUtil.getDateYearMonthDayHourMinute(), Toast.LENGTH_SHORT)
                     .show();
+            Log.d(TAG, "Pictures Directory: " + Environment.getExternalStorageDirectory());
             getBackgroundHandler().post(new Runnable() {
                 @Override
                 public void run() {
-                    File file = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES),
-                            "picture.jpg");
+                    File file = new File(FileUtil.getPicFolder(TimeUtil.getDateYearMonthDay()),
+                            FileUtil.getTimeFileName());
                     OutputStream os = null;
                     try {
                         os = new FileOutputStream(file);
                         os.write(data);
                         os.close();
+
                     } catch (IOException e) {
-                        Log.w(TAG, "Cannot write to " + file, e);
+                        Log.e(TAG, "Cannot write to " + file, e);
                     } finally {
                         if (os != null) {
                             try {
@@ -275,6 +292,8 @@ public class CameraActivity extends AppCompatActivity implements
                             }
                         }
                     }
+
+                    refreshGallery(file);
                 }
             });
         }
@@ -289,7 +308,7 @@ public class CameraActivity extends AppCompatActivity implements
         private static final String ARG_NOT_GRANTED_MESSAGE = "not_granted_message";
 
         public static ConfirmationDialogFragment newInstance(@StringRes int message,
-                String[] permissions, int requestCode, @StringRes int notGrantedMessage) {
+                                                             String[] permissions, int requestCode, @StringRes int notGrantedMessage) {
             ConfirmationDialogFragment fragment = new ConfirmationDialogFragment();
             Bundle args = new Bundle();
             args.putInt(ARG_MESSAGE, message);
@@ -330,6 +349,12 @@ public class CameraActivity extends AppCompatActivity implements
                     .create();
         }
 
+    }
+
+    private void refreshGallery(File file) {
+        Intent mediaScanIntent = new Intent( Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        mediaScanIntent.setData(Uri.fromFile(file));
+        sendBroadcast(mediaScanIntent);
     }
 
 }

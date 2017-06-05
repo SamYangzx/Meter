@@ -19,6 +19,7 @@
         android:id="@+id/aspect_ratio"
         android:icon="@drawable/ic_aspect_ratio"
         android:title="@string/aspect_ratio"
+        android:visible="false"
         app:showAsAction="ifRoom"/>
 
     <item
@@ -31,6 +32,7 @@
         android:id="@+id/switch_camera"
         android:icon="@drawable/ic_switch_camera"
         android:title="@string/switch_camera"
+        android:visible="false"
         app:showAsAction="ifRoom"/>
 
 </menu>
