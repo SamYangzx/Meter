@@ -1,160 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!--
+    Copyright (C) 2016 The Android Open Source Project
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+         http://www.apache.org/licenses/LICENSE-2.0
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_main"
+    android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.android.meter.meter.MainActivity">
+    android:background="@color/primary"
+    tools:context=".CameraActivity">
 
-    <LinearLayout
+    <com.google.android.cameraview.CameraView
+        android:id="@+id/camera"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="horizontal">
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:adjustViewBounds="true"
+        android:background="@android:color/black"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/general_padding"
-            android:text="@string/sample_unit" />
-
-        <Spinner
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:entries="@array/sample_unit_array"/>
-    </LinearLayout>
-
-    <LinearLayout
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"/>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/take_picture"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="horizontal">
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        app:srcCompat="@drawable/ic_camera"
+        app:useCompatPadding="true"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/general_padding"
-            android:text="@string/meter_unit" />
-
-        <Spinner
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:entries="@array/measure_unit_array"/>
-    </LinearLayout>
-
-    <TableLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="horizontal">
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center">
-
-            <com.android.meter.meter.numberpicker.NumberPickerView
-                android:id="@+id/step_picker"
-                app:npv_ItemPaddingHorizontal="5dp"
-                app:npv_ItemPaddingVertical="5dp"
-                app:npv_ShowCount="3"
-                app:npv_TextSizeNormal="16sp"
-                app:npv_TextSizeSelected="20sp"
-                app:npv_WrapSelectorWheel="false"
-                style="@style/PickerStyle">
-
-            </com.android.meter.meter.numberpicker.NumberPickerView>
-
-            <com.android.meter.meter.numberpicker.NumberPickerView
-                android:id="@+id/tap_picker"
-                style="@style/PickerStyle"
-                app:npv_ItemPaddingHorizontal="5dp"
-                app:npv_ItemPaddingVertical="5dp"
-                app:npv_ShowCount="3"
-                app:npv_TextSizeNormal="16sp"
-                app:npv_TextSizeSelected="20sp"
-                app:npv_WrapSelectorWheel="false">
-
-            </com.android.meter.meter.numberpicker.NumberPickerView>
-
-            <com.android.meter.meter.numberpicker.NumberPickerView
-                android:id="@+id/jinhui_picker"
-                app:npv_ItemPaddingHorizontal="5dp"
-                app:npv_ItemPaddingVertical="5dp"
-                app:npv_ShowCount="3"
-                app:npv_TextSizeNormal="16sp"
-                app:npv_TextSizeSelected="20sp"
-                app:npv_WrapSelectorWheel="false"
-                style="@style/PickerStyle">
-
-            </com.android.meter.meter.numberpicker.NumberPickerView>
-
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/general_padding"
-                android:layout_marginLeft="40dp"
-                android:text="@string/step" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="30dp"
-                android:text="@string/tap" />
-
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="30dp"
-                android:text="@string/jinhui" />
-        </TableRow>
-
-    </TableLayout>
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="46dp"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/start_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_marginBottom="88dp"
-            android:layout_marginLeft="29dp"
-            android:layout_marginStart="29dp"
-            android:padding="@dimen/general_padding"
-            android:text="@string/start" />
-
-        <Button
-            android:id="@+id/end_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginEnd="38dp"
-            android:layout_marginRight="38dp"
-            android:text="@string/end" />
-
-    </RelativeLayout>
-
-
-</LinearLayout>
+</RelativeLayout>

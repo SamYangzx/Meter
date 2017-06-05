@@ -15,6 +15,24 @@
     <string name="center">Center</string>
     <string name="cancel">Cancel</string>
 
+    <!-- UI Elements -->
+    <string name="btn_capture">Click</string>
+
+    <!-- Toast Messages -->
+    <string name="camera_not_found">No camera harware found</string>
+    <string name="take_photo_help">Touch anywhere on screen to take picture</string>
+
+
+    <string name="camera_permission_confirmation">This app demonstrates the usage of CameraView. In order to do that, it needs permission to access camera.</string>
+    <string name="camera_permission_not_granted">Camera app cannot do anything without camera permission.</string>
+    <string name="picture_taken">Picture taken</string>
+    <string name="aspect_ratio">Aspect ratio</string>
+    <string name="switch_flash">Switch flash</string>
+    <string name="switch_camera">Switch camera</string>
+    <string name="flash_auto">Flash auto</string>
+    <string name="flash_off">Flash off</string>
+    <string name="flash_on">Flash on</string>
+
     <string-array name="sample_unit_array">
         <item>m/s</item>
         <item>N/s</item>
@@ -33,11 +51,15 @@
 
 
     <string-array name="step_array">
+        <item>0.0001</item>
+        <item>0.001</item>
         <item>0.01</item>
         <item>0.1</item>
         <item>1</item>
         <item>10</item>
         <item>100</item>
+        <item>1000</item>
+        <item>10000</item>
     </string-array>
 
     <string-array name="tap_array">
@@ -45,6 +67,28 @@
         <item>B</item>
         <item>C</item>
         <item>D</item>
+        <item>E</item>
+        <item>F</item>
+        <item>G</item>
+        <item>H</item>
+        <item>I</item>
+        <item>J</item>
+        <item>K</item>
+        <item>L</item>
+        <item>M</item>
+        <item>N</item>
+        <item>O</item>
+        <item>P</item>
+        <item>Q</item>
+        <item>R</item>
+        <item>S</item>
+        <item>T</item>
+        <item>U</item>
+        <item>V</item>
+        <item>W</item>
+        <item>X</item>
+        <item>Y</item>
+        <item>Z</item>
     </string-array>
 
     <string-array name="jinhui_array">

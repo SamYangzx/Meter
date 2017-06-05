@@ -10,10 +10,10 @@ import android.widget.Toast;
 
 import com.android.meter.meter.numberpicker.NumberPickerView;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener,
+public class MeasureSetActivity extends AppCompatActivity implements View.OnClickListener,
         NumberPickerView.OnScrollListener, NumberPickerView.OnValueChangeListener,
         NumberPickerView.OnValueChangeListenerInScrolling{
-    private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String TAG = MeasureSetActivity.class.getSimpleName();
 
     private Context mContext;
     private String[] mStepArray;
@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_measure_set);
         mContext = this;
         initData();
         initView();
