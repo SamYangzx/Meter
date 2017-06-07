@@ -44,6 +44,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.android.meter.meter.camera.AspectRatioFragment;
@@ -123,11 +124,13 @@ public class CameraActivity extends AppCompatActivity implements
         if (mCameraView != null) {
             mCameraView.addCallback(mCallback);
         }
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.take_picture);
+//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.take_picture);
+        Button fab = (Button)findViewById(R.id.take_picture);
         if (fab != null) {
             fab.setOnClickListener(mOnClickListener);
         }
-        FloatingActionButton completeFab = (FloatingActionButton) findViewById(R.id.take_picture_complete);
+
+        Button completeFab = (Button) findViewById(R.id.take_picture_complete);
         if (completeFab != null){
             completeFab.setOnClickListener(mOnClickListener);
         }

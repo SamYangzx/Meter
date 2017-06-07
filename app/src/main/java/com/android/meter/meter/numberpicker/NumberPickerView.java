@@ -41,10 +41,10 @@ public class NumberPickerView extends View {
     private static final int DEFAULT_TEXT_SIZE_HINT_SP = 14;
 
     // distance between selected text and hint text
-    private static final int DEFAULT_MARGIN_START_OF_HINT_DP = 8;
+    private static final int DEFAULT_MARGIN_START_OF_HINT_DP = 20;
 
     // distance between hint text and right of this view, used in wrap_content mode
-    private static final int DEFAULT_MARGIN_END_OF_HINT_DP = 8;
+    private static final int DEFAULT_MARGIN_END_OF_HINT_DP = 20;
 
     // default divider's color
     private static final int DEFAULT_DIVIDER_COLOR = 0XFFF56313;

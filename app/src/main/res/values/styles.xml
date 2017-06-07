@@ -9,10 +9,9 @@
     </style>
 
     <style name="PickerStyle">
-        <item name="android:layout_width">@dimen/general_picker_width</item>
+        <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_margin">@dimen/general_padding</item>
-        <item name="android:layout_marginBottom">0dp</item>
+        <item name="android:layout_margin">5dp</item>
     </style>
 
     <style name="GeneralButtonBottomStyle">

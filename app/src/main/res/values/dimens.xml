@@ -24,5 +24,9 @@
     <dimen name="general_button_width">50dp</dimen>
     <dimen name="general_button_hight">50dp</dimen>
 
+    <!--MeasureActivity begin-->
+    <dimen name="measure_value_size">32sp</dimen>
+
+    <!--MeasureActivity end-->
 
 </resources>

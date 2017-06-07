@@ -12,17 +12,59 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.android.meter.meter.MeasureActivity">
 
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="采样值  单位" />
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/general_padding"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:text="@string/measure_title" />
+
+        <Button
+            android:layout_width="@dimen/general_button_hight"
+            android:layout_height="@dimen/general_button_hight"
+            android:background="@drawable/setting"
+            android:onClick="onUISettingPressed" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/general_padding"
+            android:layout_weight="1"
+            android:focusableInTouchMode="false"
+            android:gravity="center_vertical|right"
+            android:hint="0"
+            android:text="123.777"
+            android:textSize="@dimen/measure_value_size" />
+
+        <TextView
+            android:id="@+id/unit_tv_measure"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="bottom"
+            android:layout_marginRight="100dp"/>
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:gravity="center"
+        android:paddingTop="80dp"
+        android:layout_gravity="center_horizontal"
         android:orientation="horizontal"
         android:paddingLeft="@dimen/general_padding"
         android:paddingRight="@dimen/general_padding">
@@ -43,16 +85,16 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/speed" />
+                android:text="@string/measure_point" />
         </LinearLayout>
 
         <LinearLayout style="@style/GeneralLayoutStyle">
 
             <Button
-                android:layout_marginTop="10dp"
                 android:id="@+id/upload_btn"
                 android:layout_width="@dimen/general_button_width"
                 android:layout_height="@dimen/general_button_hight"
+                android:layout_marginTop="10dp"
                 android:background="@drawable/navigate_up" />
 
             <Button

@@ -6,9 +6,9 @@
     <string name="end">End</string>
     <string name="step">Step</string>
     <string name="tap">Tap</string>
-    <string name="jinhui">jinhui</string>
+    <string name="count">Count</string>
     <string name="sample_value">Sample</string>
-    <string name="speed">Speed</string>
+    <string name="measure_point">Speed</string>
     <string name="load">Load</string>
     <string name="check_point">Check point</string>
     <string name="reset">Reset</string>
@@ -33,22 +33,82 @@
     <string name="flash_off">Flash off</string>
     <string name="flash_on">Flash on</string>
 
-    <string-array name="sample_unit_array">
-        <item>m/s</item>
-        <item>N/s</item>
-        <item>N/m2</item>
-        <item>Pa</item>
-        <item>m</item>
-    </string-array>
-
     <string-array name="measure_unit_array">
-        <item>a/s</item>
-        <item>b/s</item>
-        <item>s</item>
         <item>N</item>
-        <item>ms</item>
+        <item>N•m</item>
+        <item>MPa</item>
+        <item>g</item>
+        <item>Pa</item>
+        <item>Pa·m³/s</item>
+        <item>km</item>
+        <item>Ω</item>
+        <item>F</item>
+        <item>H</item>
+        <item>V</item>
+        <item>A</item>
+        <item>W</item>
+        <item>m3/h</item>
+        <item>℃</item>
     </string-array>
 
+    <!--<string-array name="n_unit_array">-->
+    <!--<item>N		</item>-->
+    <!--<item>kN    </item>-->
+    <!--<item>cN    </item>-->
+    <!--<item>mN    </item>-->
+    <!--<item>kgf   </item>-->
+    <!--<item>daN   </item>-->
+    <!--<item>Lbf   </item>-->
+    <!--</string-array>-->
+
+    <!--<string-array name="torque_unit_array">-->
+    <!--<item>N•m</item>-->
+    <!--<item>mN•m</item>-->
+    <!--<item>cN•m</item>-->
+    <!--<item>dN•m</item>-->
+    <!--<item>kgf•m</item>-->
+    <!--<item>kgf•cm</item>-->
+    <!--<item>Lbf•in</item>-->
+    <!--<item>Lbf•ft</item>-->
+    <!--<item>ozf•in</item>-->
+    <!--</string-array>-->
+
+    <!--<string-array name="pressure_unit_array">-->
+    <!--<item>MPa</item>-->
+    <!--<item>kPa</item>-->
+    <!--<item>hPa</item>-->
+    <!--<item>Pa</item>-->
+    <!--<item>kgf/cm²</item>-->
+    <!--<item>bar</item>-->
+    <!--<item>mbar</item>-->
+    <!--<item>psi</item>-->
+    <!--<item>mmWC</item>-->
+    <!--<item>inWC</item>-->
+    <!--<item>mmHg</item>-->
+    <!--</string-array>-->
+
+    <!--<string-array name="weight_unit_array">-->
+    <!--<item>g</item>-->
+    <!--<item>mg</item>-->
+    <!--<item>kg</item>-->
+    <!--<item>t</item>-->
+    <!--<item>N</item>-->
+    <!--<item>cN</item>-->
+    <!--<item>mN</item>-->
+    <!--</string-array>-->
+
+    <!--<string-array name="empty_unit_array">-->
+    <!--<item>Pa</item>-->
+    <!--<item>mbar</item>-->
+    <!--<item>torr</item>-->
+    <!--<item>hPa</item>-->
+    <!--</string-array>-->
+
+    <!--<string-array name="leak_rate_unit_array">-->
+    <!--<item>Pa·m³/s</item>-->
+    <!--<item>mbar·l/s</item>-->
+    <!--<item>g/a</item>-->
+    <!--</string-array>-->
 
     <string-array name="step_array">
         <item>0.0001</item>
@@ -92,34 +152,53 @@
     </string-array>
 
     <string-array name="jinhui_array">
-        <item>进程2</item>
-        <item>进程1</item>
-        <item>回程1</item>
-        <item>回程2</item>
-    </string-array>
-
-
-    <string-array name="speed_array">
-        <item>-10%</item>
-        <item>-5%</item>
-        <item>-2%</item>
-        <item>-1%</item>
-        <item>0</item>
-        <item>1%</item>
-        <item>2%</item>
-        <item>5%</item>
-        <item>10%</item>
-    </string-array>
-
-    <string-array name="check_array">
-        <item>-10</item>
-        <item>-5</item>
-        <item>-2</item>
-        <item>-1</item>
-        <item>0</item>
         <item>1</item>
         <item>2</item>
+        <item>3</item>
+        <item>4</item>
         <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
         <item>10</item>
+
     </string-array>
+
+
+    <!--<string-array name="speed_array">-->
+        <!--<item>-10</item>-->
+        <!--<item>-9</item>-->
+        <!--<item>-8</item>-->
+        <!--<item>-7</item>-->
+        <!--<item>-6</item>-->
+        <!--<item>-5</item>-->
+        <!--<item>-4</item>-->
+        <!--<item>-3</item>-->
+        <!--<item>-2</item>-->
+        <!--<item>-1</item>-->
+        <!--<item>0</item>-->
+        <!--<item>1</item>-->
+        <!--<item>2</item>-->
+        <!--<item>3</item>-->
+        <!--<item>4</item>-->
+        <!--<item>5</item>-->
+        <!--<item>6</item>-->
+        <!--<item>7</item>-->
+        <!--<item>8</item>-->
+        <!--<item>9</item>-->
+        <!--<item>10</item>-->
+    <!--</string-array>-->
+
+    <!--<string-array name="check_array">-->
+        <!--<item>-10</item>-->
+        <!--<item>-5</item>-->
+        <!--<item>-2</item>-->
+        <!--<item>-1</item>-->
+        <!--<item>0</item>-->
+        <!--<item>1</item>-->
+        <!--<item>2</item>-->
+        <!--<item>5</item>-->
+        <!--<item>10</item>-->
+    <!--</string-array>-->
 </resources>
