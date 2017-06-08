@@ -43,7 +43,6 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/general_padding"
             android:layout_weight="1"
             android:focusableInTouchMode="false"
             android:gravity="center_vertical|right"
@@ -55,19 +54,19 @@
             android:id="@+id/unit_tv_measure"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="bottom"
-            android:layout_marginRight="100dp"/>
+            android:layout_gravity="bottom"
+            android:layout_marginRight="100dp" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:paddingTop="80dp"
         android:layout_gravity="center_horizontal"
+        android:layout_weight="1"
         android:orientation="horizontal"
         android:paddingLeft="@dimen/general_padding"
-        android:paddingRight="@dimen/general_padding">
+        android:paddingRight="@dimen/general_padding"
+        android:paddingTop="80dp">
 
         <LinearLayout style="@style/GeneralLayoutStyle">
 
@@ -90,18 +89,16 @@
 
         <LinearLayout style="@style/GeneralLayoutStyle">
 
-            <Button
-                android:id="@+id/upload_btn"
-                android:layout_width="@dimen/general_button_width"
-                android:layout_height="@dimen/general_button_hight"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/navigate_up" />
-
-            <Button
-                android:id="@+id/download_btn"
-                android:layout_width="@dimen/general_button_width"
-                android:layout_height="@dimen/general_button_hight"
-                android:background="@drawable/navigate_down" />
+            <com.android.meter.meter.numberpicker.NumberPickerView
+                android:id="@+id/load_picker"
+                android:layout_width="70dp"
+                android:layout_height="120dp"
+                app:npv_ItemPaddingHorizontal="5dp"
+                app:npv_ItemPaddingVertical="5dp"
+                app:npv_ShowCount="3"
+                app:npv_TextSizeNormal="16sp"
+                app:npv_TextSizeSelected="20sp"
+                app:npv_WrapSelectorWheel="false" />
 
             <TextView
                 android:layout_width="wrap_content"

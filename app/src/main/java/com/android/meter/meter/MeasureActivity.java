@@ -30,8 +30,8 @@ public class MeasureActivity extends AppCompatActivity {
     private Button mResetBtn;
     private Button mCenterBtn;
     private Button mCalcelBtn;
-    private Button mUploadBtn;
-    private Button mDownloadBtn;
+//    private Button mUploadBtn;
+//    private Button mDownloadBtn;
 
     private String mSampleUnit;
     private float mStep;
@@ -65,6 +65,8 @@ public class MeasureActivity extends AppCompatActivity {
         mCheckPointPicker = (NumberPickerView) findViewById(R.id.check_point_picker);
         mSpeedPicker.refreshByNewDisplayedValues(getStepArray(mStep));
         mCheckPointPicker.refreshByNewDisplayedValues(mCheckPointArray);
+        NumberPickerView loadPicker = (NumberPickerView)findViewById(R.id.load_picker);
+        loadPicker.setIsDrawLine(true);
 
         mResetBtn = (Button) findViewById(R.id.reset_btn);
         mCenterBtn = (Button) findViewById(R.id.center_btn);
@@ -72,10 +74,10 @@ public class MeasureActivity extends AppCompatActivity {
         mResetBtn.setOnClickListener(mListener);
         mCenterBtn.setOnClickListener(mListener);
         mCalcelBtn.setOnClickListener(mListener);
-        mUploadBtn = (Button) findViewById(R.id.upload_btn);
-        mDownloadBtn = (Button) findViewById(R.id.download_btn);
-        mUploadBtn.setOnClickListener(mListener);
-        mDownloadBtn.setOnClickListener(mListener);
+//        mUploadBtn = (Button) findViewById(R.id.upload_btn);
+//        mDownloadBtn = (Button) findViewById(R.id.download_btn);
+//        mUploadBtn.setOnClickListener(mListener);
+//        mDownloadBtn.setOnClickListener(mListener);
         TextView unitTv = (TextView) findViewById(R.id.unit_tv_measure);
         unitTv.setText(mSampleUnit);
     }
@@ -93,12 +95,12 @@ public class MeasureActivity extends AppCompatActivity {
                 case R.id.cancel_btn:
                     ToastUtil.showToast(mContext, getStringById(R.string.cancel));
                     break;
-                case R.id.upload_btn:
-                    ToastUtil.showToast(mContext, "Up");
-                    break;
-                case R.id.download_btn:
-                    ToastUtil.showToast(mContext, "Down");
-                    break;
+//                case R.id.upload_btn:
+//                    ToastUtil.showToast(mContext, "Up");
+//                    break;
+//                case R.id.download_btn:
+//                    ToastUtil.showToast(mContext, "Down");
+//                    break;
                 default:
                     break;
             }
