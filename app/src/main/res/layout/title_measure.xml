@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingLeft="@dimen/general_padding"
+    android:paddingRight="@dimen/general_padding"
+    android:orientation="horizontal">
+    <!--android:background="#4050B5"-->
+
+
+    <TextView
+        android:id="@+id/measure_title_tv"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_weight="1"
+        android:gravity="center_vertical"
+    android:textSize="@dimen/general_title_textsize"
+        android:text="@string/measure_title" />
+
+    <ImageButton
+        android:id="@+id/measure_title_ib"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/setting"
+        android:onClick="onUISettingPressed" />
+
+
+</LinearLayout>

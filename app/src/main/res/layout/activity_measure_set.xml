@@ -12,26 +12,26 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.android.meter.meter.MeasureSetActivity">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:gravity="center_vertical"-->
+        <!--android:orientation="horizontal">-->
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/general_padding"
-            android:layout_weight="1"
-            android:gravity="center_vertical"
-            android:text="@string/measure_title" />
+        <!--<TextView-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_margin="@dimen/general_padding"-->
+            <!--android:layout_weight="1"-->
+            <!--android:gravity="center_vertical"-->
+            <!--android:text="@string/measure_title" />-->
 
-        <Button
-            android:layout_width="@dimen/general_button_hight"
-            android:layout_height="@dimen/general_button_hight"
-            android:background="@drawable/setting"
-            android:onClick="onSettingPressed" />
-    </LinearLayout>
+        <!--<Button-->
+            <!--android:layout_width="@dimen/general_button_hight"-->
+            <!--android:layout_height="@dimen/general_button_hight"-->
+            <!--android:background="@drawable/setting"-->
+            <!--android:onClick="onSettingPressed" />-->
+    <!--</LinearLayout>-->
 
     <LinearLayout
         android:layout_width="match_parent"

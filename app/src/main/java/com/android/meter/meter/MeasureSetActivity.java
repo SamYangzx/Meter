@@ -1,10 +1,16 @@
 package com.android.meter.meter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -13,8 +19,9 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.android.meter.meter.numberpicker.NumberPickerView;
+import com.android.meter.meter.util.ToastUtil;
 
-public class MeasureSetActivity extends AppCompatActivity {
+public class MeasureSetActivity extends Activity {
     private static final String TAG = MeasureSetActivity.class.getSimpleName();
 
     private final static String mUnitArrays[][] = {
@@ -54,12 +61,39 @@ public class MeasureSetActivity extends AppCompatActivity {
     private float mStep;
     private int mCount;
 
+    @RequiresApi(api = Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getActionBar() != null) {
+            getActionBar().setDisplayShowHomeEnabled(false);
+        }
         setContentView(R.layout.activity_measure_set);
         mContext = this;
         initData();
         initView();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.measure_settings_menu, menu);
+        return true;
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.bluetooth_settings:
+                ToastUtil.showToast(mContext, R.string.bluetooth);
+                return true;
+            case R.id.unit_settings:
+                ToastUtil.showToast(mContext, R.string.unit);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     private void initData() {
@@ -151,8 +185,8 @@ public class MeasureSetActivity extends AppCompatActivity {
     };
 
 
-    public void onSettingPressed(View view) {
-        Log.d(TAG, "Settings is pressed");
-    }
+//    public void onSettingPressed(View view) {
+//        Log.d(TAG, "Settings is pressed");
+//    }
 
 }

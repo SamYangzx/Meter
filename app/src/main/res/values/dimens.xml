@@ -4,6 +4,8 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
 
     <!--General padding begin-->
+    <dimen name="general_title_textsize">20sp</dimen>
+
     <dimen name="general_padding">16dp</dimen>
     <dimen name="general_margin">16dp</dimen>
 
@@ -25,6 +27,7 @@
     <dimen name="general_button_hight">50dp</dimen>
 
     <!--MeasureActivity begin-->
+    <dimen name="measure_settings_layout_width">30dp</dimen>
     <dimen name="measure_value_size">32sp</dimen>
 
     <!--MeasureActivity end-->
