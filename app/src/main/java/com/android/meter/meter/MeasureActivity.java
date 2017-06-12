@@ -3,24 +3,20 @@ package com.android.meter.meter;
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
-import android.content.Intent;
+import android.content.DialogInterface;
 import android.os.Build;
-import android.support.annotation.RequiresApi;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.android.meter.meter.numberpicker.NumberPickerView;
-import com.android.meter.meter.util.LogUtil;
 import com.android.meter.meter.util.StringUtil;
 import com.android.meter.meter.util.ToastUtil;
 
@@ -123,7 +119,8 @@ public class MeasureActivity extends Activity {
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.reset_btn:
-                    ToastUtil.showToast(mContext, getStringById(R.string.reset));
+//                    ToastUtil.showToast(mContext, getStringById(R.string.reset));
+                    dialog();
                     break;
                 case R.id.center_btn:
                     ToastUtil.showToast(mContext, getStringById(R.string.center));
@@ -161,6 +158,28 @@ public class MeasureActivity extends Activity {
         }
 //        }
         return mStepArray;
+    }
+
+
+    protected void dialog() {
+        AlertDialog.Builder builder = new android.app.AlertDialog.Builder(mContext);
+        builder.setMessage(R.string.reset_confirm);
+        builder.setTitle("Warn：");
+        builder.setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                ToastUtil.showToast(mContext, R.string.reset);
+//                MeasureActivity.this.finish();
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        builder.create().show();
     }
 
 }

@@ -19,6 +19,11 @@
     <string name="check_point">第n次</string>
     <string name="load">加载</string>
     <string name="reset">清零</string>
+    <string name="confirm">确认</string>
+    <string name="reset_confirm">确认清零吗？</string>
+
+
     <string name="sample_value">采样值</string>
     <string name="measure_point">测量点</string>
+
 </resources>
