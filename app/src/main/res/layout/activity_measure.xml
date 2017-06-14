@@ -75,7 +75,6 @@
                 android:id="@+id/measure_point_picker"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:npv_ItemPaddingHorizontal="5dp"
                 app:npv_ItemPaddingVertical="5dp"
                 app:npv_TextSizeNormal="16sp"
                 app:npv_TextSizeSelected="20sp"
