@@ -17,10 +17,9 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.android.meter.meter.numberpicker.NumberPickerView;
+import com.android.meter.meter.util.Constant;
 import com.android.meter.meter.util.StringUtil;
 import com.android.meter.meter.util.ToastUtil;
-
-import static com.android.meter.meter.R.layout.activity_measure;
 
 public class MeasureActivity extends Activity {
     private static final String TAG = MeasureActivity.class.getSimpleName();
@@ -29,12 +28,13 @@ public class MeasureActivity extends Activity {
     public static final String EXTRA_STEP = "step";
     public static final String EXTRA_COUNT = "count";
 
-    private String[] mSpeedArray;
-    private String[] mCheckPointArray;
+    private String[] mMeasurePointArray;
+    private String[] mTimesArray;
     private Context mContext;
 
-    private NumberPickerView mSpeedPicker;
-    private NumberPickerView mCheckPointPicker;
+    private NumberPickerView mMeasurePointPicker;
+    private NumberPickerView mLoadPicker;
+    private NumberPickerView mTimesPicker;
 
     private Button mResetBtn;
     private Button mCenterBtn;
@@ -60,19 +60,9 @@ public class MeasureActivity extends Activity {
         ImageButton ib = (ImageButton) view.findViewById(R.id.measure_title_ib);
         ib.setOnClickListener(mListener);
 
-        setContentView(activity_measure);
+        setContentView(R.layout.activity_measure);
         //使用布局文件来定义标题栏
         mContext = this;
-//        mToolbar = (Toolbar)findViewById(R.id.activity_measure_toolbar);
-//        if (mToolbar != null) {
-//            //将Toolbar显示到界面
-//
-//            setSupportActionBar(mToolbar);
-//        }else{
-//            Log.d(TAG, "mToolbar == null");
-//
-//
-//        }
 
         mSampleUnit = getIntent().getStringExtra(EXTRA_MEASURE_UNIT);
         mStep = getIntent().getFloatExtra(EXTRA_STEP, 1);
@@ -80,25 +70,41 @@ public class MeasureActivity extends Activity {
         mCount = getIntent().getIntExtra(EXTRA_COUNT, 1);
         initData();
         initView();
+
+        mMeasurePointPicker.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mMeasurePointPicker.setPickedIndexRelativeToRaw(mStepArray.length / 2);
+            }
+        }, Constant.DELAY_REFRESH_TIME);
+
+        mTimesPicker.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mTimesPicker.setPickedIndexRelativeToRaw(mTimesArray.length /2);
+            }
+        }, Constant.DELAY_REFRESH_TIME);
+
     }
 
 
     private void initData() {
-//        mSpeedArray = getResources().getStringArray(R.array.speed_array);
-        //mCheckPointArray = getResources().getStringArray(R.array.check_array);
-        mCheckPointArray = new String[mCount];
+//        mMeasurePointArray = getResources().getStringArray(R.array.speed_array);
+        //mTimesArray = getResources().getStringArray(R.array.check_array);
+        mTimesArray = new String[mCount];
         for (int i = 0; i < mCount; i++) {
-            mCheckPointArray[i] = String.valueOf(i + 1);
+            mTimesArray[i] = String.valueOf(i + 1);
         }
     }
 
     private void initView() {
-        mSpeedPicker = (NumberPickerView) findViewById(R.id.speed_picker);
-        mCheckPointPicker = (NumberPickerView) findViewById(R.id.check_point_picker);
-        mSpeedPicker.refreshByNewDisplayedValues(getStepArray(mStep));
-        mCheckPointPicker.refreshByNewDisplayedValues(mCheckPointArray);
-        NumberPickerView loadPicker = (NumberPickerView) findViewById(R.id.load_picker);
-        loadPicker.setIsDrawLine(true);
+        mMeasurePointPicker = (NumberPickerView) findViewById(R.id.measure_point_picker);
+        mMeasurePointPicker.setHintText(mSampleUnit);
+        mTimesPicker = (NumberPickerView) findViewById(R.id.times_picker);
+        mMeasurePointPicker.refreshByNewDisplayedValues(getStepArray(mStep));
+        mTimesPicker.refreshByNewDisplayedValues(mTimesArray);
+        mLoadPicker = (NumberPickerView) findViewById(R.id.load_picker);
+        mLoadPicker.setIsDrawLine(true);
 
         mResetBtn = (Button) findViewById(R.id.reset_btn);
         mCenterBtn = (Button) findViewById(R.id.center_btn);
@@ -111,7 +117,8 @@ public class MeasureActivity extends Activity {
 //        mUploadBtn.setOnClickListener(mListener);
 //        mDownloadBtn.setOnClickListener(mListener);
         TextView unitTv = (TextView) findViewById(R.id.unit_tv_measure);
-        unitTv.setText(mSampleUnit);
+        unitTv.setText(getFormatUnit(mSampleUnit));
+
     }
 
     private View.OnClickListener mListener = new View.OnClickListener() {
@@ -180,6 +187,10 @@ public class MeasureActivity extends Activity {
             }
         });
         builder.create().show();
+    }
+
+    private String getFormatUnit(String unit){
+        return "(" + unit +")";
     }
 
 }

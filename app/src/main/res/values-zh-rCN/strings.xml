@@ -16,7 +16,7 @@
 
     <string name="cancel">取消</string>
     <string name="center">确定</string>
-    <string name="check_point">第n次</string>
+    <string name="times">第n次</string>
     <string name="load">加载</string>
     <string name="reset">清零</string>
     <string name="confirm">确认</string>
@@ -25,5 +25,6 @@
 
     <string name="sample_value">采样值</string>
     <string name="measure_point">测量点</string>
+    <string name="warn">警告</string>
 
 </resources>

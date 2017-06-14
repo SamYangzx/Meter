@@ -13,24 +13,24 @@
     tools:context="com.android.meter.meter.MeasureSetActivity">
 
     <!--<LinearLayout-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:gravity="center_vertical"-->
-        <!--android:orientation="horizontal">-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:gravity="center_vertical"-->
+    <!--android:orientation="horizontal">-->
 
-        <!--<TextView-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_margin="@dimen/general_padding"-->
-            <!--android:layout_weight="1"-->
-            <!--android:gravity="center_vertical"-->
-            <!--android:text="@string/measure_title" />-->
+    <!--<TextView-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_margin="@dimen/general_padding"-->
+    <!--android:layout_weight="1"-->
+    <!--android:gravity="center_vertical"-->
+    <!--android:text="@string/measure_title" />-->
 
-        <!--<Button-->
-            <!--android:layout_width="@dimen/general_button_hight"-->
-            <!--android:layout_height="@dimen/general_button_hight"-->
-            <!--android:background="@drawable/setting"-->
-            <!--android:onClick="onSettingPressed" />-->
+    <!--<Button-->
+    <!--android:layout_width="@dimen/general_button_hight"-->
+    <!--android:layout_height="@dimen/general_button_hight"-->
+    <!--android:background="@drawable/setting"-->
+    <!--android:onClick="onSettingPressed" />-->
     <!--</LinearLayout>-->
 
     <LinearLayout
@@ -45,15 +45,19 @@
             android:layout_margin="@dimen/general_padding"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="@string/sample_unit" />
+            android:text="@string/meter_unit"
+
+            android:textSize="@dimen/general_tv_textsize" />
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+
             android:layout_margin="@dimen/general_padding"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="@string/meter_unit" />
+            android:text="@string/sample_unit"
+            android:textSize="@dimen/general_tv_textsize" />
 
 
     </LinearLayout>
@@ -73,6 +77,7 @@
             android:layout_weight="1"
             android:entries="@array/measure_unit_array"
             android:gravity="center" />
+
 
         <Spinner
             android:id="@+id/sample_unit_spinner"
@@ -102,7 +107,6 @@
                 style="@style/PickerStyle"
                 app:npv_ItemPaddingHorizontal="5dp"
                 app:npv_ItemPaddingVertical="5dp"
-                app:npv_ShowCount="3"
                 app:npv_TextSizeNormal="16sp"
                 app:npv_TextSizeSelected="20sp"
                 app:npv_WrapSelectorWheel="false">
@@ -114,7 +118,6 @@
                 style="@style/PickerStyle"
                 app:npv_ItemPaddingHorizontal="5dp"
                 app:npv_ItemPaddingVertical="5dp"
-                app:npv_ShowCount="3"
                 app:npv_TextSizeNormal="16sp"
                 app:npv_TextSizeSelected="20sp"
                 app:npv_WrapSelectorWheel="false">
@@ -126,7 +129,6 @@
                 style="@style/PickerStyle"
                 app:npv_ItemPaddingHorizontal="5dp"
                 app:npv_ItemPaddingVertical="5dp"
-                app:npv_ShowCount="3"
                 app:npv_TextSizeNormal="16sp"
                 app:npv_TextSizeSelected="20sp"
                 app:npv_WrapSelectorWheel="false">
@@ -146,22 +148,23 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/general_padding"
                 android:gravity="center"
-                android:text="@string/step" />
+                android:text="@string/step"
+                android:textSize="@dimen/general_tv_textsize" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-
-                android:text="@string/tap" />
+                android:text="@string/tap"
+                android:textSize="@dimen/general_tv_textsize" />
 
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-
-                android:text="@string/count" />
+                android:text="@string/count"
+                android:textSize="@dimen/general_tv_textsize" />
         </TableRow>
 
     </TableLayout>

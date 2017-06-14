@@ -1,7 +1,9 @@
 package com.android.meter.meter;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
@@ -19,6 +21,8 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.android.meter.meter.numberpicker.NumberPickerView;
+import com.android.meter.meter.util.Constant;
+import com.android.meter.meter.util.LogUtil;
 import com.android.meter.meter.util.ToastUtil;
 
 public class MeasureSetActivity extends Activity {
@@ -53,6 +57,8 @@ public class MeasureSetActivity extends Activity {
 
     private Button mStartBtn;
     private Button mEndBtn;
+    private Spinner mMeasureUnitSp;
+    private ArrayAdapter<String> mMeasureAdapter;
     private Spinner mSampleUnitSp;
     private ArrayAdapter<String> mSampleAdapter;
 
@@ -71,6 +77,21 @@ public class MeasureSetActivity extends Activity {
         mContext = this;
         initData();
         initView();
+
+        mStepPicker.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Log.d(TAG, "mStepArray.length / 2: " + mStepArray.length / 2);
+                mStepPicker.setPickedIndexRelativeToRaw(mStepArray.length / 2);
+                mStep = Integer.valueOf(mStepArray[mStepArray.length / 2]);
+
+            }
+        }, Constant.DELAY_REFRESH_TIME);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 
     @Override
@@ -89,7 +110,7 @@ public class MeasureSetActivity extends Activity {
                 ToastUtil.showToast(mContext, R.string.bluetooth);
                 return true;
             case R.id.unit_settings:
-                ToastUtil.showToast(mContext, R.string.unit);
+                getUnitDialog().show();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -100,7 +121,6 @@ public class MeasureSetActivity extends Activity {
         mStepArray = getResources().getStringArray(R.array.step_array);
         mTapArray = getResources().getStringArray(R.array.tap_array);
         mCountArray = getResources().getStringArray(R.array.jinhui_array);
-        mStepArray = getResources().getStringArray(R.array.step_array);
 
         mStep = Float.parseFloat(mStepArray[0]);
         mCount = Integer.valueOf(mCountArray[0]);
@@ -108,15 +128,11 @@ public class MeasureSetActivity extends Activity {
     }
 
     private void initView() {
-        Spinner measureUnitSp = (Spinner) findViewById(R.id.measure_unit_spinner);
-        measureUnitSp.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        mMeasureUnitSp = (Spinner) findViewById(R.id.measure_unit_spinner);
+        mMeasureUnitSp.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Log.d(TAG, "position: " + position + ", id: " + id);
-                mUnitIndex = position;
-                mSampleAdapter = new ArrayAdapter<String>(mContext, android.R.layout.simple_spinner_item, mUnitArrays[position]);
-                mSampleAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                mSampleUnitSp.setAdapter(mSampleAdapter);
             }
 
             @Override
@@ -136,7 +152,11 @@ public class MeasureSetActivity extends Activity {
 
             }
         });
+        updateSpinnerArray(0);
+
         mStepPicker = (NumberPickerView) findViewById(R.id.step_picker);
+
+
         mTapPicker = (NumberPickerView) findViewById(R.id.tap_picker);
         mCountPicker = (NumberPickerView) findViewById(R.id.jinhui_picker);
 
@@ -185,8 +205,32 @@ public class MeasureSetActivity extends Activity {
     };
 
 
-//    public void onSettingPressed(View view) {
-//        Log.d(TAG, "Settings is pressed");
-//    }
+    private AlertDialog mUnitDialog;
 
+    private AlertDialog getUnitDialog() {
+        if (mUnitDialog == null) {
+            final String[] items = getResources().getStringArray(R.array.unit_type_array);
+            mUnitDialog = new AlertDialog.Builder(this)
+                    .setItems(items, new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            updateSpinnerArray(which);
+                        }
+                    }).create();
+        }
+        return mUnitDialog;
+    }
+
+
+    private void updateSpinnerArray(int position) {
+        mUnitIndex = position;
+        mMeasureAdapter = new ArrayAdapter<String>(mContext, android.R.layout.simple_spinner_item, mUnitArrays[position]);
+        mMeasureAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mMeasureUnitSp.setAdapter(mMeasureAdapter);
+
+        mSampleAdapter = new ArrayAdapter<String>(mContext, android.R.layout.simple_spinner_item, mUnitArrays[position]);
+        mSampleAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mSampleUnitSp.setAdapter(mSampleAdapter);
+    }
 }

@@ -10,7 +10,7 @@
     <string name="sample_value">Sample</string>
     <string name="measure_point">Speed</string>
     <string name="load">Load</string>
-    <string name="check_point">Check point</string>
+    <string name="times">n times</string>
     <string name="reset">Reset</string>
     <string name="center">Center</string>
     <string name="cancel">Cancel</string>
@@ -32,6 +32,7 @@
     <string name="flash_auto">Flash auto</string>
     <string name="flash_off">Flash off</string>
     <string name="flash_on">Flash on</string>
+    <string name="warn">Warn</string>
 
     <string-array name="measure_unit_array">
         <item>N</item>
@@ -49,6 +50,24 @@
         <item>W</item>
         <item>m3/h</item>
         <item>℃</item>
+    </string-array>
+
+    <string-array name="unit_type_array">
+        <item>力值</item>
+        <item>扭矩</item>
+        <item>压力</item>
+        <item>质量</item>
+        <item>真空</item>
+        <item>漏率</item>
+        <item>长度</item>
+        <item>电阻</item>
+        <item>电容</item>
+        <item>电感</item>
+        <item>电压</item>
+        <item>电流</item>
+        <item>功率</item>
+        <item>流量</item>
+        <item>温度</item>
     </string-array>
 
     <!--<string-array name="n_unit_array">-->
@@ -167,38 +186,38 @@
 
 
     <!--<string-array name="speed_array">-->
-        <!--<item>-10</item>-->
-        <!--<item>-9</item>-->
-        <!--<item>-8</item>-->
-        <!--<item>-7</item>-->
-        <!--<item>-6</item>-->
-        <!--<item>-5</item>-->
-        <!--<item>-4</item>-->
-        <!--<item>-3</item>-->
-        <!--<item>-2</item>-->
-        <!--<item>-1</item>-->
-        <!--<item>0</item>-->
-        <!--<item>1</item>-->
-        <!--<item>2</item>-->
-        <!--<item>3</item>-->
-        <!--<item>4</item>-->
-        <!--<item>5</item>-->
-        <!--<item>6</item>-->
-        <!--<item>7</item>-->
-        <!--<item>8</item>-->
-        <!--<item>9</item>-->
-        <!--<item>10</item>-->
+    <!--<item>-10</item>-->
+    <!--<item>-9</item>-->
+    <!--<item>-8</item>-->
+    <!--<item>-7</item>-->
+    <!--<item>-6</item>-->
+    <!--<item>-5</item>-->
+    <!--<item>-4</item>-->
+    <!--<item>-3</item>-->
+    <!--<item>-2</item>-->
+    <!--<item>-1</item>-->
+    <!--<item>0</item>-->
+    <!--<item>1</item>-->
+    <!--<item>2</item>-->
+    <!--<item>3</item>-->
+    <!--<item>4</item>-->
+    <!--<item>5</item>-->
+    <!--<item>6</item>-->
+    <!--<item>7</item>-->
+    <!--<item>8</item>-->
+    <!--<item>9</item>-->
+    <!--<item>10</item>-->
     <!--</string-array>-->
 
     <!--<string-array name="check_array">-->
-        <!--<item>-10</item>-->
-        <!--<item>-5</item>-->
-        <!--<item>-2</item>-->
-        <!--<item>-1</item>-->
-        <!--<item>0</item>-->
-        <!--<item>1</item>-->
-        <!--<item>2</item>-->
-        <!--<item>5</item>-->
-        <!--<item>10</item>-->
+    <!--<item>-10</item>-->
+    <!--<item>-5</item>-->
+    <!--<item>-2</item>-->
+    <!--<item>-1</item>-->
+    <!--<item>0</item>-->
+    <!--<item>1</item>-->
+    <!--<item>2</item>-->
+    <!--<item>5</item>-->
+    <!--<item>10</item>-->
     <!--</string-array>-->
 </resources>

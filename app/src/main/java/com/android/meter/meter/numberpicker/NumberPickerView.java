@@ -36,7 +36,7 @@ public class NumberPickerView extends View {
     private static final int DEFAULT_TEXT_COLOR_SELECTED = 0XFFF56313;
 
     // default text size of normal item
-    private static final int DEFAULT_TEXT_SIZE_NORMAL_SP = 14;
+    private static final int DEFAULT_TEXT_SIZE_NORMAL_SP = 16;
 
     // default text size of selected item
     private static final int DEFAULT_TEXT_SIZE_SELECTED_SP = 16;
@@ -45,10 +45,10 @@ public class NumberPickerView extends View {
     private static final int DEFAULT_TEXT_SIZE_HINT_SP = 14;
 
     // distance between selected text and hint text
-    private static final int DEFAULT_MARGIN_START_OF_HINT_DP = 20;
+    private static final int DEFAULT_MARGIN_START_OF_HINT_DP = 2;
 
     // distance between hint text and right of this view, used in wrap_content mode
-    private static final int DEFAULT_MARGIN_END_OF_HINT_DP = 20;
+    private static final int DEFAULT_MARGIN_END_OF_HINT_DP = 5;
 
     // default divider's color
     private static final int DEFAULT_DIVIDER_COLOR = 0XFFF56313;
@@ -59,8 +59,8 @@ public class NumberPickerView extends View {
     // default divider's margin to the left & right of this view
     private static final int DEFAULT_DIVIDER_MARGIN_HORIZONTAL = 0;
 
-    // default shown items' count, now we display 3 items, the 2nd one is selected
-    private static final int DEFAULT_SHOW_COUNT = 3;
+    // default shown items' count, now we display 5 items, the 2nd one is selected
+    private static final int DEFAULT_SHOW_COUNT = 5;
 
     // default items' horizontal padding, left padding and right padding are both 5dp,
     // only used in wrap_content mode

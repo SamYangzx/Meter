@@ -5,9 +5,13 @@
 
     <!--General padding begin-->
     <dimen name="general_title_textsize">20sp</dimen>
+    <dimen name="general_tv_textsize">20sp</dimen>
+
 
     <dimen name="general_padding">16dp</dimen>
     <dimen name="general_margin">16dp</dimen>
+    <dimen name="general_padding_horizontal">15dp</dimen>
+    <dimen name="general_padding_vertical">16dp</dimen>
     <dimen name="general_picker_height">120dp</dimen>
 
     <!--General padding end-->
@@ -19,7 +23,7 @@
 
 
     <!--general layout begin-->
-    <dimen name="general_layout_min_width">50dp</dimen>
+    <dimen name="general_layout_min_width">70dp</dimen>
 
     <!--general layout end-->
 
@@ -29,8 +33,8 @@
 
     <!--MeasureActivity begin-->
     <dimen name="measure_settings_layout_width">30dp</dimen>
-    <dimen name="measure_value_size">32sp</dimen>
-
+    <dimen name="measure_value_size">45sp</dimen>
+    <dimen name="measure_unit_size">45sp</dimen>
     <!--MeasureActivity end-->
 
 </resources>

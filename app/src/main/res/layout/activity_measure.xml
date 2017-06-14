@@ -15,24 +15,24 @@
     <!--<include layout="@layout/title_measure" />-->
 
     <!--<LinearLayout-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:gravity="center_vertical"-->
-        <!--android:orientation="horizontal">-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:gravity="center_vertical"-->
+    <!--android:orientation="horizontal">-->
 
-        <!--<TextView-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_margin="@dimen/general_padding"-->
-            <!--android:layout_weight="1"-->
-            <!--android:gravity="center_vertical"-->
-            <!--android:text="@string/measure_title" />-->
+    <!--<TextView-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_margin="@dimen/general_padding"-->
+    <!--android:layout_weight="1"-->
+    <!--android:gravity="center_vertical"-->
+    <!--android:text="@string/measure_title" />-->
 
-        <!--<Button-->
-            <!--android:layout_width="@dimen/general_button_hight"-->
-            <!--android:layout_height="@dimen/general_button_hight"-->
-            <!--android:background="@drawable/setting"-->
-            <!--android:onClick="onUISettingPressed" />-->
+    <!--<Button-->
+    <!--android:layout_width="@dimen/general_button_hight"-->
+    <!--android:layout_height="@dimen/general_button_hight"-->
+    <!--android:background="@drawable/setting"-->
+    <!--android:onClick="onUISettingPressed" />-->
     <!--</LinearLayout>-->
 
 
@@ -43,12 +43,12 @@
         android:orientation="horizontal">
 
         <TextView
+            android:id="@+id/textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:focusableInTouchMode="false"
             android:gravity="center_vertical|right"
-            android:hint="0"
             android:text="123.777"
             android:textSize="@dimen/measure_value_size" />
 
@@ -56,29 +56,27 @@
             android:id="@+id/unit_tv_measure"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:layout_marginRight="100dp" />
+            android:layout_gravity="center_vertical"
+            android:textSize="@dimen/measure_unit_size"
+            android:layout_marginRight="10dp" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
+        android:gravity="center_horizontal"
         android:layout_weight="1"
         android:orientation="horizontal"
-        android:paddingLeft="@dimen/general_padding"
-        android:paddingRight="@dimen/general_padding"
         android:paddingTop="80dp">
 
-        <LinearLayout style="@style/GeneralLayoutStyle">
+        <LinearLayout style="@style/GeneralVerticalLayoutStyle">
 
             <com.android.meter.meter.numberpicker.NumberPickerView
-                android:id="@+id/speed_picker"
+                android:id="@+id/measure_point_picker"
                 android:layout_width="wrap_content"
-                android:layout_height="@dimen/general_picker_height"
+                android:layout_height="wrap_content"
                 app:npv_ItemPaddingHorizontal="5dp"
                 app:npv_ItemPaddingVertical="5dp"
-                app:npv_ShowCount="3"
                 app:npv_TextSizeNormal="16sp"
                 app:npv_TextSizeSelected="20sp"
                 app:npv_WrapSelectorWheel="false" />
@@ -86,18 +84,18 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/measure_point" />
+                android:text="@string/measure_point"
+                android:textSize="@dimen/general_tv_textsize" />
         </LinearLayout>
 
-        <LinearLayout style="@style/GeneralLayoutStyle">
+        <LinearLayout style="@style/GeneralVerticalLayoutStyle">
 
             <com.android.meter.meter.numberpicker.NumberPickerView
                 android:id="@+id/load_picker"
                 android:layout_width="70dp"
-                android:layout_height="@dimen/general_picker_height"
+                android:layout_height="wrap_content"
                 app:npv_ItemPaddingHorizontal="5dp"
                 app:npv_ItemPaddingVertical="5dp"
-                app:npv_ShowCount="3"
                 app:npv_TextSizeNormal="16sp"
                 app:npv_TextSizeSelected="20sp"
                 app:npv_WrapSelectorWheel="false" />
@@ -105,18 +103,19 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/load" />
+                android:text="@string/load"
+
+                android:textSize="@dimen/general_tv_textsize" />
         </LinearLayout>
 
-        <LinearLayout style="@style/GeneralLayoutStyle">
+        <LinearLayout style="@style/GeneralVerticalLayoutStyle">
 
             <com.android.meter.meter.numberpicker.NumberPickerView
-                android:id="@+id/check_point_picker"
+                android:id="@+id/times_picker"
                 android:layout_width="wrap_content"
-                android:layout_height="@dimen/general_picker_height"
+                android:layout_height="wrap_content"
                 app:npv_ItemPaddingHorizontal="5dp"
                 app:npv_ItemPaddingVertical="5dp"
-                app:npv_ShowCount="3"
                 app:npv_TextSizeNormal="16sp"
                 app:npv_TextSizeSelected="20sp"
                 app:npv_WrapSelectorWheel="false" />
@@ -124,7 +123,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/check_point" />
+                android:text="@string/times"
+                android:textSize="@dimen/general_tv_textsize" />
         </LinearLayout>
 
     </LinearLayout>
