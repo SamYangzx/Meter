@@ -28,7 +28,7 @@ public class MeasureActivity extends Activity {
     public static final String EXTRA_STEP = "step";
     public static final String EXTRA_COUNT = "count";
 
-    private String[] mMeasurePointArray;
+    private String[] mLoadArray = new String[Constant.LINES_COUNT];
     private String[] mTimesArray;
     private Context mContext;
 
@@ -78,10 +78,10 @@ public class MeasureActivity extends Activity {
             }
         }, Constant.DELAY_REFRESH_TIME);
 
-        mTimesPicker.postDelayed(new Runnable() {
+        mLoadPicker.postDelayed(new Runnable() {
             @Override
             public void run() {
-                mTimesPicker.setPickedIndexRelativeToRaw(mTimesArray.length /2);
+                mLoadPicker.setPickedIndexRelativeToRaw(mLoadArray.length / 2);
             }
         }, Constant.DELAY_REFRESH_TIME);
 
@@ -105,6 +105,7 @@ public class MeasureActivity extends Activity {
         mTimesPicker.refreshByNewDisplayedValues(mTimesArray);
         mLoadPicker = (NumberPickerView) findViewById(R.id.load_picker);
         mLoadPicker.setIsDrawLine(true);
+        mLoadPicker.refreshByNewDisplayedValues(mLoadArray);
 
         mResetBtn = (Button) findViewById(R.id.reset_btn);
         mCenterBtn = (Button) findViewById(R.id.center_btn);
@@ -189,8 +190,8 @@ public class MeasureActivity extends Activity {
         builder.create().show();
     }
 
-    private String getFormatUnit(String unit){
-        return "(" + unit +")";
+    private String getFormatUnit(String unit) {
+        return "(" + unit + ")";
     }
 
 }

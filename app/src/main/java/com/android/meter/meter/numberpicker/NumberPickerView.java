@@ -21,6 +21,8 @@ import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
 
+import com.android.meter.meter.util.Constant;
+
 /**
  * Created by Carbs.Wang.
  * email : yeah0126@yeah.net
@@ -99,6 +101,9 @@ public class NumberPickerView extends View {
     private static final boolean DEFAULT_RESPOND_CHANGE_ON_DETACH = false;
     private static final boolean DEFAULT_RESPOND_CHANGE_IN_MAIN_THREAD = true;
 
+    private static final float NORMAL_PAINT_WIDTH = 2;
+    private static final float SELECT_PAINT_WIDTH = 5;
+
     private int mTextColorNormal = DEFAULT_TEXT_COLOR_NORMAL;
     private int mTextColorSelected = DEFAULT_TEXT_COLOR_SELECTED;
     private int mTextColorHint = DEFAULT_TEXT_COLOR_SELECTED;
@@ -171,6 +176,7 @@ public class NumberPickerView extends View {
     private VelocityTracker mVelocityTracker;
 
     private Paint mPaintDivider = new Paint();
+    private Paint mLinePaint = new Paint();
     private TextPaint mPaintText = new TextPaint();
     private Paint mPaintHint = new Paint();
 
@@ -1259,11 +1265,11 @@ public class NumberPickerView extends View {
         super.onDraw(canvas);
         //It is used to clear canvas, invode two line on top and bottom.
 //        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
-        if (mIsDrawLine) {
-            drawLinesContent(canvas);
-        } else {
-            drawContent(canvas);
-        }
+//        if (mIsDrawLine) {
+//        drawLinesContent(canvas);
+//        } else {
+        drawContent(canvas);
+//        }
         drawLine(canvas);
         drawHint(canvas);
     }
@@ -1279,9 +1285,9 @@ public class NumberPickerView extends View {
 //                dividerY0, mViewWidth - getPaddingRight() - mDividerMarginR, dividerY0, mPaintDivider);
 //        printD("left: " + mViewCenterX + " , y: " + dividerY0 + ", right: " + (mViewWidth - getPaddingRight() - mDividerMarginR) + " ,mViewHeight: " + mViewHeight);
         float halfHeight = mViewHeight / 2;
-        float diffHeight = (float) mViewHeight / (LINE_COUNT - 1);
+        float diffHeight = (float) mViewHeight / (Constant.LINES_COUNT - 1);
 //        printD("halfHeight: " + halfHeight + " ,diffHeight: " + diffHeight);
-        for (int i = 1; i < LINE_COUNT; i++) {
+        for (int i = 1; i < Constant.LINES_COUNT; i++) {
             float y = diffHeight * i;
             float xLength = getXLength(y - halfHeight);
 //            printD("i: " + i + " ,y: " + y + ", xLength: " + xLength);
@@ -1290,15 +1296,22 @@ public class NumberPickerView extends View {
         }
     }
 
-    private static final int X_LENGTH = 100;
-    private static final int Y_LENGTH = 200;
-    private static final int LINE_COUNT = 21;
+    private static final int Y_HALF_LENGTH = 400;
+//    private static final int LINE_COUNT = 21;
+
+    private float getXLengthByIndex(int count) {
+        if (count == 0 || Constant.LINES_COUNT == count + 1) {
+            return 10; //set a default lenght for 0.
+        }
+
+        float diffHeight = (float) Y_HALF_LENGTH *2 / (Constant.LINES_COUNT - 1);
+        float y = diffHeight * count;
+        float xLength = getXLength(y - Y_HALF_LENGTH);
+        return limitLinesY(xLength);
+    }
 
     private float getXLength(float y) {
-        float x = 0f;
-        if (mViewHeight != 0) {
-            x = (float) (Math.sqrt(1 - y * y / (mViewHeight * mViewHeight / 4)) * mViewCenterX);
-        }
+        float x = (float) (Math.sqrt(1 - y * y / (Y_HALF_LENGTH * Y_HALF_LENGTH )) * mViewCenterX);
         return x;
     }
 
@@ -1312,12 +1325,15 @@ public class NumberPickerView extends View {
         for (int i = 0; i < mShowCount + 1; i++) {
             float y = mCurrDrawFirstItemY + mItemHeight * i;
             index = getIndexByRawIndex(mCurrDrawFirstItemIndex + i, getOneRecycleSize(), mWrapSelectorWheel && mWrapSelectorWheelCheck);
+            printD("y: " + y + ", mCurrDrawFirstItemY: " + mCurrDrawFirstItemY + " , mItemHeight: " + mItemHeight);
+            printD("i: " + i + ", mShowCount: " + mShowCount + ", index: " + index);
             if (i == mShowCount / 2) {//this will be picked
                 fraction = (float) (mItemHeight + mCurrDrawFirstItemY) / mItemHeight;
                 textColor = getEvaluateColor(fraction, mTextColorNormal, mTextColorSelected);
                 textSize = getEvaluateSize(fraction, mTextSizeNormal, mTextSizeSelected);
                 textSizeCenterYOffset = getEvaluateSize(fraction, mTextSizeNormalCenterYOffset,
                         mTextSizeSelectedCenterYOffset);
+
             } else if (i == mShowCount / 2 + 1) {
                 textColor = getEvaluateColor(1 - fraction, mTextColorNormal, mTextColorSelected);
                 textSize = getEvaluateSize(1 - fraction, mTextSizeNormal, mTextSizeSelected);
@@ -1331,15 +1347,28 @@ public class NumberPickerView extends View {
             mPaintText.setColor(textColor);
             mPaintText.setTextSize(textSize);
 
-            if (0 <= index && index < getOneRecycleSize()) {
-                CharSequence str = mDisplayedValues[index + mMinShowIndex];
-                if (mTextEllipsize != null) {
-                    str = TextUtils.ellipsize(str, mPaintText, getWidth() - 2 * mItemPaddingHorizontal, getEllipsizeType());
+            if (mIsDrawLine) {
+                if (y+ mItemHeight / 2 > mViewHeight / 2 - mItemHeight / 2 && y+ mItemHeight / 2 < mViewHeight / 2 + mItemHeight / 2) {
+                    mLinePaint.setStrokeWidth(SELECT_PAINT_WIDTH);
+                } else {
+                    mLinePaint.setStrokeWidth(NORMAL_PAINT_WIDTH);
                 }
-                Log.d(TAG, "y: " + y + ", textSizeCenterYOffset: " + textSizeCenterYOffset);
-                Log.d(TAG, "drawContent.height: " + (y + mItemHeight / 2 + textSizeCenterYOffset));
-                canvas.drawText(str.toString(), mViewCenterX,
-                        y + mItemHeight / 2 + textSizeCenterYOffset, mPaintText);
+            }
+
+            printD("getOneRecycleSize: " + getOneRecycleSize());
+            if (0 <= index && index < getOneRecycleSize()) {
+                if (mIsDrawLine) {
+                    canvas.drawLine(mViewCenterX - getXLengthByIndex(index), y + mItemHeight / 2, mViewCenterX + getXLengthByIndex(index), y + mItemHeight / 2, mLinePaint);
+                } else {
+                    CharSequence str = mDisplayedValues[index + mMinShowIndex];
+                    if (mTextEllipsize != null) {
+                        str = TextUtils.ellipsize(str, mPaintText, getWidth() - 2 * mItemPaddingHorizontal, getEllipsizeType());
+                    }
+                    Log.d(TAG, "y: " + y + ", textSizeCenterYOffset: " + textSizeCenterYOffset);
+                    Log.d(TAG, "drawContent.height: " + (y + mItemHeight / 2 + textSizeCenterYOffset));
+                    canvas.drawText(str.toString(), mViewCenterX,
+                            y + mItemHeight / 2 + textSizeCenterYOffset, mPaintText);
+                }
             } else if (!TextUtils.isEmpty(mEmptyItemHint)) {
                 canvas.drawText(mEmptyItemHint, mViewCenterX,
                         y + mItemHeight / 2 + textSizeCenterYOffset, mPaintText);
