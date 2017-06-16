@@ -2,9 +2,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:orientation="horizontal"
     android:paddingLeft="@dimen/general_padding"
-    android:paddingRight="@dimen/general_padding"
-    android:orientation="horizontal">
+    android:paddingRight="@dimen/general_padding">
     <!--android:background="#4050B5"-->
 
 
@@ -15,8 +15,17 @@
         android:layout_gravity="center_vertical"
         android:layout_weight="1"
         android:gravity="center_vertical"
-    android:textSize="@dimen/general_title_textsize"
-        android:text="@string/measure_title" />
+        android:text="@string/measure_title"
+        android:textSize="@dimen/general_title_textsize" />
+
+    <TextView
+        android:id="@+id/bt_state_tv"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_weight="1"
+        android:gravity="center_vertical"
+        android:textSize="@dimen/general_title_textsize" />
 
     <ImageButton
         android:id="@+id/measure_title_ib"

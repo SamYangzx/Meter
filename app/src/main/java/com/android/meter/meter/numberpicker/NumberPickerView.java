@@ -1304,14 +1304,14 @@ public class NumberPickerView extends View {
             return 10; //set a default lenght for 0.
         }
 
-        float diffHeight = (float) Y_HALF_LENGTH *2 / (Constant.LINES_COUNT - 1);
+        float diffHeight = (float) Y_HALF_LENGTH * 2 / (Constant.LINES_COUNT - 1);
         float y = diffHeight * count;
         float xLength = getXLength(y - Y_HALF_LENGTH);
         return limitLinesY(xLength);
     }
 
     private float getXLength(float y) {
-        float x = (float) (Math.sqrt(1 - y * y / (Y_HALF_LENGTH * Y_HALF_LENGTH )) * mViewCenterX);
+        float x = (float) (Math.sqrt(1 - y * y / (Y_HALF_LENGTH * Y_HALF_LENGTH)) * mViewCenterX);
         return x;
     }
 
@@ -1348,7 +1348,7 @@ public class NumberPickerView extends View {
             mPaintText.setTextSize(textSize);
 
             if (mIsDrawLine) {
-                if (y+ mItemHeight / 2 > mViewHeight / 2 - mItemHeight / 2 && y+ mItemHeight / 2 < mViewHeight / 2 + mItemHeight / 2) {
+                if (y + mItemHeight / 2 > mViewHeight / 2 - mItemHeight / 2 && y + mItemHeight / 2 < mViewHeight / 2 + mItemHeight / 2) {
                     mLinePaint.setStrokeWidth(SELECT_PAINT_WIDTH);
                 } else {
                     mLinePaint.setStrokeWidth(NORMAL_PAINT_WIDTH);
@@ -1364,8 +1364,6 @@ public class NumberPickerView extends View {
                     if (mTextEllipsize != null) {
                         str = TextUtils.ellipsize(str, mPaintText, getWidth() - 2 * mItemPaddingHorizontal, getEllipsizeType());
                     }
-                    Log.d(TAG, "y: " + y + ", textSizeCenterYOffset: " + textSizeCenterYOffset);
-                    Log.d(TAG, "drawContent.height: " + (y + mItemHeight / 2 + textSizeCenterYOffset));
                     canvas.drawText(str.toString(), mViewCenterX,
                             y + mItemHeight / 2 + textSizeCenterYOffset, mPaintText);
                 }
@@ -1601,12 +1599,15 @@ public class NumberPickerView extends View {
     }
 
 
+    private static final boolean D = false;
+
     private void printD(String msg) {
-//        LogUtil.callStack(TAG, "calltrack");
-        if (mIsDrawLine) {
-            Log.d(TAG, "---" + msg);
-        } else {
-            Log.d(TAG, "++" + msg);
+        if (D) {
+            if (mIsDrawLine) {
+                Log.d(TAG, "---" + msg);
+            } else {
+                Log.d(TAG, "++" + msg);
+            }
         }
     }
 }

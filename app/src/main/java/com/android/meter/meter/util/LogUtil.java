@@ -8,6 +8,8 @@ import android.util.Log;
 
 public class LogUtil {
 
+    public static final String COMMON_TAG = "meter/";
+
     public static void callStack(String tag, String msg) {
         StringBuilder sb = new StringBuilder();
         sb.append(msg).append("\n").append(track());

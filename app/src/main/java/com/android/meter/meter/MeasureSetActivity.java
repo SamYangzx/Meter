@@ -2,12 +2,14 @@ package com.android.meter.meter;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.RequiresApi;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -20,13 +22,19 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.android.meter.meter.bluetooth.BluetoothHelper;
+import com.android.meter.meter.bluetooth.BtConstant;
+import com.android.meter.meter.bluetooth.DeviceListActivity;
 import com.android.meter.meter.numberpicker.NumberPickerView;
+import com.android.meter.meter.util.CommandUtil;
 import com.android.meter.meter.util.Constant;
 import com.android.meter.meter.util.LogUtil;
+import com.android.meter.meter.util.StringUtil;
 import com.android.meter.meter.util.ToastUtil;
 
 public class MeasureSetActivity extends Activity {
-    private static final String TAG = MeasureSetActivity.class.getSimpleName();
+    private static final String TAG = LogUtil.COMMON_TAG + MeasureSetActivity.class.getSimpleName();
+    private static final int REQUEST_CONNECT_DEVICE = 1;
 
     private final static String mUnitArrays[][] = {
             {"N", "kN", "cN", "mN", "kgf", "daN", "Lbf"},
@@ -66,9 +74,60 @@ public class MeasureSetActivity extends Activity {
     private String mSampleUnit;
     private float mStep;
     private int mCount;
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+//            Log.d(TAG, "msg: " + msg.what)
+
+            switch (msg.what) {
+                case BtConstant.MESSAGE_STATE_CHANGE:
+                    Log.i(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
+                    switch (msg.arg1) {
+                        case BluetoothHelper.STATE_CONNECTED:
+                            ToastUtil.showToast(mContext, " bluetooth connected");
+                            break;
+                        case BluetoothHelper.STATE_CONNECTING:
+//                            mTitle.setText(R.string.title_connecting);
+                            ToastUtil.showToast(mContext, R.string.title_connecting);
+
+                            break;
+                        case BluetoothHelper.STATE_LISTEN:
+                        case BluetoothHelper.STATE_NONE:
+//                            mTitle.setText(R.string.title_not_connected);
+                            ToastUtil.showToast(mContext, R.string.title_not_connected);
+                            break;
+                    }
+                    break;
+                case BtConstant.MESSAGE_WRITE:
+                    byte[] writeBuf = (byte[]) msg.obj;
+                    // construct a string from the buffer
+                    String writeMessage = new String(writeBuf);
+//                    mConversationArrayAdapter.add("Me:  " + writeMessage);
+                    ToastUtil.showToast(mContext, "sendString hex: " + writeMessage + " \n "+ StringUtil.hexDecode(writeMessage));
+                    break;
+                case BtConstant.MESSAGE_READ:
+                    byte[] readBuf = (byte[]) msg.obj;
+                    // construct a string from the valid bytes in the buffer
+                    String readMessage = new String(readBuf, 0, msg.arg1);
+//                    mConversationArrayAdapter.add(mConnectedDeviceName + ":  " + readMessage);
+                    ToastUtil.showToast(mContext, "Receive: " + readMessage );
+                    break;
+                case BtConstant.MESSAGE_DEVICE_NAME:
+                    // save the connected device's name
+//                    mConnectedDeviceName = msg.getData().getString(DEVICE_NAME);
+//                    Toast.makeText(getApplicationContext(), "Connected to "
+//                            + mConnectedDeviceName, Toast.LENGTH_SHORT).show();
+                    break;
+                case BtConstant.MESSAGE_TOAST:
+//                    Toast.makeText(getApplicationContext(), msg.getData().getString(TOAST),
+//                            Toast.LENGTH_SHORT).show();
+                    break;
+            }
+        }
+    };
 
     @RequiresApi(api = Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getActionBar() != null) {
             getActionBar().setDisplayShowHomeEnabled(false);
@@ -87,11 +146,7 @@ public class MeasureSetActivity extends Activity {
 
             }
         }, Constant.DELAY_REFRESH_TIME);
-    }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
     }
 
     @Override
@@ -107,7 +162,10 @@ public class MeasureSetActivity extends Activity {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.bluetooth_settings:
-                ToastUtil.showToast(mContext, R.string.bluetooth);
+//                ToastUtil.showToast(mContext, R.string.bluetooth);
+                Intent serverIntent = new Intent(mContext, DeviceListActivity.class);
+                startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE);
+
                 return true;
             case R.id.unit_settings:
                 getUnitDialog().show();
@@ -115,6 +173,13 @@ public class MeasureSetActivity extends Activity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        mHandler.removeCallbacksAndMessages(null);
+        mHandler = null;
+        super.onDestroy();
     }
 
     private void initData() {
@@ -125,6 +190,7 @@ public class MeasureSetActivity extends Activity {
         mStep = Float.parseFloat(mStepArray[0]);
         mCount = Integer.valueOf(mCountArray[0]);
 
+        BluetoothHelper.getBluetoothChatService(mContext).setmHandler(mHandler);
     }
 
     private void initView() {
@@ -133,6 +199,8 @@ public class MeasureSetActivity extends Activity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Log.d(TAG, "position: " + position + ", id: " + id);
+//                BluetoothHelper.getBluetoothChatService(mContext).sendHex(mUnitArrays[mUnitIndex][position]);
+                BluetoothHelper.getBluetoothChatService(mContext).sendString(CommandUtil.TEST_CMD);
             }
 
             @Override
@@ -145,6 +213,7 @@ public class MeasureSetActivity extends Activity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 mSampleUnit = mUnitArrays[mUnitIndex][position];
+                BluetoothHelper.getBluetoothChatService(mContext).sendHex(mUnitArrays[mUnitIndex][position]);
             }
 
             @Override
@@ -166,6 +235,8 @@ public class MeasureSetActivity extends Activity {
             public void onValueChange(NumberPickerView picker, int oldVal, int newVal) {
                 Log.d(TAG, "oldVal: " + oldVal + ", newVal: " + newVal + ", Value: " + mStepArray[newVal]);
                 mStep = Float.parseFloat(mStepArray[newVal]);
+//                BluetoothHelper.getBluetoothChatService(mContext).sendString(mStepArray[newVal] + " unit");
+
             }
         });
         mTapPicker.refreshByNewDisplayedValues(mTapArray);
@@ -184,6 +255,40 @@ public class MeasureSetActivity extends Activity {
         mEndBtn.setOnClickListener(mListener);
     }
 
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d(TAG, "onActivityResult " + resultCode);
+        switch (requestCode) {
+            case REQUEST_CONNECT_DEVICE:
+                // When DeviceListActivity returns with a device to connect
+                if (resultCode == Activity.RESULT_OK) {
+                    // Get the device MAC address
+                    String address = data.getExtras()
+                            .getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
+                    // Get the BLuetoothDevice object
+                    BluetoothDevice device = BluetoothHelper.getBluetoothChatService(mContext).getBluetoothAdapter().getRemoteDevice(address);
+                    // Attempt to connect to the device
+                    BluetoothHelper.getBluetoothChatService(mContext).connect(device);
+                }
+                break;
+//            case REQUEST_ENABLE_BT:
+//                // When the request to enable Bluetooth returns
+//                if (resultCode == Activity.RESULT_OK) {
+//                    // Bluetooth is now enabled, so set up a chat session
+//                    setupChat();
+//                } else {
+//                    // User did not enable Bluetooth or an error occured
+//                    Log.d(TAG, "BT not enabled");
+//                    Toast.makeText(this, R.string.bt_not_enabled_leaving, Toast.LENGTH_SHORT).show();
+//                    finish();
+//                }
+//                break;
+            default:
+                break;
+        }
+    }
+
+
     private View.OnClickListener mListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -192,7 +297,7 @@ public class MeasureSetActivity extends Activity {
                     Intent intent = new Intent();
                     intent.putExtra(MeasureActivity.EXTRA_MEASURE_UNIT, mSampleUnit);
                     intent.putExtra(MeasureActivity.EXTRA_STEP, mStep);
-                    Log.d(TAG, "send mStep: " + mStep);
+                    Log.d(TAG, "sendString mStep: " + mStep);
                     intent.putExtra(MeasureActivity.EXTRA_COUNT, mCount);
                     intent.setClass(mContext, MeasureActivity.class);
                     startActivity(intent);
@@ -233,4 +338,6 @@ public class MeasureSetActivity extends Activity {
         mSampleAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mSampleUnitSp.setAdapter(mSampleAdapter);
     }
+
+
 }

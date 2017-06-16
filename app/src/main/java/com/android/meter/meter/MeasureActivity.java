@@ -8,21 +8,26 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.RequiresApi;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.android.meter.meter.bluetooth.BluetoothHelper;
+import com.android.meter.meter.bluetooth.BtConstant;
 import com.android.meter.meter.numberpicker.NumberPickerView;
+import com.android.meter.meter.util.CommandUtil;
 import com.android.meter.meter.util.Constant;
+import com.android.meter.meter.util.LogUtil;
 import com.android.meter.meter.util.StringUtil;
 import com.android.meter.meter.util.ToastUtil;
 
 public class MeasureActivity extends Activity {
-    private static final String TAG = MeasureActivity.class.getSimpleName();
+    private static final String TAG = LogUtil.COMMON_TAG + MeasureActivity.class.getSimpleName();
 
     public static final String EXTRA_MEASURE_UNIT = "measure_unit";
     public static final String EXTRA_STEP = "step";
@@ -46,7 +51,62 @@ public class MeasureActivity extends Activity {
     private float mStep;
     private int mCount;
 
-    private Toolbar mToolbar;
+    private TextView mBtStateTv;
+    private TextView mSampleTv;
+
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+//            Log.d(TAG, "msg: " + msg.what)
+
+            switch (msg.what) {
+                case BtConstant.MESSAGE_STATE_CHANGE:
+                    Log.i(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
+                    switch (msg.arg1) {
+                        case BluetoothHelper.STATE_CONNECTED:
+//                            ToastUtil.showToast(mContext, "bluetooth connected");
+                            mBtStateTv.setText("Connected");
+                            break;
+                        case BluetoothHelper.STATE_CONNECTING:
+                            mBtStateTv.setText(R.string.title_connecting);
+//                            ToastUtil.showToast(mContext, R.string.title_connecting);
+                            break;
+                        case BluetoothHelper.STATE_LISTEN:
+                        case BluetoothHelper.STATE_NONE:
+                            mBtStateTv.setText(R.string.title_not_connected);
+//                            ToastUtil.showToast(mContext, R.string.title_not_connected);
+                            break;
+                    }
+                    break;
+                case BtConstant.MESSAGE_WRITE:
+                    byte[] writeBuf = (byte[]) msg.obj;
+                    // construct a string from the buffer
+                    String writeMessage = new String(writeBuf);
+//                    mConversationArrayAdapter.add("Me:  " + writeMessage);
+                    ToastUtil.showToast(mContext, "sendString: " + writeMessage);
+                    break;
+                case BtConstant.MESSAGE_READ:
+                    byte[] readBuf = (byte[]) msg.obj;
+                    // construct a string from the valid bytes in the buffer
+                    String readMessage = StringUtil.bytesToHexString(readBuf);
+                    mSampleTv.setText(readMessage);
+                    break;
+                case BtConstant.MESSAGE_DEVICE_NAME:
+                    // save the connected device's name
+//                    mConnectedDeviceName = msg.getData().getString(DEVICE_NAME);
+//                    Toast.makeText(getApplicationContext(), "Connected to "
+//                            + mConnectedDeviceName, Toast.LENGTH_SHORT).show();
+                    break;
+                case BtConstant.MESSAGE_TOAST:
+//                    Toast.makeText(getApplicationContext(), msg.getData().getString(TOAST),
+//                            Toast.LENGTH_SHORT).show();
+                    break;
+            }
+        }
+    };
+
+
+    private TextView mTitleTv;
 
     @SuppressLint("NewApi")
     @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
@@ -57,6 +117,8 @@ public class MeasureActivity extends Activity {
         getActionBar().setCustomView(R.layout.title_measure);
         getActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         View view = getActionBar().getCustomView();
+
+        mBtStateTv = (TextView) findViewById(R.id.bt_state_tv);
         ImageButton ib = (ImageButton) view.findViewById(R.id.measure_title_ib);
         ib.setOnClickListener(mListener);
 
@@ -70,6 +132,7 @@ public class MeasureActivity extends Activity {
         mCount = getIntent().getIntExtra(EXTRA_COUNT, 1);
         initData();
         initView();
+
 
         mMeasurePointPicker.postDelayed(new Runnable() {
             @Override
@@ -89,6 +152,8 @@ public class MeasureActivity extends Activity {
 
 
     private void initData() {
+        BluetoothHelper.getBluetoothChatService(mContext).setmHandler(mHandler);
+
 //        mMeasurePointArray = getResources().getStringArray(R.array.speed_array);
         //mTimesArray = getResources().getStringArray(R.array.check_array);
         mTimesArray = new String[mCount];
@@ -119,7 +184,7 @@ public class MeasureActivity extends Activity {
 //        mDownloadBtn.setOnClickListener(mListener);
         TextView unitTv = (TextView) findViewById(R.id.unit_tv_measure);
         unitTv.setText(getFormatUnit(mSampleUnit));
-
+        mSampleTv = (TextView) findViewById(R.id.measure_value_textView);
     }
 
     private View.OnClickListener mListener = new View.OnClickListener() {
@@ -131,7 +196,7 @@ public class MeasureActivity extends Activity {
                     dialog();
                     break;
                 case R.id.center_btn:
-                    ToastUtil.showToast(mContext, getStringById(R.string.center));
+                    BluetoothHelper.getBluetoothChatService(mContext).sendString(CommandUtil.TEST_CMD);
                     break;
                 case R.id.cancel_btn:
                     ToastUtil.showToast(mContext, getStringById(R.string.cancel));
@@ -172,7 +237,7 @@ public class MeasureActivity extends Activity {
     protected void dialog() {
         AlertDialog.Builder builder = new android.app.AlertDialog.Builder(mContext);
         builder.setMessage(R.string.reset_confirm);
-        builder.setTitle("Warn：");
+        builder.setTitle(R.string.warn);
         builder.setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
