@@ -81,15 +81,15 @@ public class MeasureActivity extends Activity {
                 case BtConstant.MESSAGE_WRITE:
                     byte[] writeBuf = (byte[]) msg.obj;
                     // construct a string from the buffer
-                    String writeMessage = new String(writeBuf);
+                    String writeMessage = StringUtil.bytes2HexString(writeBuf);
 //                    mConversationArrayAdapter.add("Me:  " + writeMessage);
                     ToastUtil.showToast(mContext, "sendString: " + writeMessage);
                     break;
                 case BtConstant.MESSAGE_READ:
                     byte[] readBuf = (byte[]) msg.obj;
-                    // construct a string from the valid bytes in the buffer
-                    String readMessage = StringUtil.bytesToHexString(readBuf);
-                    mSampleTv.setText(readMessage);
+                    String readMessage = StringUtil.bytes2HexString(readBuf);
+//                    mSampleTv.setText(readMessage);
+                    ToastUtil.showToast(mContext, "receice: " + readMessage);
                     break;
                 case BtConstant.MESSAGE_DEVICE_NAME:
                     // save the connected device's name
@@ -196,7 +196,7 @@ public class MeasureActivity extends Activity {
                     dialog();
                     break;
                 case R.id.center_btn:
-                    BluetoothHelper.getBluetoothChatService(mContext).sendString(CommandUtil.TEST_CMD);
+                    BluetoothHelper.getBluetoothChatService(mContext).sendHex(CommandUtil.TEST_HEX_CMD);
                     break;
                 case R.id.cancel_btn:
                     ToastUtil.showToast(mContext, getStringById(R.string.cancel));

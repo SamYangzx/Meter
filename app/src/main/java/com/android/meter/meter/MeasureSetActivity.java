@@ -1,5 +1,6 @@
 package com.android.meter.meter;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothDevice;
@@ -26,7 +27,6 @@ import com.android.meter.meter.bluetooth.BluetoothHelper;
 import com.android.meter.meter.bluetooth.BtConstant;
 import com.android.meter.meter.bluetooth.DeviceListActivity;
 import com.android.meter.meter.numberpicker.NumberPickerView;
-import com.android.meter.meter.util.CommandUtil;
 import com.android.meter.meter.util.Constant;
 import com.android.meter.meter.util.LogUtil;
 import com.android.meter.meter.util.StringUtil;
@@ -70,6 +70,8 @@ public class MeasureSetActivity extends Activity {
     private Spinner mSampleUnitSp;
     private ArrayAdapter<String> mSampleAdapter;
 
+    private ActionBar mActionBar;
+
     private int mUnitIndex = 0;
     private String mSampleUnit;
     private float mStep;
@@ -84,15 +86,18 @@ public class MeasureSetActivity extends Activity {
                     Log.i(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
                     switch (msg.arg1) {
                         case BluetoothHelper.STATE_CONNECTED:
-                            ToastUtil.showToast(mContext, " bluetooth connected");
+                            setTitles("connected");
+                            ToastUtil.showToast(mContext, "connected");
                             break;
                         case BluetoothHelper.STATE_CONNECTING:
 //                            mTitle.setText(R.string.title_connecting);
+                            setTitles(R.string.title_connecting);
                             ToastUtil.showToast(mContext, R.string.title_connecting);
 
                             break;
                         case BluetoothHelper.STATE_LISTEN:
                         case BluetoothHelper.STATE_NONE:
+                            setTitles(R.string.title_not_connected);
 //                            mTitle.setText(R.string.title_not_connected);
                             ToastUtil.showToast(mContext, R.string.title_not_connected);
                             break;
@@ -103,14 +108,12 @@ public class MeasureSetActivity extends Activity {
                     // construct a string from the buffer
                     String writeMessage = new String(writeBuf);
 //                    mConversationArrayAdapter.add("Me:  " + writeMessage);
-                    ToastUtil.showToast(mContext, "sendString hex: " + writeMessage + " \n "+ StringUtil.hexDecode(writeMessage));
+                    ToastUtil.showToast(mContext, "sendString : " + writeMessage);
                     break;
                 case BtConstant.MESSAGE_READ:
                     byte[] readBuf = (byte[]) msg.obj;
-                    // construct a string from the valid bytes in the buffer
-                    String readMessage = new String(readBuf, 0, msg.arg1);
-//                    mConversationArrayAdapter.add(mConnectedDeviceName + ":  " + readMessage);
-                    ToastUtil.showToast(mContext, "Receive: " + readMessage );
+                    String readMessage = StringUtil.bytes2HexString(readBuf);
+                    ToastUtil.showToast(mContext, "Receive: " + readMessage);
                     break;
                 case BtConstant.MESSAGE_DEVICE_NAME:
                     // save the connected device's name
@@ -132,6 +135,7 @@ public class MeasureSetActivity extends Activity {
         if (getActionBar() != null) {
             getActionBar().setDisplayShowHomeEnabled(false);
         }
+
         setContentView(R.layout.activity_measure_set);
         mContext = this;
         initData();
@@ -147,6 +151,24 @@ public class MeasureSetActivity extends Activity {
             }
         }, Constant.DELAY_REFRESH_TIME);
 
+    }
+
+    private void setTitles(int strId) {
+        if (mActionBar == null) {
+            mActionBar = getActionBar();
+        }
+        if (mActionBar != null) {
+            mActionBar.setTitle(getResources().getString(R.string.measure_title) + "/" + getResources().getString(strId));
+        }
+    }
+
+    private void setTitles(String str){
+        if (mActionBar == null) {
+            mActionBar = getActionBar();
+        }
+        if (mActionBar != null) {
+            mActionBar.setTitle(getResources().getString(R.string.measure_title) + "/" + str);
+        }
     }
 
     @Override
@@ -175,6 +197,12 @@ public class MeasureSetActivity extends Activity {
         }
     }
 
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+    }
+
     @Override
     protected void onDestroy() {
         mHandler.removeCallbacksAndMessages(null);
@@ -190,7 +218,12 @@ public class MeasureSetActivity extends Activity {
         mStep = Float.parseFloat(mStepArray[0]);
         mCount = Integer.valueOf(mCountArray[0]);
 
+        initBtStatus();
         BluetoothHelper.getBluetoothChatService(mContext).setmHandler(mHandler);
+    }
+
+    private void initBtStatus() {
+        setTitles(BluetoothHelper.getBluetoothChatService(mContext).getStateString());
     }
 
     private void initView() {
@@ -199,8 +232,8 @@ public class MeasureSetActivity extends Activity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Log.d(TAG, "position: " + position + ", id: " + id);
-//                BluetoothHelper.getBluetoothChatService(mContext).sendHex(mUnitArrays[mUnitIndex][position]);
-                BluetoothHelper.getBluetoothChatService(mContext).sendString(CommandUtil.TEST_CMD);
+                BluetoothHelper.getBluetoothChatService(mContext).sendHex(StringUtil.string2HexString(mUnitArrays[mUnitIndex][position]));
+//                BluetoothHelper.getBluetoothChatService(mContext).sendHex(CommandUtil.TEST_HEX_CMD);
             }
 
             @Override
@@ -213,7 +246,7 @@ public class MeasureSetActivity extends Activity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 mSampleUnit = mUnitArrays[mUnitIndex][position];
-                BluetoothHelper.getBluetoothChatService(mContext).sendHex(mUnitArrays[mUnitIndex][position]);
+                BluetoothHelper.getBluetoothChatService(mContext).sendHex(StringUtil.string2HexString(mUnitArrays[mUnitIndex][position]));
             }
 
             @Override
