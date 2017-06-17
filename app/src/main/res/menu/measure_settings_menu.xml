@@ -8,4 +8,8 @@
     <item
         android:id="@+id/unit_settings"
         android:title="@string/unit" />
+
+    <item
+        android:id="@+id/debug"
+        android:title="@string/debug" />
 </menu>

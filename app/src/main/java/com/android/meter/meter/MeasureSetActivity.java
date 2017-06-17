@@ -26,6 +26,7 @@ import android.widget.Toast;
 import com.android.meter.meter.bluetooth.BluetoothHelper;
 import com.android.meter.meter.bluetooth.BtConstant;
 import com.android.meter.meter.bluetooth.DeviceListActivity;
+import com.android.meter.meter.general_ui.CustomDialog;
 import com.android.meter.meter.numberpicker.NumberPickerView;
 import com.android.meter.meter.util.Constant;
 import com.android.meter.meter.util.LogUtil;
@@ -106,7 +107,7 @@ public class MeasureSetActivity extends Activity {
                 case BtConstant.MESSAGE_WRITE:
                     byte[] writeBuf = (byte[]) msg.obj;
                     // construct a string from the buffer
-                    String writeMessage = new String(writeBuf);
+                    String writeMessage = StringUtil.bytes2HexString(writeBuf);
 //                    mConversationArrayAdapter.add("Me:  " + writeMessage);
                     ToastUtil.showToast(mContext, "sendString : " + writeMessage);
                     break;
@@ -191,6 +192,23 @@ public class MeasureSetActivity extends Activity {
                 return true;
             case R.id.unit_settings:
                 getUnitDialog().show();
+                return true;
+
+            case R.id.debug:
+                final CustomDialog mDebugDialog = new CustomDialog(mContext);
+                mDebugDialog.setYesOnclickListener(new CustomDialog.onEnterclickListener() {
+                    @Override
+                    public void onYesClick() {
+                       BluetoothHelper.getBluetoothChatService(mContext).sendHex(mDebugDialog.getMessageStr());
+                    }
+                });
+                mDebugDialog.setNoOnclickListener(new CustomDialog.onCancelclickListener() {
+                    @Override
+                    public void onNoClick() {
+                        mDebugDialog.cancel();
+                    }
+                });
+                mDebugDialog.show();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

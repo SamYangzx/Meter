@@ -42,6 +42,7 @@
     <string name="title_connecting">连接中...</string>
     <string name="title_connected_to">连接到: </string>
     <string name="title_not_connected">无连接</string>
+    <string name="debug">调试</string>
 
     <!--  DeviceListActivity -->
     <string name="scanning">寻找设备...</string>
