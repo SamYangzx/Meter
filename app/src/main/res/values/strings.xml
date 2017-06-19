@@ -51,12 +51,13 @@
     <string name="none_found">没有发现设备</string>
     <string name="title_paired_devices">可以连接的设备</string>
     <string name="title_other_devices">其他</string>
-    <string name="button_scan">寻找设备</string>
+    <string name="discovery">寻找设备</string>
 
     <!-- Options Menu -->
     <string name="connect">连接一个设备</string>
     <string name="jianjie">关于</string>
     <string name="discoverable">打开可见</string>
+    <string name="cancel_discovery">停止扫描</string>
     <!--bluetooth end-->
 
     <string-array name="measure_unit_array">
