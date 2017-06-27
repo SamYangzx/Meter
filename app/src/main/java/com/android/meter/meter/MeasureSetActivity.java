@@ -8,10 +8,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.RequiresApi;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,8 +27,10 @@ import com.android.meter.meter.bluetooth.BluetoothHelper;
 import com.android.meter.meter.bluetooth.BtConstant;
 import com.android.meter.meter.bluetooth.DeviceListActivity;
 import com.android.meter.meter.general_ui.CustomDialog;
+import com.android.meter.meter.http.ClientConnector;
 import com.android.meter.meter.numberpicker.NumberPickerView;
 import com.android.meter.meter.util.Constant;
+import com.android.meter.meter.util.IMsgListener;
 import com.android.meter.meter.util.LogUtil;
 import com.android.meter.meter.util.StringUtil;
 import com.android.meter.meter.util.ToastUtil;
@@ -115,6 +117,7 @@ public class MeasureSetActivity extends Activity {
                     byte[] readBuf = (byte[]) msg.obj;
                     String readMessage = StringUtil.bytes2HexString(readBuf);
                     ToastUtil.showToast(mContext, "Receive: " + readMessage);
+
                     break;
                 case BtConstant.MESSAGE_DEVICE_NAME:
                     // save the connected device's name
@@ -163,7 +166,7 @@ public class MeasureSetActivity extends Activity {
         }
     }
 
-    private void setTitles(String str){
+    private void setTitles(String str) {
         if (mActionBar == null) {
             mActionBar = getActionBar();
         }
@@ -199,7 +202,8 @@ public class MeasureSetActivity extends Activity {
                 mDebugDialog.setYesOnclickListener(new CustomDialog.onEnterclickListener() {
                     @Override
                     public void onYesClick() {
-                       BluetoothHelper.getBluetoothChatService(mContext).sendHex(mDebugDialog.getMessageStr());
+                        BluetoothHelper.getBluetoothChatService(mContext).sendHex(mDebugDialog.getMessageStr());
+
                     }
                 });
                 mDebugDialog.setNoOnclickListener(new CustomDialog.onCancelclickListener() {
@@ -320,6 +324,7 @@ public class MeasureSetActivity extends Activity {
                     BluetoothDevice device = BluetoothHelper.getBluetoothChatService(mContext).getBluetoothAdapter().getRemoteDevice(address);
                     // Attempt to connect to the device
                     BluetoothHelper.getBluetoothChatService(mContext).connect(device);
+                    BluetoothHelper.getBluetoothChatService(mContext).setIMsgListener(mIMsgListener);
                 }
                 break;
 //            case REQUEST_ENABLE_BT:
@@ -355,6 +360,7 @@ public class MeasureSetActivity extends Activity {
                     break;
                 case R.id.end_btn:
                     Toast.makeText(mContext, "End check!!", Toast.LENGTH_SHORT).show();
+                    test();
                     break;
             }
         }
@@ -390,5 +396,32 @@ public class MeasureSetActivity extends Activity {
         mSampleUnitSp.setAdapter(mSampleAdapter);
     }
 
+    private boolean isContinue = true;
+    ClientConnector mClient;
+
+    private void test() {
+        mClient = new ClientConnector(ClientConnector.DEFAULT_SERVER, ClientConnector.DEFAULT_PORT);
+        mClient.start();
+
+    }
+
+    private void sendTest(String data) {
+        if (mClient != null && mClient.isConnected()) {
+            mClient.send(data);
+        }
+    }
+
+
+    private IMsgListener mIMsgListener = new IMsgListener() {
+        @Override
+        public void received(int state, final String msg) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    sendTest(msg);
+                }
+            }).start();
+        }
+    };
 
 }

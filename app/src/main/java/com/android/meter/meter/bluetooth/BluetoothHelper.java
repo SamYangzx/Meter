@@ -12,6 +12,8 @@ import android.os.SystemClock;
 import android.util.Log;
 
 import com.android.meter.meter.util.CommandUtil;
+import com.android.meter.meter.util.Constant;
+import com.android.meter.meter.util.IMsgListener;
 import com.android.meter.meter.util.LogUtil;
 import com.android.meter.meter.util.StringUtil;
 
@@ -38,6 +40,12 @@ public class BluetoothHelper {
     public static final int STATE_LISTEN = 1;
     public static final int STATE_CONNECTING = 2;
     public static final int STATE_CONNECTED = 3;
+
+    private IMsgListener mIMsgListener;
+
+    public void setIMsgListener(IMsgListener iMsgListener){
+        mIMsgListener = iMsgListener;
+    }
 
     private BluetoothHelper(Context context) {
         this(context, null);
@@ -439,8 +447,13 @@ public class BluetoothHelper {
                     }
                     byte[] wholeByte = CommandUtil.getWholeCmd(preByte, lengthByte, readbuff);
                     Log.d(TAG, "byteCount: " + byteCount + ", origin: " + StringUtil.bytes2HexString(wholeByte));
-                    mHandler.obtainMessage(BtConstant.MESSAGE_READ, wholeByte.length, -1, wholeByte)
-                            .sendToTarget();
+//                    mHandler.obtainMessage(BtConstant.MESSAGE_READ, wholeByte.length, -1, wholeByte)
+//                            .sendToTarget();
+                    if(mIMsgListener != null){
+                        Log.d(TAG, "thread: " + Thread.currentThread().getId());
+                        mIMsgListener.received(Constant.SEND_SUCCESS, StringUtil.bytes2HexString(wholeByte));
+                    }
+
                 } catch (IOException e) {
                     Log.e(TAG, "read exception: ", e);
                     connectionLost();

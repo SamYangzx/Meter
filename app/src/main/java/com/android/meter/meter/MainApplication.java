@@ -18,7 +18,7 @@ public class MainApplication extends Application {
         sApp = this;
     }
 
-    public static MainApplication getApp() {
+    public static MainApplication getContext() {
         return sApp;
     }
 
