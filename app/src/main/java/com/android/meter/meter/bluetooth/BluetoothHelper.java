@@ -12,7 +12,6 @@ import android.os.SystemClock;
 import android.util.Log;
 
 import com.android.meter.meter.util.CommandUtil;
-import com.android.meter.meter.util.Constant;
 import com.android.meter.meter.util.IMsgListener;
 import com.android.meter.meter.util.LogUtil;
 import com.android.meter.meter.util.StringUtil;
@@ -43,7 +42,7 @@ public class BluetoothHelper {
 
     private IMsgListener mIMsgListener;
 
-    public void setIMsgListener(IMsgListener iMsgListener){
+    public void setIMsgListener(IMsgListener iMsgListener) {
         mIMsgListener = iMsgListener;
     }
 
@@ -89,8 +88,8 @@ public class BluetoothHelper {
         mHandler.obtainMessage(BtConstant.MESSAGE_STATE_CHANGE, state, -1).sendToTarget();
     }
 
-    public String getStateString(){
-        switch (getState()){
+    public String getStateString() {
+        switch (getState()) {
             case STATE_NONE:
                 return "no device";
             case STATE_CONNECTING:
@@ -449,9 +448,9 @@ public class BluetoothHelper {
                     Log.d(TAG, "byteCount: " + byteCount + ", origin: " + StringUtil.bytes2HexString(wholeByte));
 //                    mHandler.obtainMessage(BtConstant.MESSAGE_READ, wholeByte.length, -1, wholeByte)
 //                            .sendToTarget();
-                    if(mIMsgListener != null){
+                    if (mIMsgListener != null) {
                         Log.d(TAG, "thread: " + Thread.currentThread().getId());
-                        mIMsgListener.received(Constant.SEND_SUCCESS, StringUtil.bytes2HexString(wholeByte));
+                        mIMsgListener.received(BtConstant.SEND_SUCCESS, StringUtil.bytes2HexString(wholeByte));
                     }
 
                 } catch (IOException e) {

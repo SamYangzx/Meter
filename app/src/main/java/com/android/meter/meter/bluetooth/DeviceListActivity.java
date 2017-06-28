@@ -57,6 +57,12 @@ public class DeviceListActivity extends Activity {
         mScanButton = (Button) findViewById(R.id.button_scan);
         mScanButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
+                if (!mBtAdapter.isEnabled()) {
+                    Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                    startActivity(enableIntent);
+                    return;
+                }
+
                 startOrCancelDiscovery();
             }
         });
@@ -78,19 +84,28 @@ public class DeviceListActivity extends Activity {
 
         // Register for broadcasts when a device is discovered
         IntentFilter filter = new IntentFilter();
+        filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
         filter.addAction(BluetoothDevice.ACTION_FOUND);
         filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
         this.registerReceiver(mReceiver, filter);
 
         // Get the local Bluetooth adapter
         mBtAdapter = BluetoothAdapter.getDefaultAdapter();
-
+        if (mBtAdapter.isEnabled()) {
+            getBondedDevices();
+        }
         // Get a set of currently paired devices
+
+    }
+
+
+    private void getBondedDevices() {
         Set<BluetoothDevice> pairedDevices = mBtAdapter.getBondedDevices();
 
         // If there are paired devices, add each one to the ArrayAdapter
         if (pairedDevices.size() > 0) {
             findViewById(R.id.title_paired_devices).setVisibility(View.VISIBLE);
+            mPairedDevicesArrayAdapter.clear();
             for (BluetoothDevice device : pairedDevices) {
                 mPairedDevicesArrayAdapter.add(device.getName() + "\n" + device.getAddress());
             }
@@ -99,6 +114,7 @@ public class DeviceListActivity extends Activity {
             mPairedDevicesArrayAdapter.add(noDevices);
         }
     }
+
 
     @Override
     protected void onDestroy() {
@@ -118,12 +134,6 @@ public class DeviceListActivity extends Activity {
      */
     private void startDiscovery() {
         if (D) Log.d(TAG, "startDiscovery()");
-        if (!mBtAdapter.isEnabled()) {
-            Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivity(enableIntent);
-            return;
-        }
-
         // Indicate scanning in the title
         setProgressBarIndeterminateVisibility(true);
         setTitle(R.string.scanning);
@@ -185,8 +195,16 @@ public class DeviceListActivity extends Activity {
             String action = intent.getAction();
             Log.d(TAG, "action: " + action);
 
-            // When discovery finds a device
-            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+            if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
+                int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE,BluetoothAdapter.STATE_OFF);
+                switch (state){
+                    case BluetoothAdapter.STATE_ON:
+                        Log.d(TAG, "enable bt");
+                        getBondedDevices();
+                        break;
+                }
+
+            } else if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 // Get the BluetoothDevice object from the Intent
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 Log.d(TAG, "device: " + device.getAddress() + ", name: " + device.getName());

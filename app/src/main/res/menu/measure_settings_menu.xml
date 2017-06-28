@@ -6,6 +6,10 @@
         android:title="@string/bluetooth" />
 
     <item
+        android:id="@+id/ip_settings"
+        android:title="@string/network" />
+
+    <item
         android:id="@+id/unit_settings"
         android:title="@string/unit" />
 

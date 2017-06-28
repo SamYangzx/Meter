@@ -27,7 +27,10 @@ import com.android.meter.meter.bluetooth.BluetoothHelper;
 import com.android.meter.meter.bluetooth.BtConstant;
 import com.android.meter.meter.bluetooth.DeviceListActivity;
 import com.android.meter.meter.general_ui.CustomDialog;
-import com.android.meter.meter.http.ClientConnector;
+import com.android.meter.meter.general_ui.NetworkDialog;
+import com.android.meter.meter.http.ClientControl;
+import com.android.meter.meter.http.HTTPConstant;
+import com.android.meter.meter.http.IHttpListener;
 import com.android.meter.meter.numberpicker.NumberPickerView;
 import com.android.meter.meter.util.Constant;
 import com.android.meter.meter.util.IMsgListener;
@@ -74,6 +77,8 @@ public class MeasureSetActivity extends Activity {
     private ArrayAdapter<String> mSampleAdapter;
 
     private ActionBar mActionBar;
+
+    private NetworkDialog mNetworkDialog;
 
     private int mUnitIndex = 0;
     private String mSampleUnit;
@@ -129,6 +134,19 @@ public class MeasureSetActivity extends Activity {
 //                    Toast.makeText(getApplicationContext(), msg.getData().getString(TOAST),
 //                            Toast.LENGTH_SHORT).show();
                     break;
+                case HTTPConstant.CONNECT_SUCCESS:
+                    ToastUtil.showToast(mContext, "connect success");
+                    mNetworkDialog.dismiss();
+                    break;
+                case HTTPConstant.CONNECT_FAIL:
+                    ToastUtil.showToast(mContext, "connect fail");
+                    break;
+                case HTTPConstant.SEND_FAIL:
+                    ToastUtil.showToast(mContext, "http send msg fail!!");
+                    break;
+                default:
+                    break;
+
             }
         }
     };
@@ -182,7 +200,6 @@ public class MeasureSetActivity extends Activity {
         return true;
     }
 
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
@@ -192,6 +209,24 @@ public class MeasureSetActivity extends Activity {
                 Intent serverIntent = new Intent(mContext, DeviceListActivity.class);
                 startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE);
 
+                return true;
+            case R.id.ip_settings:
+                if (mNetworkDialog == null) {
+                    mNetworkDialog = new NetworkDialog(mContext);
+                }
+                mNetworkDialog.setYesOnclickListener(new NetworkDialog.onEnterclickListener() {
+                    @Override
+                    public void onYesClick() {
+                        connectServer(mNetworkDialog.getServer(), mNetworkDialog.getIp());
+                    }
+                });
+                mNetworkDialog.setNoOnclickListener(new NetworkDialog.onCancelclickListener() {
+                    @Override
+                    public void onNoClick() {
+                        mNetworkDialog.cancel();
+                    }
+                });
+                mNetworkDialog.show();
                 return true;
             case R.id.unit_settings:
                 getUnitDialog().show();
@@ -324,7 +359,7 @@ public class MeasureSetActivity extends Activity {
                     BluetoothDevice device = BluetoothHelper.getBluetoothChatService(mContext).getBluetoothAdapter().getRemoteDevice(address);
                     // Attempt to connect to the device
                     BluetoothHelper.getBluetoothChatService(mContext).connect(device);
-                    BluetoothHelper.getBluetoothChatService(mContext).setIMsgListener(mIMsgListener);
+                    BluetoothHelper.getBluetoothChatService(mContext).setIMsgListener(mIBtMsgListener);
                 }
                 break;
 //            case REQUEST_ENABLE_BT:
@@ -397,30 +432,55 @@ public class MeasureSetActivity extends Activity {
     }
 
     private boolean isContinue = true;
-    ClientConnector mClient;
+    ClientControl mClient;
 
     private void test() {
-        mClient = new ClientConnector(ClientConnector.DEFAULT_SERVER, ClientConnector.DEFAULT_PORT);
-        mClient.start();
+        mClient = new ClientControl(HTTPConstant.DEFAULT_SERVER, HTTPConstant.DEFAULT_PORT, mHttpListener);
+    }
 
+    private void connectServer(String server, int ip) {
+        mClient = new ClientControl(server, ip, mHttpListener);
     }
 
     private void sendTest(String data) {
-        if (mClient != null && mClient.isConnected()) {
-            mClient.send(data);
-        }
+//        if (mClient != null && mClient.isConnected()) {
+        mClient.sendMsg(data);
+//        }
     }
 
 
-    private IMsgListener mIMsgListener = new IMsgListener() {
+    private IMsgListener mIBtMsgListener = new IMsgListener() {
         @Override
         public void received(int state, final String msg) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    sendTest(msg);
-                }
-            }).start();
+//            new Thread(new Runnable() {
+//                @Override
+//                public void run() {
+            sendTest(msg);
+//                }
+//            }).start();
+        }
+    };
+
+
+    private IHttpListener mHttpListener = new IHttpListener() {
+        @Override
+        public void onResult(int state, String data) {
+            switch (state) {
+                case HTTPConstant.CONNECT_SUCCESS:
+                    Log.d(TAG, "connect success");
+                    mHandler.sendEmptyMessage(HTTPConstant.CONNECT_SUCCESS);
+                    break;
+                case HTTPConstant.CONNECT_FAIL:
+                    mHandler.sendEmptyMessage(HTTPConstant.CONNECT_FAIL);
+                    Log.d(TAG, "connect fail");
+                    break;
+                case HTTPConstant.SEND_FAIL:
+                    mHandler.sendEmptyMessage(HTTPConstant.SEND_FAIL);
+                    break;
+                default:
+                    break;
+            }
+
         }
     };
 
