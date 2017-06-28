@@ -445,6 +445,7 @@ public class BluetoothHelper {
                         }
                     }
                     byte[] wholeByte = CommandUtil.getWholeCmd(preByte, lengthByte, readbuff);
+                    Log.d(TAG, "checksum" + CommandUtil.getChecksum(wholeByte));
                     Log.d(TAG, "byteCount: " + byteCount + ", origin: " + StringUtil.bytes2HexString(wholeByte));
 //                    mHandler.obtainMessage(BtConstant.MESSAGE_READ, wholeByte.length, -1, wholeByte)
 //                            .sendToTarget();
@@ -460,7 +461,6 @@ public class BluetoothHelper {
                 }
             }
         }
-
 
         public void write(byte[] buffer) {
             try {
