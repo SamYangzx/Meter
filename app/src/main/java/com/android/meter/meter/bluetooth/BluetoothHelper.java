@@ -430,7 +430,7 @@ public class BluetoothHelper {
                     }
                     byte[] lengthByte = new byte[1];
                     mmInStream.read(lengthByte);
-                    int messageLength = StringUtil.byte2int(lengthByte[0]) + 1;// it has a end code.
+                    int messageLength = StringUtil.byte2int(lengthByte[0]);// it has a end code.
                     int readCnt = 0;
                     byte[] readbuff = new byte[messageLength];
                     int remain = messageLength;
@@ -440,13 +440,15 @@ public class BluetoothHelper {
                                 - remain, remain);
                         remain = messageLength - readCnt;
                         //set 10ms as timeout.
-                        if (SystemClock.currentThreadTimeMillis() - curTime > 10) {
+                        if (SystemClock.currentThreadTimeMillis() - curTime > 10) {//invode wrong code cause blocking.
                             break;
                         }
                     }
-                    byte[] wholeByte = CommandUtil.getWholeCmd(preByte, lengthByte, readbuff);
-                    Log.d(TAG, "checksum" + CommandUtil.getChecksum(wholeByte));
-                    Log.d(TAG, "byteCount: " + byteCount + ", origin: " + StringUtil.bytes2HexString(wholeByte));
+                    byte[] endByte = new byte[1];
+                    mmInStream.read(endByte, 0, 1);
+                    byte[] wholeByte = CommandUtil.getWholeCmd(preByte, lengthByte, readbuff,endByte);
+                    Log.d(TAG, "checksum: " + CommandUtil.getChecksum(StringUtil.byteMerger(lengthByte, readbuff)) +" ,end: " + StringUtil.byte2int(endByte[0]));
+                    Log.d(TAG, "origin: " + StringUtil.bytes2HexString(wholeByte));
 //                    mHandler.obtainMessage(BtConstant.MESSAGE_READ, wholeByte.length, -1, wholeByte)
 //                            .sendToTarget();
                     if (mIMsgListener != null) {

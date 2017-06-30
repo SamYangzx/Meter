@@ -28,7 +28,7 @@ import com.android.meter.meter.bluetooth.BtConstant;
 import com.android.meter.meter.bluetooth.DeviceListActivity;
 import com.android.meter.meter.general_ui.CustomDialog;
 import com.android.meter.meter.general_ui.NetworkDialog;
-import com.android.meter.meter.http.ClientControl;
+import com.android.meter.meter.http.SocketControl;
 import com.android.meter.meter.http.HTTPConstant;
 import com.android.meter.meter.http.IHttpListener;
 import com.android.meter.meter.numberpicker.NumberPickerView;
@@ -218,6 +218,7 @@ public class MeasureSetActivity extends Activity {
                     @Override
                     public void onYesClick() {
                         connectServer(mNetworkDialog.getServer(), mNetworkDialog.getIp());
+
                     }
                 });
                 mNetworkDialog.setNoOnclickListener(new NetworkDialog.onCancelclickListener() {
@@ -432,20 +433,20 @@ public class MeasureSetActivity extends Activity {
     }
 
     private boolean isContinue = true;
-    ClientControl mClient;
+//    SocketControl mClient;
 
     private void test() {
-        mClient = new ClientControl(HTTPConstant.DEFAULT_SERVER, HTTPConstant.DEFAULT_PORT, mHttpListener);
+//        mClient = new SocketControl(HTTPConstant.DEFAULT_SERVER, HTTPConstant.DEFAULT_PORT, mHttpListener);
+        SocketControl.getInstance().sendMsg("send test");
     }
 
     private void connectServer(String server, int ip) {
-        mClient = new ClientControl(server, ip, mHttpListener);
+        SocketControl.getInstance().setListener(mHttpListener);
+        SocketControl.getInstance().connect(server, ip);
     }
 
     private void sendTest(String data) {
-//        if (mClient != null && mClient.isConnected()) {
-        mClient.sendMsg(data);
-//        }
+        SocketControl.getInstance().sendMsg(data);
     }
 
 

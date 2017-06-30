@@ -2,11 +2,7 @@ package com.android.meter.meter.util;
 
 import android.util.Log;
 
-import java.io.ByteArrayOutputStream;
-import java.math.BigDecimal;
 import java.text.NumberFormat;
-
-import static android.R.attr.src;
 
 /**
  * Created by fenghe on 2017/6/7.
@@ -156,6 +152,16 @@ public class StringUtil {
     }
 
     /*******String, byte ,hex transform end************************************************/
+
+    /********array merger***********************/
+    public static byte[] byteMerger(byte[] byte_1, byte[] byte_2) {
+        byte[] byte_3 = new byte[byte_1.length + byte_2.length];
+        System.arraycopy(byte_1, 0, byte_3, 0, byte_1.length);
+        System.arraycopy(byte_2, 0, byte_3, byte_1.length, byte_2.length);
+        return byte_3;
+    }
+
+    /*********************************************************/
 
 
 }

@@ -2,6 +2,8 @@
     <string name="app_name">仪表测量器</string>
     <!--measureSetActivity begin-->
     <string name="measure_title">计量器具显示采集器</string>
+    <string name="measure_title_measure">测量</string>
+    <string name="measure_title_calibrate">标定</string>
     <string name="bluetooth">蓝牙</string>
     <string name="network">网络</string>
     <string name="unit">单位</string>

@@ -19,6 +19,9 @@ import android.widget.TextView;
 
 import com.android.meter.meter.bluetooth.BluetoothHelper;
 import com.android.meter.meter.bluetooth.BtConstant;
+import com.android.meter.meter.http.HTTPConstant;
+import com.android.meter.meter.http.IHttpListener;
+import com.android.meter.meter.http.SocketControl;
 import com.android.meter.meter.numberpicker.NumberPickerView;
 import com.android.meter.meter.util.CommandUtil;
 import com.android.meter.meter.util.Constant;
@@ -32,6 +35,8 @@ public class MeasureActivity extends Activity {
     public static final String EXTRA_MEASURE_UNIT = "measure_unit";
     public static final String EXTRA_STEP = "step";
     public static final String EXTRA_COUNT = "count";
+    private static final int MEASURE_MODE = 0;
+    private static final int CALIBRATE_MODE = 1;
 
     private String[] mLoadArray = new String[Constant.LINES_COUNT];
     private String[] mTimesArray;
@@ -53,6 +58,8 @@ public class MeasureActivity extends Activity {
 
     private TextView mBtStateTv;
     private TextView mSampleTv;
+    private int mMode = MEASURE_MODE;
+    private boolean mFirstTime = true;
 
     private Handler mHandler = new Handler() {
         @Override
@@ -118,6 +125,7 @@ public class MeasureActivity extends Activity {
         getActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         View view = getActionBar().getCustomView();
 
+        mTitleTv = (TextView)findViewById(R.id.measure_title_tv);
         mBtStateTv = (TextView) findViewById(R.id.bt_state_tv);
         ImageButton ib = (ImageButton) view.findViewById(R.id.measure_title_ib);
         ib.setOnClickListener(mListener);
@@ -153,6 +161,7 @@ public class MeasureActivity extends Activity {
 
     private void initData() {
         BluetoothHelper.getBluetoothChatService(mContext).setmHandler(mHandler);
+        SocketControl.getInstance().setListener(mHttpListener);
 
 //        mMeasurePointArray = getResources().getStringArray(R.array.speed_array);
         //mTimesArray = getResources().getStringArray(R.array.check_array);
@@ -160,6 +169,7 @@ public class MeasureActivity extends Activity {
         for (int i = 0; i < mCount; i++) {
             mTimesArray[i] = String.valueOf(i + 1);
         }
+
     }
 
     private void initView() {
@@ -196,13 +206,15 @@ public class MeasureActivity extends Activity {
                     dialog();
                     break;
                 case R.id.center_btn:
-                    BluetoothHelper.getBluetoothChatService(mContext).sendHex(CommandUtil.TEST_HEX_CMD);
+//                    BluetoothHelper.getBluetoothChatService(mContext).sendHex(CommandUtil.TEST_HEX_CMD);
+                    SocketControl.getInstance().sendMsg(CommandUtil.TEST_HEX_CMD);
                     break;
                 case R.id.cancel_btn:
                     ToastUtil.showToast(mContext, getStringById(R.string.cancel));
                     break;
                 case R.id.measure_title_ib:
-                    ToastUtil.showToast(mContext, "change UI");
+//                    ToastUtil.showToast(mContext, "change UI");
+                    changeMode();
                     break;
 //                case R.id.upload_btn:
 //                    ToastUtil.showToast(mContext, "Up");
@@ -214,7 +226,18 @@ public class MeasureActivity extends Activity {
                     break;
             }
         }
+
     };
+
+    private void changeMode() {
+        if (MEASURE_MODE == mMode) {
+            mMode = CALIBRATE_MODE;
+            mTitleTv.setText(R.string.measure_title_calibrate);
+        } else {
+            mMode = MEASURE_MODE;
+            mTitleTv.setText(R.string.measure_title_measure);
+        }
+    }
 
     private String getStringById(int str) {
         return mContext.getResources().getString(str);
@@ -227,7 +250,7 @@ public class MeasureActivity extends Activity {
 //        if (mPreMagnification != magnification) {
         for (int i = 0; i <= 20; i++) {
             mStepArray[i] = StringUtil.getNumber(magnification * (i - 10));
-            Log.d(TAG, "i: " + mStepArray[i]);
+//            Log.d(TAG, "i: " + mStepArray[i]);
         }
 //        }
         return mStepArray;
@@ -258,5 +281,28 @@ public class MeasureActivity extends Activity {
     private String getFormatUnit(String unit) {
         return "(" + unit + ")";
     }
+
+
+    private IHttpListener mHttpListener = new IHttpListener() {
+        @Override
+        public void onResult(int state, String data) {
+            switch (state) {
+                case HTTPConstant.CONNECT_SUCCESS:
+                    Log.d(TAG, "connect success");
+                    mHandler.sendEmptyMessage(HTTPConstant.CONNECT_SUCCESS);
+                    break;
+                case HTTPConstant.CONNECT_FAIL:
+                    mHandler.sendEmptyMessage(HTTPConstant.CONNECT_FAIL);
+                    Log.d(TAG, "connect fail");
+                    break;
+                case HTTPConstant.SEND_FAIL:
+                    mHandler.sendEmptyMessage(HTTPConstant.SEND_FAIL);
+                    break;
+                default:
+                    break;
+            }
+
+        }
+    };
 
 }

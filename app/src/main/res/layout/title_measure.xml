@@ -15,7 +15,7 @@
         android:layout_gravity="center_vertical"
         android:layout_weight="1"
         android:gravity="center_vertical"
-        android:text="@string/measure_title"
+        android:text="@string/measure_title_measure"
         android:textSize="@dimen/general_title_textsize" />
 
     <TextView

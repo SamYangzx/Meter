@@ -37,18 +37,28 @@ public class CommandUtil {
         return result;
     }
 
-    public static byte[] getWholeCmd(byte[] pre, byte[] lenth, byte[] cmdBody) {
-        byte[] b = new byte[pre.length + lenth.length + cmdBody.length];
+    public static byte[] getWholeCmd(byte[] pre, byte[] cmdLength, byte[] cmdBody, byte[] endByte) {
+        byte[] b = new byte[pre.length + cmdLength.length + cmdBody.length +1];
         for (int i = 0; i < b.length; i++) {
             if (i < pre.length) {
                 b[i] = pre[i];
-            } else if (i < pre.length + lenth.length) {
-                b[i] = lenth[i - pre.length];
-            } else {
-                b[i] = cmdBody[i - pre.length - lenth.length];
+            } else if (i < pre.length + cmdLength.length) {
+                b[i] = cmdLength[i - pre.length];
+            } else if(i < pre.length + cmdLength.length + cmdBody.length){
+                b[i] = cmdBody[i - pre.length - cmdLength.length];
+            }else{
+                b[i] = endByte[i - pre.length - cmdLength.length -cmdBody.length];
             }
         }
         return b;
+    }
+
+    public static byte[] getCheckBytes(int cmdLength,  byte[] cmdBody){
+        if(cmdLength>1){
+//            byte[]  checkByte = new byte[];
+//            cmdBody.
+        }
+        return null;
     }
 
 

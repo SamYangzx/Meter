@@ -2,6 +2,8 @@ package com.android.meter.meter.http;
 
 import android.util.Log;
 
+import com.android.meter.meter.util.LogUtil;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -9,8 +11,8 @@ import java.net.Socket;
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class ClientMessageSender extends Thread {
-    private static final String TAG = ClientMessageSender.class.getSimpleName();
+public class SocketSender extends Thread {
+    private static final String TAG = LogUtil.COMMON_TAG + SocketSender.class.getSimpleName();
 
     private Socket mSocket;
     private boolean mContinue = true;
@@ -18,8 +20,8 @@ public class ClientMessageSender extends Thread {
     private IHttpListener mIHttpListener;
 
 
-    public ClientMessageSender(Socket socket, IHttpListener listener) {
-        this.mSocket = socket;
+    public SocketSender(Socket socket, IHttpListener listener) {
+        mSocket = socket;
         mIHttpListener = listener;
     }
 
@@ -40,7 +42,7 @@ public class ClientMessageSender extends Thread {
                         continue;
                     }
                     if (mSocket.isClosed()) {
-                        System.out.println("Socket已关闭，无法发送消息");
+                        System.out.println("Socket id closed!");
                         writer.close();
                         mSocket.close();
                         break;
@@ -54,6 +56,7 @@ public class ClientMessageSender extends Thread {
                     }
                 }
             } catch (IOException e) {
+                Log.d(TAG, "e: " + e);
                 mIHttpListener.onResult(HTTPConstant.SEND_FAIL, null);
                 if (writer != null) {
                     writer.close();
@@ -69,10 +72,11 @@ public class ClientMessageSender extends Thread {
     }
 
     public synchronized void sendMsg(String data) {
-        Log.d(TAG, "add data");
-        if (mSocket == null && mSocket.isConnected()) {
+        if (mSocket != null) {
+            Log.d(TAG, "add data");
             mMsgQueue.offer(data);
         } else {
+            Log.d(TAG, "add data failed.");
             mIHttpListener.onResult(HTTPConstant.SEND_FAIL, null);
         }
     }

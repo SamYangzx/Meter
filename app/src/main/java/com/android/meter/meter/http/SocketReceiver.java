@@ -1,15 +1,20 @@
 package com.android.meter.meter.http;
 
+import android.util.Log;
+
+import com.android.meter.meter.util.LogUtil;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.Socket;
 
-public class ClientMessageReceiver extends Thread {
+public class SocketReceiver extends Thread {
+    private static final String TAG = LogUtil.COMMON_TAG + SocketReceiver.class.getSimpleName();
 
     private Socket socket;
     private IHttpListener mIHttpListener;
 
-    public ClientMessageReceiver(Socket socket, IHttpListener listener) {
+    public SocketReceiver(Socket socket, IHttpListener listener) {
         this.socket = socket;
         mIHttpListener = listener;
     }
@@ -39,7 +44,7 @@ public class ClientMessageReceiver extends Thread {
                     socket.close();
                     break;
                 }
-                System.out.println("Receive: " + content + "\n");
+                Log.d(TAG, "Receive: " + content);
             }
             reader.close();
             socket.close();
