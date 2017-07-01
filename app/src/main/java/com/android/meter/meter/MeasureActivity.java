@@ -47,14 +47,19 @@ public class MeasureActivity extends Activity {
     private NumberPickerView mTimesPicker;
 
     private Button mResetBtn;
-    private Button mCenterBtn;
+    private Button mEnterBtn;
     private Button mCalcelBtn;
 //    private Button mUploadBtn;
 //    private Button mDownloadBtn;
 
+    private String mMeasureValueUnit;
     private String mSampleUnit;
+
+    private String mMeasurePointValue;
+    private String mMeasureValue;
     private float mStep;
-    private int mCount;
+    private int mTotalTimes;
+    private int mTimes;
 
     private TextView mBtStateTv;
     private TextView mSampleTv;
@@ -99,10 +104,6 @@ public class MeasureActivity extends Activity {
                     ToastUtil.showToast(mContext, "receice: " + readMessage);
                     break;
                 case BtConstant.MESSAGE_DEVICE_NAME:
-                    // save the connected device's name
-//                    mConnectedDeviceName = msg.getData().getString(DEVICE_NAME);
-//                    Toast.makeText(getApplicationContext(), "Connected to "
-//                            + mConnectedDeviceName, Toast.LENGTH_SHORT).show();
                     break;
                 case BtConstant.MESSAGE_TOAST:
 //                    Toast.makeText(getApplicationContext(), msg.getData().getString(TOAST),
@@ -125,19 +126,17 @@ public class MeasureActivity extends Activity {
         getActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         View view = getActionBar().getCustomView();
 
-        mTitleTv = (TextView)findViewById(R.id.measure_title_tv);
+        mTitleTv = (TextView) findViewById(R.id.measure_title_tv);
         mBtStateTv = (TextView) findViewById(R.id.bt_state_tv);
         ImageButton ib = (ImageButton) view.findViewById(R.id.measure_title_ib);
         ib.setOnClickListener(mListener);
-
         setContentView(R.layout.activity_measure);
-        //使用布局文件来定义标题栏
         mContext = this;
 
         mSampleUnit = getIntent().getStringExtra(EXTRA_MEASURE_UNIT);
+        mMeasureValueUnit = mSampleUnit;
         mStep = getIntent().getFloatExtra(EXTRA_STEP, 1);
-        Log.d(TAG, "onCreate.mStep: " + mStep);
-        mCount = getIntent().getIntExtra(EXTRA_COUNT, 1);
+        mTotalTimes = getIntent().getIntExtra(EXTRA_COUNT, 1);
         initData();
         initView();
 
@@ -165,8 +164,8 @@ public class MeasureActivity extends Activity {
 
 //        mMeasurePointArray = getResources().getStringArray(R.array.speed_array);
         //mTimesArray = getResources().getStringArray(R.array.check_array);
-        mTimesArray = new String[mCount];
-        for (int i = 0; i < mCount; i++) {
+        mTimesArray = new String[mTotalTimes];
+        for (int i = 0; i < mTotalTimes; i++) {
             mTimesArray[i] = String.valueOf(i + 1);
         }
 
@@ -175,6 +174,12 @@ public class MeasureActivity extends Activity {
     private void initView() {
         mMeasurePointPicker = (NumberPickerView) findViewById(R.id.measure_point_picker);
         mMeasurePointPicker.setHintText(mSampleUnit);
+        mMeasurePointPicker.setOnValueChangedListener(new NumberPickerView.OnValueChangeListener() {
+            @Override
+            public void onValueChange(NumberPickerView picker, int oldVal, int newVal) {
+
+            }
+        });
         mTimesPicker = (NumberPickerView) findViewById(R.id.times_picker);
         mMeasurePointPicker.refreshByNewDisplayedValues(getStepArray(mStep));
         mTimesPicker.refreshByNewDisplayedValues(mTimesArray);
@@ -183,10 +188,10 @@ public class MeasureActivity extends Activity {
         mLoadPicker.refreshByNewDisplayedValues(mLoadArray);
 
         mResetBtn = (Button) findViewById(R.id.reset_btn);
-        mCenterBtn = (Button) findViewById(R.id.center_btn);
+        mEnterBtn = (Button) findViewById(R.id.center_btn);
         mCalcelBtn = (Button) findViewById(R.id.cancel_btn);
         mResetBtn.setOnClickListener(mListener);
-        mCenterBtn.setOnClickListener(mListener);
+        mEnterBtn.setOnClickListener(mListener);
         mCalcelBtn.setOnClickListener(mListener);
 //        mUploadBtn = (Button) findViewById(R.id.upload_btn);
 //        mDownloadBtn = (Button) findViewById(R.id.download_btn);
@@ -207,7 +212,9 @@ public class MeasureActivity extends Activity {
                     break;
                 case R.id.center_btn:
 //                    BluetoothHelper.getBluetoothChatService(mContext).sendHex(CommandUtil.TEST_HEX_CMD);
-                    SocketControl.getInstance().sendMsg(CommandUtil.TEST_HEX_CMD);
+//                    SocketControl.getInstance().sendMsg(CommandUtil.TEST_HEX_CMD);
+                    sendMsg(null);
+                    mTimes ++;
                     break;
                 case R.id.cancel_btn:
                     ToastUtil.showToast(mContext, getStringById(R.string.cancel));
@@ -304,5 +311,27 @@ public class MeasureActivity extends Activity {
 
         }
     };
+
+
+    private void sendMsg(String msg) {
+        String hexCmd;
+        if (MEASURE_MODE == mMode) {
+            if (mFirstTime) {
+                hexCmd = CommandUtil.getUploadCmd(mSampleUnit);
+                SocketControl.getInstance().sendMsg(hexCmd);
+                hexCmd = CommandUtil.getUploadCmd(mMeasureValueUnit);
+                SocketControl.getInstance().sendMsg(hexCmd);
+                mFirstTime = false;
+            }
+            hexCmd = CommandUtil.getUploadCmd(mSampleTv.getText().toString());
+            SocketControl.getInstance().sendMsg(hexCmd);
+            hexCmd = CommandUtil.getUploadCmd(mMeasurePointValue);
+            SocketControl.getInstance().sendMsg(hexCmd);
+            hexCmd = CommandUtil.getUploadCmd(Integer.toString(mTimes));
+            SocketControl.getInstance().sendMsg(hexCmd);
+        }else{
+//            BluetoothHelper.getBluetoothChatService(mContext).sendHex();
+        }
+    }
 
 }

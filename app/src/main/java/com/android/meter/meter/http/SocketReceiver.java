@@ -34,16 +34,18 @@ public class SocketReceiver extends Thread {
                     break;
                 }
                 content = reader.readLine();
+                if(content == null || content ==""){
+                    continue;
+                }
                 if(mIHttpListener != null){
                     mIHttpListener.onResult(HTTPConstant.RECEIVE_MSG, content);
                 }
-
-                if (content.equals("bye")) {
-                    System.out.println("对方请求关闭连接,无法继续进行聊天");
-                    reader.close();
-                    socket.close();
-                    break;
-                }
+//                if (content.equals("bye")) {
+//                    System.out.println("对方请求关闭连接,无法继续进行聊天");
+//                    reader.close();
+//                    socket.close();
+//                    break;
+//                }
                 Log.d(TAG, "Receive: " + content);
             }
             reader.close();

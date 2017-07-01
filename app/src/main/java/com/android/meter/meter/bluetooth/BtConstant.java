@@ -12,6 +12,4 @@ public class BtConstant {
     public static final int MESSAGE_DEVICE_NAME = 4;
     public static final int MESSAGE_TOAST = 5;
 
-    public static final int SEND_SUCCESS= 0x11;
-
 }

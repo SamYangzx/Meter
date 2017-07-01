@@ -453,7 +453,7 @@ public class BluetoothHelper {
 //                            .sendToTarget();
                     if (mIMsgListener != null) {
                         Log.d(TAG, "thread: " + Thread.currentThread().getId());
-                        mIMsgListener.received(BtConstant.SEND_SUCCESS, StringUtil.bytes2HexString(wholeByte));
+                        mIMsgListener.received(BtConstant.MESSAGE_READ, StringUtil.bytes2HexString(wholeByte));
                     }
 
                 } catch (IOException e) {

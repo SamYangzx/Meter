@@ -5,6 +5,7 @@ import android.util.Log;
 import com.android.meter.meter.util.LogUtil;
 
 import java.io.BufferedWriter;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
@@ -28,8 +29,10 @@ public class SocketSender extends Thread {
     @Override
     public void run() {
         try {
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(mSocket.getOutputStream(), "UTF-8"));
+//            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(mSocket.getOutputStream(), "UTF-8"));
 //            BufferedReader inputReader = new BufferedReader(new InputStreamReader(System.in));
+            DataOutputStream writer = new DataOutputStream(mSocket.getOutputStream());
+//            os.write();
             try {
                 String msg;
                 while (mContinue) {
@@ -79,6 +82,10 @@ public class SocketSender extends Thread {
             Log.d(TAG, "add data failed.");
             mIHttpListener.onResult(HTTPConstant.SEND_FAIL, null);
         }
+    }
+
+    private void sendMsg(String data){
+        if()
     }
 
     public void setContinue(boolean conti) {

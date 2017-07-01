@@ -67,7 +67,7 @@ public class StringUtil {
      * ************************************************/
 
     /**
-     * 字节数组转16进制字符串
+     * 字节数组转16进制字符串. 0x58 --> "58"
      */
     public static String bytes2HexString(byte[] b) {
         String r = "";
@@ -115,7 +115,7 @@ public class StringUtil {
     }
 
     /**
-     * 字节数组转字符串
+     * 字节数组转字符串,ex: 0x58 -->"X"
      */
     public static String bytes2String(byte[] b) {
         String r = "";

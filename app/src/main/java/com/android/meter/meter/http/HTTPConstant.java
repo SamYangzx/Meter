@@ -14,4 +14,6 @@ public class HTTPConstant {
     public static final int CONNECT_FAIL = 0x104;
     public static final int RECEIVE_MSG = 0x105;
 
+    public static final boolean WRITE_HEX = true;
+
 }

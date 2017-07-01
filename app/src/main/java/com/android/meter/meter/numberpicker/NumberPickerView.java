@@ -188,6 +188,8 @@ public class NumberPickerView extends View {
     private Handler mHandlerInNewThread;
     private Handler mHandlerInMainThread;
 
+
+
     // compatible for NumberPicker
     public interface OnValueChangeListener {
         void onValueChange(NumberPickerView picker, int oldVal, int newVal);
