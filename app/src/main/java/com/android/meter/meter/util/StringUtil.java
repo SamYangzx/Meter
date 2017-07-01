@@ -128,7 +128,7 @@ public class StringUtil {
     }
 
     /**
-     * 字符串转字节数组
+     * 字符串转字节数组. "X" --> 0x58
      */
     public static byte[] string2Bytes(String s) {
         byte[] r = s.getBytes();

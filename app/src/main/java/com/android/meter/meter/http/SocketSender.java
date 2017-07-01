@@ -3,11 +3,10 @@ package com.android.meter.meter.http;
 import android.util.Log;
 
 import com.android.meter.meter.util.LogUtil;
+import com.android.meter.meter.util.StringUtil;
 
-import java.io.BufferedWriter;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -19,6 +18,7 @@ public class SocketSender extends Thread {
     private boolean mContinue = true;
     private Queue<String> mMsgQueue = new LinkedList<String>();
     private IHttpListener mIHttpListener;
+    private DataOutputStream mOutStream;
 
 
     public SocketSender(Socket socket, IHttpListener listener) {
@@ -29,9 +29,9 @@ public class SocketSender extends Thread {
     @Override
     public void run() {
         try {
-//            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(mSocket.getOutputStream(), "UTF-8"));
+//            BufferedWriter mOutStream = new BufferedWriter(new OutputStreamWriter(mSocket.getOutputStream(), "UTF-8"));
 //            BufferedReader inputReader = new BufferedReader(new InputStreamReader(System.in));
-            DataOutputStream writer = new DataOutputStream(mSocket.getOutputStream());
+            mOutStream = new DataOutputStream(mSocket.getOutputStream());
 //            os.write();
             try {
                 String msg;
@@ -46,13 +46,14 @@ public class SocketSender extends Thread {
                     }
                     if (mSocket.isClosed()) {
                         System.out.println("Socket id closed!");
-                        writer.close();
+                        mOutStream.close();
                         mSocket.close();
                         break;
                     }
-                    writer.write(msg);
-                    writer.newLine();
-                    writer.flush();
+//                    mOutStream.write(msg);
+//                    mOutStream.newLine();
+                    writeMsg(msg);
+                    mOutStream.flush();
                     Log.d(TAG, "send: " + msg);
                     if (mIHttpListener != null) {
                         mIHttpListener.onResult(HTTPConstant.SEND_SUCCESS, msg);
@@ -61,8 +62,8 @@ public class SocketSender extends Thread {
             } catch (IOException e) {
                 Log.d(TAG, "e: " + e);
                 mIHttpListener.onResult(HTTPConstant.SEND_FAIL, null);
-                if (writer != null) {
-                    writer.close();
+                if (mOutStream != null) {
+                    mOutStream.close();
                 }
                 if (mSocket != null) {
                     mSocket.close();
@@ -84,8 +85,12 @@ public class SocketSender extends Thread {
         }
     }
 
-    private void sendMsg(String data){
-        if()
+    private void writeMsg(String data) throws IOException {
+        if (HTTPConstant.WRITE_HEX) {
+            mOutStream.write(StringUtil.hexString2Bytes(data));
+        } else {
+            mOutStream.write(StringUtil.string2Bytes(data));
+        }
     }
 
     public void setContinue(boolean conti) {
