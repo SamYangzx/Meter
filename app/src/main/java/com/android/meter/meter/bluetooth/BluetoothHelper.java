@@ -449,12 +449,12 @@ public class BluetoothHelper {
                     byte[] wholeByte = CommandUtil.getWholeCmd(preByte, lengthByte, readbuff,endByte);
                     Log.d(TAG, "checksum: " + CommandUtil.getChecksum(StringUtil.byteMerger(lengthByte, readbuff)) +" ,end: " + StringUtil.byte2int(endByte[0]));
                     Log.d(TAG, "origin: " + StringUtil.bytes2HexString(wholeByte));
-//                    mHandler.obtainMessage(BtConstant.MESSAGE_READ, wholeByte.length, -1, wholeByte)
-//                            .sendToTarget();
-                    if (mIMsgListener != null) {
-                        Log.d(TAG, "thread: " + Thread.currentThread().getId());
-                        mIMsgListener.received(BtConstant.MESSAGE_READ, StringUtil.bytes2HexString(wholeByte));
-                    }
+                    mHandler.obtainMessage(BtConstant.MESSAGE_READ, wholeByte.length, -1, wholeByte)
+                            .sendToTarget();
+//                    if (mIMsgListener != null) {
+//                        Log.d(TAG, "thread: " + Thread.currentThread().getId());
+//                        mIMsgListener.received(BtConstant.MESSAGE_READ, StringUtil.bytes2HexString(wholeByte));
+//                    }
 
                 } catch (IOException e) {
                     Log.e(TAG, "read exception: ", e);

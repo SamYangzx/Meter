@@ -53,6 +53,7 @@ public class SocketSender extends Thread {
 //                    mOutStream.write(msg);
 //                    mOutStream.newLine();
                     writeMsg(msg);
+                    writeMsg(HTTPConstant.HEX_END);
                     mOutStream.flush();
                     Log.d(TAG, "send: " + msg);
                     if (mIHttpListener != null) {

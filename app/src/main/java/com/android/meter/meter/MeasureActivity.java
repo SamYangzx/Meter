@@ -330,7 +330,7 @@ public class MeasureActivity extends Activity {
             hexCmd = CommandUtil.getUploadCmd(Integer.toString(mTimes));
             SocketControl.getInstance().sendMsg(hexCmd);
         }else{
-//            BluetoothHelper.getBluetoothChatService(mContext).sendHex();
+            BluetoothHelper.getBluetoothChatService(mContext).sendHex(CommandUtil.TEST_HEX_CMD);
         }
     }
 
