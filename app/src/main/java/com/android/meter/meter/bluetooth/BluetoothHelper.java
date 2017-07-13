@@ -452,6 +452,7 @@ public class BluetoothHelper {
                     Log.d(TAG, "origin: " + StringUtil.bytes2HexString(wholeByte));
                     mHandler.obtainMessage(BtConstant.MESSAGE_READ, wholeByte.length, -1, wholeByte)
                             .sendToTarget();
+
                     if (mIMsgListener != null) {
 //                        Log.d(TAG, "thread: " + Thread.currentThread().getId());
                         mIMsgListener.received(BtConstant.MESSAGE_READ, StringUtil.bytes2HexString(wholeByte));

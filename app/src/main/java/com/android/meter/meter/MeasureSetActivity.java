@@ -457,6 +457,7 @@ public class MeasureSetActivity extends Activity {
     }
 
 
+    /*****This is for test**/
     private IMsgListener mIBtMsgListener = new IMsgListener() {
         @Override
         public void received(int state, final String msg) {

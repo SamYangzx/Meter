@@ -15,5 +15,7 @@ public class HTTPConstant {
     public static final int RECEIVE_MSG = 0x105;
 
     public static final boolean WRITE_HEX = true;
+    public static final String HEX_END = "0D0A";
+
 
 }
