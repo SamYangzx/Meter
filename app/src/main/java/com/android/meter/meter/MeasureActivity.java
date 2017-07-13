@@ -29,6 +29,8 @@ import com.android.meter.meter.util.LogUtil;
 import com.android.meter.meter.util.StringUtil;
 import com.android.meter.meter.util.ToastUtil;
 
+import static com.android.meter.meter.util.CommandUtil.UPLOCD_CMD_CODE;
+
 public class MeasureActivity extends Activity {
     private static final String TAG = LogUtil.COMMON_TAG + MeasureActivity.class.getSimpleName();
 
@@ -63,6 +65,7 @@ public class MeasureActivity extends Activity {
 
     private TextView mBtStateTv;
     private TextView mSampleTv;
+    private TextView mUnitTv;
     private int mMode = MEASURE_MODE;
     private boolean mFirstTime = true;
 
@@ -102,12 +105,19 @@ public class MeasureActivity extends Activity {
                     String readMessage = StringUtil.bytes2HexString(readBuf);
 //                    mSampleTv.setText(readMessage);
                     ToastUtil.showToast(mContext, "receice: " + readMessage);
+                    handlerCmd(readMessage);
                     break;
                 case BtConstant.MESSAGE_DEVICE_NAME:
                     break;
                 case BtConstant.MESSAGE_TOAST:
 //                    Toast.makeText(getApplicationContext(), msg.getData().getString(TOAST),
 //                            Toast.LENGTH_SHORT).show();
+                    break;
+                case HTTPConstant.RECEIVE_MSG:
+                    String data = (String) msg.obj;
+                    handlerCmd(data);
+                    break;
+                default:
                     break;
             }
         }
@@ -197,8 +207,8 @@ public class MeasureActivity extends Activity {
 //        mDownloadBtn = (Button) findViewById(R.id.download_btn);
 //        mUploadBtn.setOnClickListener(mListener);
 //        mDownloadBtn.setOnClickListener(mListener);
-        TextView unitTv = (TextView) findViewById(R.id.unit_tv_measure);
-        unitTv.setText(getFormatUnit(mSampleUnit));
+        mUnitTv = (TextView) findViewById(R.id.unit_tv_measure);
+        mUnitTv.setText(getFormatUnit(mSampleUnit));
         mSampleTv = (TextView) findViewById(R.id.measure_value_textView);
     }
 
@@ -214,7 +224,7 @@ public class MeasureActivity extends Activity {
 //                    BluetoothHelper.getBluetoothChatService(mContext).sendHex(CommandUtil.TEST_HEX_CMD);
 //                    SocketControl.getInstance().sendMsg(CommandUtil.TEST_HEX_CMD);
                     sendMsg(null);
-                    mTimes ++;
+                    mTimes++;
                     break;
                 case R.id.cancel_btn:
                     ToastUtil.showToast(mContext, getStringById(R.string.cancel));
@@ -274,6 +284,7 @@ public class MeasureActivity extends Activity {
                 dialog.dismiss();
                 ToastUtil.showToast(mContext, R.string.reset);
 //                MeasureActivity.this.finish();
+                sendMsg(CommandUtil.RESET_CMD_CODE);
             }
         });
         builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -305,6 +316,12 @@ public class MeasureActivity extends Activity {
                 case HTTPConstant.SEND_FAIL:
                     mHandler.sendEmptyMessage(HTTPConstant.SEND_FAIL);
                     break;
+                case HTTPConstant.RECEIVE_MSG:
+                    Message msg = new Message();
+                    msg.arg1 = HTTPConstant.RECEIVE_MSG;
+                    msg.obj = data;
+                    mHandler.sendMessage(msg);
+                    break;
                 default:
                     break;
             }
@@ -329,9 +346,33 @@ public class MeasureActivity extends Activity {
             SocketControl.getInstance().sendMsg(hexCmd);
             hexCmd = CommandUtil.getUploadCmd(Integer.toString(mTimes));
             SocketControl.getInstance().sendMsg(hexCmd);
-        }else{
+        } else {
 //            BluetoothHelper.getBluetoothChatService(mContext).sendHex();
         }
     }
 
+
+    public void handlerCmd(String hexCmd) {
+        Log.d(TAG, "handlerCmd: "+ hexCmd);
+        byte[] length = StringUtil.hexString2Bytes(hexCmd.substring(2, 4));
+        int cmdLength = StringUtil.bytes2int(length);
+        String cmdType = hexCmd.substring(4, 6);
+        String content = "";
+        if (6 + cmdLength *2 <= hexCmd.length()) {
+            content = hexCmd.substring(6, 6 + cmdLength *2);
+        }else{
+            ToastUtil.showToast(mContext, "cmd lenght is error!");
+        }
+        Log.d(TAG, "cmdLength: " + cmdLength + " ,cmdType: " + cmdType + " , content: " + content);
+        switch (cmdType) {
+            case UPLOCD_CMD_CODE:
+                //TODO replease it after separation is OK.
+                String sampleValue = content.substring(18,36);
+                mSampleTv.setText(StringUtil.hex2String(sampleValue));
+                mUnitTv.setVisibility(View.GONE);
+                break;
+            default:
+                break;
+        }
+    }
 }
