@@ -1,5 +1,6 @@
 package com.android.meter.meter.util;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import java.text.NumberFormat;
@@ -100,6 +101,7 @@ public class StringUtil {
         if ((hex == null) || (hex.equals(""))) {
             return null;
         } else if (hex.length() % 2 != 0) {
+            Log.d(TAG , "hex.length is error number: " + hex.length());
             return null;
         } else {
             hex = hex.toUpperCase();
@@ -139,7 +141,11 @@ public class StringUtil {
      * 16进制字符串转字符串
      */
     public static String hex2String(String hex) {
+        if(TextUtils.isEmpty(hex)){
+            return "";
+        }
         String r = bytes2String(hexString2Bytes(hex));
+        Log.d(TAG, "hex2String generate string: "+r);
         return r;
     }
 

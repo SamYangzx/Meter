@@ -21,17 +21,17 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import com.android.meter.meter.bluetooth.BluetoothHelper;
 import com.android.meter.meter.bluetooth.BtConstant;
 import com.android.meter.meter.bluetooth.DeviceListActivity;
 import com.android.meter.meter.general_ui.CustomDialog;
 import com.android.meter.meter.general_ui.NetworkDialog;
-import com.android.meter.meter.http.SocketControl;
 import com.android.meter.meter.http.HTTPConstant;
 import com.android.meter.meter.http.IHttpListener;
+import com.android.meter.meter.http.SocketControl;
 import com.android.meter.meter.numberpicker.NumberPickerView;
+import com.android.meter.meter.util.CommandUtil;
 import com.android.meter.meter.util.Constant;
 import com.android.meter.meter.util.IMsgListener;
 import com.android.meter.meter.util.LogUtil;
@@ -263,6 +263,9 @@ public class MeasureSetActivity extends Activity {
 
     @Override
     protected void onDestroy() {
+        BluetoothHelper.getBluetoothChatService(mContext).setmHandler(null);
+        BluetoothHelper.getBluetoothChatService(mContext).setIMsgListener(null);
+        SocketControl.getInstance().setListener(null);
         mHandler.removeCallbacksAndMessages(null);
         mHandler = null;
         super.onDestroy();
@@ -386,6 +389,8 @@ public class MeasureSetActivity extends Activity {
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.start_btn:
+                    BluetoothHelper.getBluetoothChatService(mContext).sendHex(CommandUtil.getStartCmd());
+
                     Intent intent = new Intent();
                     intent.putExtra(MeasureActivity.EXTRA_MEASURE_UNIT, mSampleUnit);
                     intent.putExtra(MeasureActivity.EXTRA_STEP, mStep);
@@ -395,8 +400,10 @@ public class MeasureSetActivity extends Activity {
                     startActivity(intent);
                     break;
                 case R.id.end_btn:
-                    Toast.makeText(mContext, "End check!!", Toast.LENGTH_SHORT).show();
-                    test();
+                    BluetoothHelper.getBluetoothChatService(mContext).sendHex(CommandUtil.getStopCmd());
+//                    Toast.makeText(mContext, "End check!!", Toast.LENGTH_SHORT).show();
+                    break;
+                default:
                     break;
             }
         }
@@ -454,12 +461,7 @@ public class MeasureSetActivity extends Activity {
     private IMsgListener mIBtMsgListener = new IMsgListener() {
         @Override
         public void received(int state, final String msg) {
-//            new Thread(new Runnable() {
-//                @Override
-//                public void run() {
             sendTest(msg);
-//                }
-//            }).start();
         }
     };
 

@@ -12,6 +12,8 @@ public class CommandUtil {
     private static final String TAG = LogUtil.COMMON_TAG + CommandUtil.class.getSimpleName();
 
     public static final String PRE_CODE = "BB";
+    public static final String RECEIVE_PRE_CODE = "AA";
+
     public static final String END_CODE = "CC";
     /********* cmdCode begin*********************/
     public static final String RESET_CMD_CODE = "E0";
@@ -113,8 +115,12 @@ public class CommandUtil {
     }
 
 
-    public static String getStartStopCmd() {
-        return getCmdHex(PRE_CODE, START_STOP_CMD_CODE, null);
+    public static String getStartCmd() {
+        return getCmdHex(PRE_CODE, START_STOP_CMD_CODE, "00");
+    }
+
+    public static String getStopCmd() {
+        return getCmdHex(PRE_CODE, START_STOP_CMD_CODE, "01");
     }
 
 }

@@ -5,7 +5,7 @@ package com.android.meter.meter.http;
  */
 
 public class HTTPConstant {
-    public static final String DEFAULT_SERVER = "192.168.1.153";
+    public static final String DEFAULT_SERVER = "192.168.1.160";
     public static final int DEFAULT_PORT = 2345;
 
     public static final int SEND_SUCCESS = 0x101;

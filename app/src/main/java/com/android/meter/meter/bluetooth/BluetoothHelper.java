@@ -425,7 +425,8 @@ public class BluetoothHelper {
             while (true) {
                 try {
                     byteCount = mmInStream.read(preByte);
-                    if (!(byteCount == 1 && CommandUtil.PRE_CODE.equals(StringUtil.bytes2HexString(preByte)))) {
+                    Log.d(TAG, "receive origin head: " + StringUtil.bytes2HexString(preByte));
+                    if (!(byteCount == 1 && CommandUtil.RECEIVE_PRE_CODE.equals(StringUtil.bytes2HexString(preByte)))) {
                         continue;
                     }
                     byte[] lengthByte = new byte[1];
@@ -451,10 +452,11 @@ public class BluetoothHelper {
                     Log.d(TAG, "origin: " + StringUtil.bytes2HexString(wholeByte));
                     mHandler.obtainMessage(BtConstant.MESSAGE_READ, wholeByte.length, -1, wholeByte)
                             .sendToTarget();
-//                    if (mIMsgListener != null) {
+
+                    if (mIMsgListener != null) {
 //                        Log.d(TAG, "thread: " + Thread.currentThread().getId());
-//                        mIMsgListener.received(BtConstant.MESSAGE_READ, StringUtil.bytes2HexString(wholeByte));
-//                    }
+                        mIMsgListener.received(BtConstant.MESSAGE_READ, StringUtil.bytes2HexString(wholeByte));
+                    }
 
                 } catch (IOException e) {
                     Log.e(TAG, "read exception: ", e);
