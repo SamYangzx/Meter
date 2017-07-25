@@ -10,7 +10,7 @@ public class SocketControl {
     private static final String TAG = SocketControl.class.getSimpleName();
 
     private static final int CONNECT_TIMEOUT = 5 * 1000;
-    private static final int READ_TIMEOUT = 7 * 1000;
+    private static final int READ_TIMEOUT = 2 * 1000;
 
     private Socket mSocket;
     private SocketSender mSendThread;
@@ -61,7 +61,7 @@ public class SocketControl {
                     mSocket = new Socket();
                     mSocket.connect(new InetSocketAddress(server, port),
                             CONNECT_TIMEOUT);
-//                    mSocket.setSoTimeout(READ_TIMEOUT);
+                    mSocket.setSoTimeout(READ_TIMEOUT);
                     if (mIHttpListener != null) {
                         mIHttpListener.onResult(HTTPConstant.CONNECT_SUCCESS, null);
                     }

@@ -400,8 +400,9 @@ public class MeasureSetActivity extends Activity {
                     startActivity(intent);
                     break;
                 case R.id.end_btn:
-                    BluetoothHelper.getBluetoothChatService(mContext).sendHex(CommandUtil.getStopCmd());
+//                    BluetoothHelper.getBluetoothChatService(mContext).sendHex(CommandUtil.getStopCmd());
 //                    Toast.makeText(mContext, "End check!!", Toast.LENGTH_SHORT).show();
+                    test();
                     break;
                 default:
                     break;
@@ -444,7 +445,7 @@ public class MeasureSetActivity extends Activity {
 
     private void test() {
 //        mClient = new SocketControl(HTTPConstant.DEFAULT_SERVER, HTTPConstant.DEFAULT_PORT, mHttpListener);
-        SocketControl.getInstance().sendMsg("send test");
+        SocketControl.getInstance().sendMsg("AA12E4016368616E656C3120303030302E304EBBCC");
     }
 
     private void connectServer(String server, int ip) {

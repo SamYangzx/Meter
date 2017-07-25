@@ -37,8 +37,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:hint="192.168.1.153" />
+            android:layout_marginRight="20dp"/>
     </LinearLayout>
 
 
@@ -64,8 +63,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:hint="2345" />
+            android:layout_marginRight="20dp" />
     </LinearLayout>
 
 

@@ -3,6 +3,7 @@ package com.android.meter.meter.http;
 import android.util.Log;
 
 import com.android.meter.meter.util.LogUtil;
+import com.android.meter.meter.util.StringUtil;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -37,6 +38,7 @@ public class SocketReceiver extends Thread {
                 if(content == null || content ==""){
                     continue;
                 }
+                Log.d(TAG, "Receive: " + StringUtil.hex2String(content));
                 if(mIHttpListener != null){
                     mIHttpListener.onResult(HTTPConstant.RECEIVE_MSG, content);
                 }
@@ -46,7 +48,6 @@ public class SocketReceiver extends Thread {
 //                    socket.close();
 //                    break;
 //                }
-                Log.d(TAG, "Receive: " + content);
             }
             reader.close();
             socket.close();

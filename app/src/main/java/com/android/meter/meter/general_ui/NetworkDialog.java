@@ -151,8 +151,10 @@ public class NetworkDialog extends Dialog {
         no = (Button) findViewById(R.id.no);
         mServerTv = (TextView) findViewById(R.id.server_toast);
         mServerEt = (EditText) findViewById(R.id.server_et);
+        mServerEt.setHint(HTTPConstant.DEFAULT_SERVER);
         mPortTv = (TextView) findViewById(R.id.port_toast);
         mPortEt = (EditText) findViewById(R.id.port_et);
+        mPortEt.setHint(Integer.toString(HTTPConstant.DEFAULT_PORT));
     }
 
     /**

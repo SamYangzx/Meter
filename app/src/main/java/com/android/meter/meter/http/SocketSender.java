@@ -5,8 +5,8 @@ import android.util.Log;
 import com.android.meter.meter.util.LogUtil;
 import com.android.meter.meter.util.StringUtil;
 
-import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -18,8 +18,10 @@ public class SocketSender extends Thread {
     private boolean mContinue = true;
     private Queue<String> mMsgQueue = new LinkedList<String>();
     private IHttpListener mIHttpListener;
-    private DataOutputStream mOutStream;
+//    private DataOutputStream mOutStream;
+//    private BufferedWriter mOutStream;
 
+    private OutputStream mOutStream;   //优先使用此输出流
 
     public SocketSender(Socket socket, IHttpListener listener) {
         mSocket = socket;
@@ -29,9 +31,11 @@ public class SocketSender extends Thread {
     @Override
     public void run() {
         try {
-//            BufferedWriter mOutStream = new BufferedWriter(new OutputStreamWriter(mSocket.getOutputStream(), "UTF-8"));
+//            mOutStream = new BufferedWriter(new OutputStreamWriter(mSocket.getOutputStream(), "UTF-8"));
 //            BufferedReader inputReader = new BufferedReader(new InputStreamReader(System.in));
-            mOutStream = new DataOutputStream(mSocket.getOutputStream());
+//            mOutStream = new DataOutputStream(mSocket.getOutputStream());
+            mOutStream = mSocket.getOutputStream();
+
 //            os.write();
             try {
                 String msg;
@@ -53,7 +57,8 @@ public class SocketSender extends Thread {
 //                    mOutStream.write(msg);
 //                    mOutStream.newLine();
                     writeMsg(msg);
-                    writeMsg(HTTPConstant.HEX_END);
+//                    mOutStream.write("\0".getBytes());
+//                    writeMsg(HTTPConstant.HEX_END);
                     mOutStream.flush();
                     Log.d(TAG, "send: " + msg);
                     if (mIHttpListener != null) {
