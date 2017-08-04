@@ -136,10 +136,10 @@ public class NetworkDialog extends Dialog {
     }
 
     public int getIp() {
-        if (TextUtils.isEmpty(mServerEt.getText().toString())) {
+        if (TextUtils.isEmpty(mPortEt.getText().toString())) {
             return HTTPConstant.DEFAULT_PORT;
         }
-        return Integer.valueOf(mServerEt.getText().toString());
+        return Integer.valueOf(mPortEt.getText().toString());
     }
 
 
