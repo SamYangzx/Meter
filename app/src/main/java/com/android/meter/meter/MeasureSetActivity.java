@@ -156,6 +156,7 @@ public class MeasureSetActivity extends Activity {
         super.onCreate(savedInstanceState);
         if (getActionBar() != null) {
             getActionBar().setDisplayShowHomeEnabled(false);
+//            getActionBar().setBackgroundDrawable(getResources().getDrawable(R.drawable.title_background));
         }
 
         setContentView(R.layout.activity_measure_set);
@@ -431,7 +432,8 @@ public class MeasureSetActivity extends Activity {
 
     private void updateSpinnerArray(int position) {
         mUnitIndex = position;
-        mMeasureAdapter = new ArrayAdapter<String>(mContext, android.R.layout.simple_spinner_item, mUnitArrays[position]);
+//        mMeasureAdapter = new ArrayAdapter<String>(mContext, android.R.layout.simple_spinner_item, mUnitArrays[position]);
+        mMeasureAdapter = new ArrayAdapter<String>(mContext, R.layout.custom_spiner_text_item, mUnitArrays[position]);
         mMeasureAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mMeasureUnitSp.setAdapter(mMeasureAdapter);
 
