@@ -1,26 +1,24 @@
 package com.android.meter.meter;
 
-import android.app.ActionBar;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.RequiresApi;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.android.meter.meter.bluetooth.BluetoothHelper;
 import com.android.meter.meter.bluetooth.BtConstant;
@@ -38,7 +36,8 @@ import com.android.meter.meter.util.LogUtil;
 import com.android.meter.meter.util.StringUtil;
 import com.android.meter.meter.util.ToastUtil;
 
-public class MeasureSetActivity extends Activity {
+
+public class MeasureSetActivity extends AppCompatActivity {
     private static final String TAG = LogUtil.COMMON_TAG + MeasureSetActivity.class.getSimpleName();
     private static final int REQUEST_CONNECT_DEVICE = 1;
 
@@ -76,7 +75,9 @@ public class MeasureSetActivity extends Activity {
     private Spinner mSampleUnitSp;
     private ArrayAdapter<String> mSampleAdapter;
 
-    private ActionBar mActionBar;
+    //    private ActionBar mActionBar;
+    private Toolbar mToolbar;
+    private TextView mCustomerTitle;
 
     private NetworkDialog mNetworkDialog;
 
@@ -151,13 +152,12 @@ public class MeasureSetActivity extends Activity {
         }
     };
 
-    @RequiresApi(api = Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getActionBar() != null) {
-            getActionBar().setDisplayShowHomeEnabled(false);
-//            getActionBar().setBackgroundDrawable(getResources().getDrawable(R.drawable.title_background));
-        }
+//        if (getActionBar() != null) {
+//            getActionBar().setDisplayShowHomeEnabled(false);
+////            getActionBar().setBackgroundDrawable(getResources().getDrawable(R.drawable.title_background));
+//        }
 
         setContentView(R.layout.activity_measure_set);
         mContext = this;
@@ -177,27 +177,29 @@ public class MeasureSetActivity extends Activity {
     }
 
     private void setTitles(int strId) {
-        if (mActionBar == null) {
-            mActionBar = getActionBar();
-        }
-        if (mActionBar != null) {
-            mActionBar.setTitle(getResources().getString(R.string.measure_title) + "/" + getResources().getString(strId));
-        }
+//        if (mActionBar == null) {
+//            mActionBar = getActionBar();
+//        }
+//        if (mActionBar != null) {
+//            mActionBar.setTitle(getResources().getString(R.string.measure_title) + "/" + getResources().getString(strId));
+//        }
+        mCustomerTitle.setText(getResources().getString(R.string.measure_title) + "/" + getResources().getString(strId));
     }
 
     private void setTitles(String str) {
-        if (mActionBar == null) {
-            mActionBar = getActionBar();
-        }
-        if (mActionBar != null) {
-            mActionBar.setTitle(getResources().getString(R.string.measure_title) + "/" + str);
-        }
+//        if (mActionBar == null) {
+//            mActionBar = getActionBar();
+//        }
+//        if (mActionBar != null) {
+//            mActionBar.setTitle(getResources().getString(R.string.measure_title) + "/" + str);
+//        }
+        mCustomerTitle.setText(getResources().getString(R.string.measure_title) + "/" + str);
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.measure_settings_menu, menu);
+        getMenuInflater().inflate(R.menu.measure_settings_menu, menu);
         return true;
     }
 
@@ -280,7 +282,6 @@ public class MeasureSetActivity extends Activity {
         mStep = Float.parseFloat(mStepArray[0]);
         mCount = Integer.valueOf(mCountArray[0]);
 
-        initBtStatus();
         BluetoothHelper.getBluetoothChatService(mContext).setmHandler(mHandler);
     }
 
@@ -289,6 +290,12 @@ public class MeasureSetActivity extends Activity {
     }
 
     private void initView() {
+        mToolbar = (Toolbar) findViewById(R.id.measure_toolbar);
+        mCustomerTitle = (TextView) findViewById(R.id.customer_title);
+        setSupportActionBar(mToolbar);
+
+        initBtStatus();
+
         mMeasureUnitSp = (Spinner) findViewById(R.id.measure_unit_spinner);
         mMeasureUnitSp.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -356,7 +363,7 @@ public class MeasureSetActivity extends Activity {
         switch (requestCode) {
             case REQUEST_CONNECT_DEVICE:
                 // When DeviceListActivity returns with a device to connect
-                if (resultCode == Activity.RESULT_OK) {
+                if (resultCode == AppCompatActivity.RESULT_OK) {
                     // Get the device MAC address
                     String address = data.getExtras()
                             .getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);

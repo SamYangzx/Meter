@@ -1,11 +1,13 @@
 <resources xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="@style/android:Theme.Holo.Light">
+    <style name="AppTheme" parent="@style/Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="android:textColorSecondary">#ffffff</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowBackground">@color/default_background_color</item>
         <item name="android:textColor">@color/general_textview_color</item>
     </style>
 
@@ -24,8 +26,15 @@
         <item name="android:gravity">center</item>
     </style>
 
+    <style name="MeasureButtonBottomStyle" parent="@style/GeneralButtonBottomStyle">
+        <item name="android:layout_width">@dimen/measure_button_width</item>
+        <item name="android:layout_height">@dimen/measure_button_width</item>
+        <item name="android:background">@drawable/grey_circle</item>
+        <item name="android:textColor">@color/general_textview_color</item>
+    </style>
+
     <style name="GeneralVerticalLayoutStyle">
-        <item name="android:layout_margin">10dp</item>
+        <item name="android:padding">10dp</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_width">wrap_content</item>
         <item name="android:minWidth">@dimen/general_layout_min_width</item>
@@ -48,4 +57,9 @@
         <item name="android:backgroundDimEnabled">false</item>
     </style>
 
+
+    <!-- toolbar弹出菜单样式 -->
+    <style name="ToolbarPopupTheme" parent="@style/ThemeOverlay.AppCompat.Dark">
+        <item name="android:colorBackground">@color/toolbar_popup_background_color</item>
+    </style>
 </resources>

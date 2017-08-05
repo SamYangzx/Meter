@@ -1,19 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
         android:id="@+id/bluetooth_settings"
-        android:title="@string/bluetooth" />
+        android:title="@string/bluetooth"
+        app:showAsAction="never"/>
 
     <item
         android:id="@+id/ip_settings"
-        android:title="@string/network" />
+        android:title="@string/network"
+        app:showAsAction="never"/>
 
     <item
         android:id="@+id/unit_settings"
-        android:title="@string/unit" />
+        android:title="@string/unit"
+        app:showAsAction="never"/>
 
     <item
         android:id="@+id/debug"
-        android:title="@string/debug" />
+        android:title="@string/debug"
+        app:showAsAction="never"/>
 </menu>

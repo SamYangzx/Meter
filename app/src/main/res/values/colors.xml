@@ -6,13 +6,15 @@
     <color name="primary">#3F51B5</color>
     <color name="primaryDark">#303F9F</color>
     <color name="accent">#4CAF50</color>
-    <color name="primaryText">#FFFFFF</color>
-    <color name="secondaryText">#727272</color>
+    <color name="primaryText">#FFFF00</color>
+    <color name="secondaryText">#720072</color>
 
     <!--default general color begin-->
     <color name="default_background_color">#000000</color>
+    <color name="general_background_grey_color">#444</color>
     <color name="general_textview_color">#FFFFFF</color>
     <color name="general_picker_color">#FFFFFF</color>
+    <color name="toolbar_popup_background_color">#222</color>
     <!--default general color end-->
 
 

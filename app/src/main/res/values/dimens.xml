@@ -31,7 +31,13 @@
     <dimen name="general_button_width">50dp</dimen>
     <dimen name="general_button_hight">50dp</dimen>
 
+    <!--MeasureSetActivity begin-->
+    <dimen name="measure_settings_button_width">75dp</dimen>
+
+    <!--MeasureSetActivity end-->
+
     <!--MeasureActivity begin-->
+    <dimen name="measure_button_width">75dp</dimen>
     <dimen name="measure_settings_layout_width">30dp</dimen>
     <dimen name="measure_value_size">45sp</dimen>
     <dimen name="measure_unit_size">45sp</dimen>

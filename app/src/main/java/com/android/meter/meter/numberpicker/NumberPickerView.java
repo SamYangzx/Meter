@@ -3,10 +3,8 @@ package com.android.meter.meter.numberpicker;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Align;
-import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -32,10 +30,10 @@ public class NumberPickerView extends View {
     private static final String TAG = NumberPickerView.class.getSimpleName();
 
     // default text color of not selected item
-    private static final int DEFAULT_TEXT_COLOR_NORMAL = 0XFF333333;
+    private static final int DEFAULT_TEXT_COLOR_NORMAL = 0XFF888888;
 
     // default text color of selected item
-    private static final int DEFAULT_TEXT_COLOR_SELECTED = 0XFFF56313;
+    private static final int DEFAULT_TEXT_COLOR_SELECTED = 0XFFFFFFFF;
 
     // default text size of normal item
     private static final int DEFAULT_TEXT_SIZE_NORMAL_SP = 16;
@@ -53,7 +51,7 @@ public class NumberPickerView extends View {
     private static final int DEFAULT_MARGIN_END_OF_HINT_DP = 5;
 
     // default divider's color
-    private static final int DEFAULT_DIVIDER_COLOR = 0XFFF56313;
+    private static final int DEFAULT_DIVIDER_COLOR = 0XFFAAAAAA;
 
     // default divider's height
     private static final int DEFAULT_DIVIDER_HEIGHT = 2;
@@ -320,6 +318,7 @@ public class NumberPickerView extends View {
         if (mMarginEndOfHint == 0) mMarginEndOfHint = dp2px(context, DEFAULT_MARGIN_END_OF_HINT_DP);
 
         mPaintDivider.setColor(mDividerColor);
+        mLinePaint.setColor(DEFAULT_TEXT_COLOR_NORMAL);
         mPaintDivider.setAntiAlias(true);
         mPaintDivider.setStyle(Paint.Style.STROKE);
         mPaintDivider.setStrokeWidth(mDividerHeight);
@@ -1351,8 +1350,10 @@ public class NumberPickerView extends View {
 
             if (mIsDrawLine) {
                 if (y + mItemHeight / 2 > mViewHeight / 2 - mItemHeight / 2 && y + mItemHeight / 2 < mViewHeight / 2 + mItemHeight / 2) {
+                    mLinePaint.setColor(DEFAULT_TEXT_COLOR_SELECTED);
                     mLinePaint.setStrokeWidth(SELECT_PAINT_WIDTH);
                 } else {
+                    mLinePaint.setColor(DEFAULT_TEXT_COLOR_NORMAL);
                     mLinePaint.setStrokeWidth(NORMAL_PAINT_WIDTH);
                 }
             }
