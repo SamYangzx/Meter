@@ -6,12 +6,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context="com.android.meter.meter.MeasureSetActivity">
-    <!--android:background="@color/default_background_color"-->
 
     <android.support.v7.widget.Toolbar
-        android:id="@+id/measure_toolbar"
+        android:id="@+id/measure_set_toolbar"
         android:layout_width="match_parent"
         android:layout_height="45dp"
         android:background="@color/general_background_grey_color"
@@ -21,171 +19,182 @@
             android:id="@+id/customer_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="20dp"
-            android:hint="title"/>
+            android:hint="title"
+            android:textSize="20dp" />
     </android.support.v7.widget.Toolbar>
 
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:padding="16dp"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="@string/meter_unit"
-            android:textSize="@dimen/general_tv_textsize" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="@string/sample_unit"
-            android:textSize="@dimen/general_tv_textsize" />
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin">
 
 
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
-
-
-        <Spinner
-            android:id="@+id/measure_unit_spinner"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="1"
-            android:entries="@array/measure_unit_array"
-            android:gravity="center" />
-
-
-        <Spinner
-            android:id="@+id/sample_unit_spinner"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="1"
-            android:gravity="center" />
-
-
-    </LinearLayout>
-
-    <TableLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="horizontal"
-        android:paddingTop="80dp">
-
-        <TableRow
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center">
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="16dp">
 
-            <com.android.meter.meter.numberpicker.NumberPickerView
-                android:id="@+id/step_picker"
-                style="@style/PickerStyle"
-                app:npv_ItemPaddingHorizontal="5dp"
-                app:npv_ItemPaddingVertical="5dp"
-                app:npv_TextSizeNormal="16sp"
-                app:npv_TextSizeSelected="20sp"
-                app:npv_WrapSelectorWheel="false">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="@string/meter_unit"
+                android:textSize="@dimen/general_tv_textsize" />
 
-            </com.android.meter.meter.numberpicker.NumberPickerView>
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="@string/sample_unit"
+                android:textSize="@dimen/general_tv_textsize" />
 
-            <com.android.meter.meter.numberpicker.NumberPickerView
-                android:id="@+id/tap_picker"
-                style="@style/PickerStyle"
-                app:npv_ItemPaddingHorizontal="5dp"
-                app:npv_ItemPaddingVertical="5dp"
-                app:npv_TextSizeNormal="16sp"
-                app:npv_TextSizeSelected="20sp"
-                app:npv_WrapSelectorWheel="false">
 
-            </com.android.meter.meter.numberpicker.NumberPickerView>
+        </LinearLayout>
 
-            <com.android.meter.meter.numberpicker.NumberPickerView
-                android:id="@+id/jinhui_picker"
-                style="@style/PickerStyle"
-                app:npv_ItemPaddingHorizontal="5dp"
-                app:npv_ItemPaddingVertical="5dp"
-                app:npv_TextSizeNormal="16sp"
-                app:npv_TextSizeSelected="20sp"
-                app:npv_WrapSelectorWheel="false">
-
-            </com.android.meter.meter.numberpicker.NumberPickerView>
-
-        </TableRow>
-
-        <TableRow
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:paddingTop="16dp"
+            android:gravity="center_vertical"
             android:orientation="horizontal">
 
-            <TextView
-                android:layout_width="wrap_content"
+
+            <Spinner
+                android:id="@+id/measure_unit_spinner"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:entries="@array/measure_unit_array"
+                android:gravity="center" />
+
+
+            <Spinner
+                android:id="@+id/sample_unit_spinner"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="center" />
+
+
+        </LinearLayout>
+
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:paddingTop="80dp">
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center">
+
+                <com.android.meter.meter.numberpicker.NumberPickerView
+                    android:id="@+id/step_picker"
+                    style="@style/PickerStyle"
+                    app:npv_ItemPaddingHorizontal="5dp"
+                    app:npv_ItemPaddingVertical="5dp"
+                    app:npv_TextSizeNormal="16sp"
+                    app:npv_TextSizeSelected="20sp"
+                    app:npv_WrapSelectorWheel="false">
+
+                </com.android.meter.meter.numberpicker.NumberPickerView>
+
+                <com.android.meter.meter.numberpicker.NumberPickerView
+                    android:id="@+id/tap_picker"
+                    style="@style/PickerStyle"
+                    app:npv_ItemPaddingHorizontal="5dp"
+                    app:npv_ItemPaddingVertical="5dp"
+                    app:npv_TextSizeNormal="16sp"
+                    app:npv_TextSizeSelected="20sp"
+                    app:npv_WrapSelectorWheel="false">
+
+                </com.android.meter.meter.numberpicker.NumberPickerView>
+
+                <com.android.meter.meter.numberpicker.NumberPickerView
+                    android:id="@+id/jinhui_picker"
+                    style="@style/PickerStyle"
+                    app:npv_ItemPaddingHorizontal="5dp"
+                    app:npv_ItemPaddingVertical="5dp"
+                    app:npv_TextSizeNormal="16sp"
+                    app:npv_TextSizeSelected="20sp"
+                    app:npv_WrapSelectorWheel="false">
+
+                </com.android.meter.meter.numberpicker.NumberPickerView>
+
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="@string/step"
-                android:textSize="@dimen/general_tv_textsize" />
+                android:orientation="horizontal"
+                android:paddingTop="16dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="@string/tap"
-                android:textSize="@dimen/general_tv_textsize" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/step"
+                    android:textSize="@dimen/general_tv_textsize" />
 
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="@string/count"
-                android:textSize="@dimen/general_tv_textsize" />
-        </TableRow>
-
-    </TableLayout>
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/start_btn"
-            android:layout_width="@dimen/measure_settings_button_width"
-            android:layout_height="@dimen/measure_settings_button_width"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:background="@drawable/grey_circle"
-            android:text="@string/start"
-            android:textColor="@color/general_textview_color" />
-
-        <Button
-            android:id="@+id/end_btn"
-            android:layout_width="@dimen/measure_settings_button_width"
-            android:layout_height="@dimen/measure_settings_button_width"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"
-            android:background="@drawable/blue_circle"
-            android:text="@string/end"
-            android:textColor="@color/general_textview_color" />
-
-    </RelativeLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/tap"
+                    android:textSize="@dimen/general_tv_textsize" />
 
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/count"
+                    android:textSize="@dimen/general_tv_textsize" />
+            </TableRow>
+
+        </TableLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/start_btn"
+                android:layout_width="@dimen/measure_settings_button_width"
+                android:layout_height="@dimen/measure_settings_button_width"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:background="@drawable/grey_circle"
+                android:text="@string/start"
+                android:textColor="@color/general_textview_color" />
+
+            <Button
+                android:id="@+id/end_btn"
+                android:layout_width="@dimen/measure_settings_button_width"
+                android:layout_height="@dimen/measure_settings_button_width"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:background="@drawable/blue_circle"
+                android:text="@string/end"
+                android:textColor="@color/general_textview_color" />
+
+        </RelativeLayout>
+
+
+    </LinearLayout>
 </LinearLayout>

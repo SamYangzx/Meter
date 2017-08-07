@@ -1,8 +1,6 @@
 package com.android.meter.meter;
 
 import android.annotation.SuppressLint;
-import android.app.ActionBar;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,6 +9,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.RequiresApi;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -31,7 +31,7 @@ import com.android.meter.meter.util.ToastUtil;
 
 import static com.android.meter.meter.util.CommandUtil.UPLOCD_CMD_CODE;
 
-public class MeasureActivity extends Activity {
+public class MeasureActivity extends AppCompatActivity {
     private static final String TAG = LogUtil.COMMON_TAG + MeasureActivity.class.getSimpleName();
 
     public static final String EXTRA_MEASURE_UNIT = "measure_unit";
@@ -131,17 +131,9 @@ public class MeasureActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getActionBar().setIcon(null);
-        getActionBar().setCustomView(R.layout.title_measure);
-        getActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-        View view = getActionBar().getCustomView();
-
-        mTitleTv = (TextView) findViewById(R.id.measure_title_tv);
-        mBtStateTv = (TextView) findViewById(R.id.bt_state_tv);
-        ImageButton ib = (ImageButton) view.findViewById(R.id.measure_title_ib);
-        ib.setOnClickListener(mListener);
         setContentView(R.layout.activity_measure);
         mContext = this;
+        initTitle();
 
         mSampleUnit = getIntent().getStringExtra(EXTRA_MEASURE_UNIT);
         mMeasureValueUnit = mSampleUnit;
@@ -165,6 +157,14 @@ public class MeasureActivity extends Activity {
             }
         }, Constant.DELAY_REFRESH_TIME);
 
+    }
+
+    private void initTitle(){
+       Toolbar toolbar = (Toolbar)findViewById(R.id.measure_toolbar);
+        mTitleTv = (TextView) findViewById(R.id.measure_title_tv);
+        mBtStateTv = (TextView) findViewById(R.id.bt_state_tv);
+        ImageButton ib = (ImageButton)findViewById(R.id.measure_title_ib);
+        ib.setOnClickListener(mListener);
     }
 
 

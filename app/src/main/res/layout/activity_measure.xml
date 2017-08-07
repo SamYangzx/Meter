@@ -5,132 +5,179 @@
     android:id="@+id/activity_measure"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/default_background_color"
     android:orientation="vertical"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.android.meter.meter.MeasureActivity">
+    <!--android:background="@color/default_background_color"-->
 
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/measure_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/general_title_height"
+        android:background="@color/general_background_grey_color">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="@dimen/general_padding_horizontal"
+            android:paddingRight="@dimen/general_padding_horizontal"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/measure_title_tv"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:text="@string/measure_title_measure"
+                android:textSize="@dimen/general_title_textsize" />
+
+            <TextView
+                android:id="@+id/bt_state_tv"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:textSize="@dimen/general_title_textsize"
+                android:visibility="gone" />
+
+            <ImageButton
+                android:id="@+id/measure_title_ib"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/setting"
+                android:onClick="onUISettingPressed" />
+        </LinearLayout>
+    </android.support.v7.widget.Toolbar>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin">
 
-        <TextView
-            android:id="@+id/measure_value_textView"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/measure_value_textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:focusableInTouchMode="false"
+                android:gravity="center_vertical|right"
+                android:maxLines="1"
+                android:text="123.777"
+                android:textSize="@dimen/measure_value_size" />
+
+            <TextView
+                android:id="@+id/unit_tv_measure"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:paddingRight="10dp"
+                android:textSize="@dimen/measure_unit_size" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:focusableInTouchMode="false"
-            android:gravity="center_vertical|right"
-            android:maxLines="1"
-            android:text="123.777"
-            android:textSize="@dimen/measure_value_size" />
+            android:gravity="center_horizontal"
+            android:orientation="horizontal"
+            android:paddingTop="80dp">
 
-        <TextView
-            android:id="@+id/unit_tv_measure"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:paddingRight="10dp"
-            android:textSize="@dimen/measure_unit_size" />
+            <LinearLayout style="@style/GeneralVerticalLayoutStyle">
+
+                <com.android.meter.meter.numberpicker.NumberPickerView
+                    android:id="@+id/measure_point_picker"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:npv_ItemPaddingVertical="5dp"
+                    app:npv_TextSizeNormal="16sp"
+                    app:npv_TextSizeSelected="20sp"
+                    app:npv_WrapSelectorWheel="false" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/measure_point"
+                    android:textSize="@dimen/general_tv_textsize" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/GeneralVerticalLayoutStyle">
+
+                <com.android.meter.meter.numberpicker.NumberPickerView
+                    android:id="@+id/load_picker"
+                    android:layout_width="70dp"
+                    android:layout_height="wrap_content"
+                    app:npv_ItemPaddingHorizontal="5dp"
+                    app:npv_ItemPaddingVertical="5dp"
+                    app:npv_TextSizeNormal="16sp"
+                    app:npv_TextSizeSelected="20sp"
+                    app:npv_WrapSelectorWheel="false" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/load"
+
+                    android:textSize="@dimen/general_tv_textsize" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/GeneralVerticalLayoutStyle">
+
+                <com.android.meter.meter.numberpicker.NumberPickerView
+                    android:id="@+id/times_picker"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:npv_ItemPaddingHorizontal="5dp"
+                    app:npv_ItemPaddingVertical="5dp"
+                    app:npv_TextSizeNormal="16sp"
+                    app:npv_TextSizeSelected="20sp"
+                    app:npv_WrapSelectorWheel="false" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/times"
+                    android:textSize="@dimen/general_tv_textsize" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/reset_btn"
+                style="@style/MeasureButtonBottomStyle"
+                android:text="@string/reset" />
+
+            <Button
+                android:id="@+id/center_btn"
+                style="@style/MeasureButtonBottomStyle"
+                android:layout_centerInParent="true"
+                android:text="@string/center" />
+
+            <Button
+                android:id="@+id/cancel_btn"
+                style="@style/MeasureButtonBottomStyle"
+                android:layout_alignParentRight="true"
+                android:text="@string/cancel" />
+
+        </RelativeLayout>
+
+
     </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:gravity="center_horizontal"
-        android:orientation="horizontal"
-        android:paddingTop="80dp">
-
-        <LinearLayout style="@style/GeneralVerticalLayoutStyle">
-
-            <com.android.meter.meter.numberpicker.NumberPickerView
-                android:id="@+id/measure_point_picker"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:npv_ItemPaddingVertical="5dp"
-                app:npv_TextSizeNormal="16sp"
-                app:npv_TextSizeSelected="20sp"
-                app:npv_WrapSelectorWheel="false" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/measure_point"
-                android:textSize="@dimen/general_tv_textsize" />
-        </LinearLayout>
-
-        <LinearLayout style="@style/GeneralVerticalLayoutStyle">
-
-            <com.android.meter.meter.numberpicker.NumberPickerView
-                android:id="@+id/load_picker"
-                android:layout_width="70dp"
-                android:layout_height="wrap_content"
-                app:npv_ItemPaddingHorizontal="5dp"
-                app:npv_ItemPaddingVertical="5dp"
-                app:npv_TextSizeNormal="16sp"
-                app:npv_TextSizeSelected="20sp"
-                app:npv_WrapSelectorWheel="false" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/load"
-
-                android:textSize="@dimen/general_tv_textsize" />
-        </LinearLayout>
-
-        <LinearLayout style="@style/GeneralVerticalLayoutStyle">
-
-            <com.android.meter.meter.numberpicker.NumberPickerView
-                android:id="@+id/times_picker"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:npv_ItemPaddingHorizontal="5dp"
-                app:npv_ItemPaddingVertical="5dp"
-                app:npv_TextSizeNormal="16sp"
-                app:npv_TextSizeSelected="20sp"
-                app:npv_WrapSelectorWheel="false" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/times"
-                android:textSize="@dimen/general_tv_textsize" />
-        </LinearLayout>
-
-    </LinearLayout>
-
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <Button
-            android:id="@+id/reset_btn"
-            style="@style/MeasureButtonBottomStyle"
-
-            android:text="@string/reset" />
-
-        <Button
-            android:id="@+id/center_btn"
-            style="@style/MeasureButtonBottomStyle"
-            android:layout_centerInParent="true"
-            android:text="@string/center" />
-
-        <Button
-            android:id="@+id/cancel_btn"
-            style="@style/MeasureButtonBottomStyle"
-            android:layout_alignParentRight="true"
-            android:text="@string/cancel" />
-
-    </RelativeLayout>
-
-
 </LinearLayout>

@@ -289,7 +289,7 @@ public class MeasureSetActivity extends AppCompatActivity {
     }
 
     private void initView() {
-        mToolbar = (Toolbar) findViewById(R.id.measure_toolbar);
+        mToolbar = (Toolbar) findViewById(R.id.measure_set_toolbar);
         mCustomerTitle = (TextView) findViewById(R.id.customer_title);
         setSupportActionBar(mToolbar);
 
