@@ -158,7 +158,6 @@ public class MeasureSetActivity extends AppCompatActivity {
 //            getActionBar().setDisplayShowHomeEnabled(false);
 ////            getActionBar().setBackgroundDrawable(getResources().getDrawable(R.drawable.title_background));
 //        }
-
         setContentView(R.layout.activity_measure_set);
         mContext = this;
         initData();
@@ -439,13 +438,15 @@ public class MeasureSetActivity extends AppCompatActivity {
 
     private void updateSpinnerArray(int position) {
         mUnitIndex = position;
-//        mMeasureAdapter = new ArrayAdapter<String>(mContext, android.R.layout.simple_spinner_item, mUnitArrays[position]);
-        mMeasureAdapter = new ArrayAdapter<String>(mContext, R.layout.custom_spiner_text_item, mUnitArrays[position]);
-        mMeasureAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mMeasureAdapter = new ArrayAdapter<String>(mContext, android.R.layout.simple_spinner_item, mUnitArrays[position]);
+//        mMeasureAdapter = new ArrayAdapter<String>(mContext, R.layout.custom_spiner_text_item, mUnitArrays[position]);
+//        mMeasureAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mMeasureAdapter.setDropDownViewResource(R.layout.custom_spinner_dropdown_itrm);
         mMeasureUnitSp.setAdapter(mMeasureAdapter);
 
         mSampleAdapter = new ArrayAdapter<String>(mContext, android.R.layout.simple_spinner_item, mUnitArrays[position]);
-        mSampleAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//        mSampleAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mSampleAdapter.setDropDownViewResource(R.layout.custom_spinner_dropdown_itrm);
         mSampleUnitSp.setAdapter(mSampleAdapter);
     }
 

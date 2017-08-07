@@ -9,7 +9,16 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:windowBackground">@color/default_background_color</item>
         <item name="android:textColor">@color/general_textview_color</item>
+        <item name="android:textSize">@dimen/general_tv_textsize</item>
     </style>
+
+    <style name="MeasureActivityStyle" parent="@style/android:Theme.Holo.Light">
+        <item name="android:windowBackground">@color/default_background_color</item>
+        <item name="android:textColor">@color/general_textview_color</item>
+        <item name="android:textSize">@dimen/general_tv_textsize</item>
+    </style>
+
+
 
     <style name="PickerStyle">
         <item name="android:layout_width">match_parent</item>

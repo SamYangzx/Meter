@@ -41,6 +41,7 @@
             android:screenOrientation="portrait"></activity>
         <activity
             android:name=".MeasureActivity"
+            android:theme="@style/MeasureActivityStyle"
             android:screenOrientation="portrait"></activity>
 
         <activity
