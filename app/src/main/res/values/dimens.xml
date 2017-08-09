@@ -33,6 +33,7 @@
 
     <!--MeasureSetActivity begin-->
     <dimen name="measure_settings_button_width">75dp</dimen>
+    <dimen name="measure_settings_horizontal_padding">25dp</dimen>
 
     <!--MeasureSetActivity end-->
 

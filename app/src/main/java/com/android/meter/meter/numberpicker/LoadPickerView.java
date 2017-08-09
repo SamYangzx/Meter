@@ -62,7 +62,7 @@ public class LoadPickerView extends View {
     private static final int DEFAULT_DIVIDER_MARGIN_HORIZONTAL = 0;
 
     // default shown items' count, now we display 5 items, the 2nd one is selected
-    private static final int DEFAULT_SHOW_COUNT = 15;
+    private static final int DEFAULT_SHOW_COUNT = 19;
 
     // default items' horizontal padding, left padding and right padding are both 5dp,
     // only used in wrap_content mode

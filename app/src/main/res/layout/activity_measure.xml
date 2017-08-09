@@ -64,7 +64,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
+            android:gravity="center"
             android:orientation="horizontal">
 
             <TextView
@@ -73,7 +73,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:focusableInTouchMode="false"
-                android:gravity="center_vertical|right"
+                android:gravity="center_vertical|end"
                 android:maxLines="1"
                 android:text="123.777"
                 android:textSize="@dimen/measure_value_size" />
@@ -81,9 +81,10 @@
             <TextView
                 android:id="@+id/unit_tv_measure"
                 android:layout_width="wrap_content"
+                android:layout_weight="1"
                 android:layout_height="wrap_content"
+                android:gravity="start"
                 android:layout_gravity="center_vertical"
-                android:paddingRight="10dp"
                 android:textSize="@dimen/measure_unit_size" />
         </LinearLayout>
 
@@ -119,10 +120,9 @@
                     android:id="@+id/load_picker"
                     android:layout_width="70dp"
                     android:layout_height="@dimen/measure_load_picker_height"
-                    app:npv_ItemPaddingHorizontal="5dp"
                     app:npv_ItemPaddingVertical="5dp"
-                    app:npv_TextSizeNormal="16sp"
-                    app:npv_TextSizeSelected="20sp"
+                    app:npv_TextSizeNormal="8sp"
+                    app:npv_TextSizeSelected="10sp"
                     app:npv_WrapSelectorWheel="true" />
 
                 <TextView

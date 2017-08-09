@@ -92,12 +92,12 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:orientation="horizontal"
             android:paddingTop="80dp">
 
             <TableRow
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
                 android:gravity="center">
 
                 <com.android.meter.meter.numberpicker.NumberPickerView
@@ -137,7 +137,7 @@
 
             <TableRow
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:gravity="center"
                 android:orientation="horizontal"
                 android:paddingTop="16dp">
@@ -189,7 +189,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
-                android:background="@drawable/blue_circle"
+                android:background="@drawable/green_circle"
                 android:text="@string/end"
                 android:textColor="@color/general_textview_color" />
 

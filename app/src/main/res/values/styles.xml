@@ -21,10 +21,10 @@
 
 
     <style name="PickerStyle">
-        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:paddingLeft">@dimen/general_padding_horizontal</item>
-        <item name="android:paddingRight">@dimen/general_padding_horizontal</item>
+        <item name="android:paddingLeft">@dimen/measure_settings_horizontal_padding</item>
+        <item name="android:paddingRight">@dimen/measure_settings_horizontal_padding</item>
     </style>
 
     <style name="GeneralButtonBottomStyle">
@@ -37,16 +37,17 @@
     <style name="MeasureButtonBottomStyle" parent="@style/GeneralButtonBottomStyle">
         <item name="android:layout_width">@dimen/measure_button_width</item>
         <item name="android:layout_height">@dimen/measure_button_width</item>
-        <item name="android:background">@drawable/grey_circle</item>
+        <item name="android:background">@drawable/green_circle</item>
         <item name="android:textColor">@color/general_textview_color</item>
     </style>
 
     <style name="GeneralVerticalLayoutStyle">
-        <item name="android:padding">10dp</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_width">wrap_content</item>
         <item name="android:minWidth">@dimen/general_layout_min_width</item>
         <item name="android:orientation">vertical</item>
+        <item name="android:paddingLeft">@dimen/general_padding_horizontal</item>
+        <item name="android:paddingRight">@dimen/general_padding_horizontal</item>
         <item name="android:gravity">center</item>
     </style>
 
