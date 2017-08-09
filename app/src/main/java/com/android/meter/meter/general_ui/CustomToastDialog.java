@@ -4,31 +4,32 @@ import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import com.android.meter.meter.R;
-import com.android.meter.meter.http.HTTPConstant;
+import com.android.meter.meter.util.CommandUtil;
+
+import static android.content.ContentValues.TAG;
 
 /**
  * Created by fenghe on 2017/6/17.
  */
 
-public class NetworkDialog extends Dialog {
+public class CustomToastDialog extends Dialog {
     private Button yes;//确定按钮
     private Button no;//取消按钮
-    private TextView mServerTv;
-    private TextView mPortTv;
-    private EditText mServerEt;
-    private EditText mPortEt;
-    private String titleStr;
-    private String messageStr;//从外界设置的消息文本
+    private TextView titleTv;//消息标题文本
+    private TextView messageTv;//消息提示文本
+    private String titleStr;//从外界设置的title文本
+    private int mMessageId;//从外界设置的消息文本
     private String yesStr, noStr;
 
     private onCancelclickListener noOnclickListener;//取消按钮被点击了的监听器
     private onEnterclickListener yesOnclickListener;//确定按钮被点击了的监听器
+
 
     /**
      * 设置取消按钮的显示内容和监听
@@ -64,14 +65,14 @@ public class NetworkDialog extends Dialog {
         this.yesOnclickListener = onYesOnclickListener;
     }
 
-    public NetworkDialog(Context context) {
+    public CustomToastDialog(Context context) {
         super(context, R.style.MyDialog);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.network_dialog);
+        setContentView(R.layout.custom_toast_dialog);
         //按空白处不能取消动画
         setCanceledOnTouchOutside(false);
 
@@ -114,10 +115,10 @@ public class NetworkDialog extends Dialog {
     private void initData() {
         //如果用户自定了title和message
         if (titleStr != null) {
-            mServerTv.setText(titleStr);
+            titleTv.setText(titleStr);
         }
-        if (messageStr != null) {
-            mServerEt.setText(messageStr);
+        if (mMessageId != 0) {
+            messageTv.setText(mMessageId);
         }
         //如果设置按钮的文字
         if (yesStr != null) {
@@ -128,33 +129,22 @@ public class NetworkDialog extends Dialog {
         }
     }
 
-    public String getServer() {
-        if (TextUtils.isEmpty(mServerEt.getText().toString())) {
-            return HTTPConstant.DEFAULT_SERVER;
+    public String getmMessageId() {
+        if (TextUtils.isEmpty(messageTv.getText().toString())) {
+            return CommandUtil.TEST_HEX_CMD;
         }
-        return mServerEt.getText().toString();
+        return messageTv.getText().toString();
     }
-
-    public int getIp() {
-        if (TextUtils.isEmpty(mPortEt.getText().toString())) {
-            return HTTPConstant.DEFAULT_PORT;
-        }
-        return Integer.valueOf(mPortEt.getText().toString());
-    }
-
 
     /**
      * 初始化界面控件
      */
     private void initView() {
+        Log.d(TAG, " initVIew is invoked...");
         yes = (Button) findViewById(R.id.yes);
         no = (Button) findViewById(R.id.no);
-        mServerTv = (TextView) findViewById(R.id.server_toast);
-        mServerEt = (EditText) findViewById(R.id.server_et);
-        mServerEt.setText(HTTPConstant.DEFAULT_SERVER);
-        mPortTv = (TextView) findViewById(R.id.port_toast);
-        mPortEt = (EditText) findViewById(R.id.port_et);
-        mPortEt.setText(Integer.toString(HTTPConstant.DEFAULT_PORT));
+        titleTv = (TextView) findViewById(R.id.title);
+        messageTv = (TextView) findViewById(R.id.message);
     }
 
     /**
@@ -166,13 +156,9 @@ public class NetworkDialog extends Dialog {
         titleStr = title;
     }
 
-    /**
-     * 从外界Activity为Dialog设置dialog的message
-     *
-     * @param message
-     */
-    public void setMessage(String message) {
-        messageStr = message;
+
+    public void setMessage(int message) {
+        mMessageId = message;
     }
 
     /**

@@ -18,9 +18,9 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="horizontal"
             android:paddingLeft="@dimen/general_padding_horizontal"
-            android:paddingRight="@dimen/general_padding_horizontal"
-            android:orientation="horizontal">
+            android:paddingRight="@dimen/general_padding_horizontal">
 
             <TextView
                 android:id="@+id/measure_title_tv"
@@ -100,7 +100,7 @@
                 <com.android.meter.meter.numberpicker.NumberPickerView
                     android:id="@+id/measure_point_picker"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/measure_load_picker_height"
                     app:npv_ItemPaddingVertical="5dp"
                     app:npv_TextSizeNormal="16sp"
                     app:npv_TextSizeSelected="20sp"
@@ -115,21 +115,20 @@
 
             <LinearLayout style="@style/GeneralVerticalLayoutStyle">
 
-                <com.android.meter.meter.numberpicker.NumberPickerView
+                <com.android.meter.meter.numberpicker.LoadPickerView
                     android:id="@+id/load_picker"
                     android:layout_width="70dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/measure_load_picker_height"
                     app:npv_ItemPaddingHorizontal="5dp"
                     app:npv_ItemPaddingVertical="5dp"
                     app:npv_TextSizeNormal="16sp"
                     app:npv_TextSizeSelected="20sp"
-                    app:npv_WrapSelectorWheel="false" />
+                    app:npv_WrapSelectorWheel="true" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/load"
-
                     android:textSize="@dimen/general_tv_textsize" />
             </LinearLayout>
 
@@ -138,7 +137,7 @@
                 <com.android.meter.meter.numberpicker.NumberPickerView
                     android:id="@+id/times_picker"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/measure_load_picker_height"
                     app:npv_ItemPaddingHorizontal="5dp"
                     app:npv_ItemPaddingVertical="5dp"
                     app:npv_TextSizeNormal="16sp"

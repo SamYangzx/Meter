@@ -19,11 +19,13 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.meter.meter.bluetooth.BluetoothHelper;
 import com.android.meter.meter.bluetooth.BtConstant;
 import com.android.meter.meter.bluetooth.DeviceListActivity;
 import com.android.meter.meter.general_ui.CustomDialog;
+import com.android.meter.meter.general_ui.CustomToastDialog;
 import com.android.meter.meter.general_ui.NetworkDialog;
 import com.android.meter.meter.http.HTTPConstant;
 import com.android.meter.meter.http.IHttpListener;
@@ -35,6 +37,8 @@ import com.android.meter.meter.util.IMsgListener;
 import com.android.meter.meter.util.LogUtil;
 import com.android.meter.meter.util.StringUtil;
 import com.android.meter.meter.util.ToastUtil;
+
+import static com.android.meter.meter.bluetooth.BluetoothChatActivity.TOAST;
 
 
 public class MeasureSetActivity extends AppCompatActivity {
@@ -82,33 +86,34 @@ public class MeasureSetActivity extends AppCompatActivity {
     private NetworkDialog mNetworkDialog;
 
     private int mUnitIndex = 0;
+    private String mMeasureUnit;
     private String mSampleUnit;
+    private String mTap;
     private float mStep;
     private int mCount;
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
 //            Log.d(TAG, "msg: " + msg.what)
-
             switch (msg.what) {
                 case BtConstant.MESSAGE_STATE_CHANGE:
                     Log.i(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
                     switch (msg.arg1) {
                         case BluetoothHelper.STATE_CONNECTED:
                             setTitles("connected");
-                            ToastUtil.showToast(mContext, "connected");
+//                            ToastUtil.showToast(mContext, "connected");
                             break;
                         case BluetoothHelper.STATE_CONNECTING:
-//                            mTitle.setText(R.string.title_connecting);
                             setTitles(R.string.title_connecting);
-                            ToastUtil.showToast(mContext, R.string.title_connecting);
+//                            ToastUtil.showToast(mContext, R.string.title_connecting);
 
                             break;
                         case BluetoothHelper.STATE_LISTEN:
                         case BluetoothHelper.STATE_NONE:
                             setTitles(R.string.title_not_connected);
-//                            mTitle.setText(R.string.title_not_connected);
-                            ToastUtil.showToast(mContext, R.string.title_not_connected);
+//                            ToastUtil.showToast(mContext, R.string.title_not_connected);
+                            break;
+                        default:
                             break;
                     }
                     break;
@@ -132,18 +137,18 @@ public class MeasureSetActivity extends AppCompatActivity {
 //                            + mConnectedDeviceName, Toast.LENGTH_SHORT).show();
                     break;
                 case BtConstant.MESSAGE_TOAST:
-//                    Toast.makeText(getApplicationContext(), msg.getData().getString(TOAST),
-//                            Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), msg.getData().getString(TOAST),
+                            Toast.LENGTH_SHORT).show();
                     break;
                 case HTTPConstant.CONNECT_SUCCESS:
-                    ToastUtil.showToast(mContext, "connect success");
+                    ToastUtil.showToast(mContext, "Http connect success");
                     mNetworkDialog.dismiss();
                     break;
                 case HTTPConstant.CONNECT_FAIL:
-                    ToastUtil.showToast(mContext, "connect fail");
+                    ToastUtil.showToast(mContext, "Http connect fail");
                     break;
                 case HTTPConstant.SEND_FAIL:
-                    ToastUtil.showToast(mContext, "http send msg fail!!");
+                    ToastUtil.showToast(mContext, "Http send msg fail!!");
                     break;
                 default:
                     break;
@@ -174,6 +179,18 @@ public class MeasureSetActivity extends AppCompatActivity {
         }, Constant.DELAY_REFRESH_TIME);
 
     }
+
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        if (isNeedResetHandler) {
+            BluetoothHelper.getBluetoothChatService(mContext).setmHandler(mHandler);
+            isNeedResetHandler = false;
+        }
+    }
+
+    private boolean isNeedResetHandler = false;
 
     private void setTitles(int strId) {
 //        if (mActionBar == null) {
@@ -219,6 +236,7 @@ public class MeasureSetActivity extends AppCompatActivity {
                 mNetworkDialog.setYesOnclickListener(new NetworkDialog.onEnterclickListener() {
                     @Override
                     public void onYesClick() {
+                        ToastUtil.showToast(mContext, "connect...");
                         connectServer(mNetworkDialog.getServer(), mNetworkDialog.getIp());
 
                     }
@@ -252,6 +270,24 @@ public class MeasureSetActivity extends AppCompatActivity {
                 });
                 mDebugDialog.show();
                 return true;
+            case R.id.about:
+                final CustomToastDialog mDialog = new CustomToastDialog(mContext);
+                mDialog.setTitle(R.string.about);
+                mDialog.setMessage(R.string.about_msg);
+                mDialog.setNoOnclickListener(new CustomToastDialog.onCancelclickListener() {
+                    @Override
+                    public void onNoClick() {
+                        mDialog.cancel();
+                    }
+                });
+                mDialog.setYesOnclickListener(new CustomToastDialog.onEnterclickListener() {
+                    @Override
+                    public void onYesClick() {
+                        mDialog.cancel();
+                    }
+                });
+                mDialog.show();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -261,12 +297,15 @@ public class MeasureSetActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        BluetoothHelper.getBluetoothChatService(mContext).disconnect();
+        SocketControl.getInstance().disconnect();
     }
 
     @Override
     protected void onDestroy() {
+        Log.d(TAG, "onDestroy is invoked...");
         BluetoothHelper.getBluetoothChatService(mContext).setmHandler(null);
-        BluetoothHelper.getBluetoothChatService(mContext).setIMsgListener(null);
+//        BluetoothHelper.getBluetoothChatService(mContext).setIMsgListener(null);
         SocketControl.getInstance().setListener(null);
         mHandler.removeCallbacksAndMessages(null);
         mHandler = null;
@@ -300,7 +339,8 @@ public class MeasureSetActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Log.d(TAG, "position: " + position + ", id: " + id);
-                BluetoothHelper.getBluetoothChatService(mContext).sendHex(StringUtil.string2HexString(mUnitArrays[mUnitIndex][position]));
+                mMeasureUnit = mUnitArrays[mUnitIndex][position];
+//                BluetoothHelper.getBluetoothChatService(mContext).sendHex(StringUtil.string2HexString(mUnitArrays[mUnitIndex][position]));
 //                BluetoothHelper.getBluetoothChatService(mContext).sendHex(CommandUtil.TEST_HEX_CMD);
             }
 
@@ -314,7 +354,7 @@ public class MeasureSetActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 mSampleUnit = mUnitArrays[mUnitIndex][position];
-                BluetoothHelper.getBluetoothChatService(mContext).sendHex(StringUtil.string2HexString(mUnitArrays[mUnitIndex][position]));
+//                BluetoothHelper.getBluetoothChatService(mContext).sendHex(StringUtil.string2HexString(mUnitArrays[mUnitIndex][position]));
             }
 
             @Override
@@ -341,6 +381,13 @@ public class MeasureSetActivity extends AppCompatActivity {
             }
         });
         mTapPicker.refreshByNewDisplayedValues(mTapArray);
+        mTapPicker.setOnValueChangedListener(new NumberPickerView.OnValueChangeListener() {
+            @Override
+            public void onValueChange(NumberPickerView picker, int oldVal, int newVal) {
+                mTap = mTapArray[newVal];
+            }
+        });
+
         mCountPicker.refreshByNewDisplayedValues(mCountArray);
         mCountPicker.setOnValueChangedListener(new NumberPickerView.OnValueChangeListener() {
             @Override
@@ -370,7 +417,7 @@ public class MeasureSetActivity extends AppCompatActivity {
                     BluetoothDevice device = BluetoothHelper.getBluetoothChatService(mContext).getBluetoothAdapter().getRemoteDevice(address);
                     // Attempt to connect to the device
                     BluetoothHelper.getBluetoothChatService(mContext).connect(device);
-                    BluetoothHelper.getBluetoothChatService(mContext).setIMsgListener(mIBtMsgListener);
+//                    BluetoothHelper.getBluetoothChatService(mContext).setIMsgListener(mIBtMsgListener);
                 }
                 break;
 //            case REQUEST_ENABLE_BT:
@@ -399,17 +446,19 @@ public class MeasureSetActivity extends AppCompatActivity {
                     BluetoothHelper.getBluetoothChatService(mContext).sendHex(CommandUtil.getStartCmd());
 
                     Intent intent = new Intent();
-                    intent.putExtra(MeasureActivity.EXTRA_MEASURE_UNIT, mSampleUnit);
+                    intent.putExtra(MeasureActivity.EXTRA_MEASURE_UNIT, mMeasureUnit);
+                    intent.putExtra(MeasureActivity.EXTRA_SAMPLE_UNIT, mSampleUnit);
                     intent.putExtra(MeasureActivity.EXTRA_STEP, mStep);
+                    intent.putExtra(MeasureActivity.EXTRA_TAP, mTap);
                     Log.d(TAG, "sendString mStep: " + mStep);
                     intent.putExtra(MeasureActivity.EXTRA_COUNT, mCount);
                     intent.setClass(mContext, MeasureActivity.class);
+                    isNeedResetHandler = true;
                     startActivity(intent);
                     break;
                 case R.id.end_btn:
-//                    BluetoothHelper.getBluetoothChatService(mContext).sendHex(CommandUtil.getStopCmd());
-//                    Toast.makeText(mContext, "End check!!", Toast.LENGTH_SHORT).show();
-                    test();
+                    BluetoothHelper.getBluetoothChatService(mContext).sendHex(CommandUtil.getStopCmd());
+//                    test();
                     break;
                 default:
                     break;

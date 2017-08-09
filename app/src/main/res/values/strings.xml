@@ -43,6 +43,8 @@
     <string name="title_connected_to">连接到: </string>
     <string name="title_not_connected">无连接</string>
     <string name="debug">调试</string>
+    <string name="about">关于</string>
+    <string name="about_msg">1.蓝牙处可以连接想要连接的蓝牙设备；\n2.网络设置处，输入电脑IP和端口，如果不输入，则使用默认值。请确保手机和电脑连接在同一局域网内；\n3.单位用于选择需要设置的单位；\n4.调试处用于测试发送指定的指令，蓝牙和网络均会发送;\n</string>
 
     <!--  DeviceListActivity -->
     <string name="scanning">寻找设备...</string>

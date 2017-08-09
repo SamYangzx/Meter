@@ -11,8 +11,8 @@ import android.util.Log;
 public class CommandUtil {
     private static final String TAG = LogUtil.COMMON_TAG + CommandUtil.class.getSimpleName();
 
-    public static final String PRE_CODE = "BB";
-    public static final String RECEIVE_PRE_CODE = "AA";
+    public static final String COLLECTOR_PRE_CODE = "BB";
+    public static final String PLATFORM_PRE_CODE = "AA";
 
     public static final String END_CODE = "CC";
     /********* cmdCode begin*********************/
@@ -23,6 +23,8 @@ public class CommandUtil {
     public static final String UPLOCD_CMD_CODE = "E4";
     public static final String START_STOP_CMD_CODE = "E5";
     /********************** cmdCode end*******************/
+
+    public static final String SPERATOR_CODE = "07";
 
     /***constant cmd begin*/
     public static final String START_CLOLLECT_HEXCMD = "BB03E500CC";
@@ -99,28 +101,32 @@ public class CommandUtil {
     }
 
     public static String getCalibrateCmd(String data) {
-        return getCmdHex(PRE_CODE, CALIBRATE_CMD_CODE, data);
+        return getCmdHex(COLLECTOR_PRE_CODE, CALIBRATE_CMD_CODE, data);
     }
 
     public static String getSaveCmd() {
-        return getCmdHex(PRE_CODE, SAVE_CMD_CODE, null);
+        return getCmdHex(COLLECTOR_PRE_CODE, SAVE_CMD_CODE, null);
     }
 
     public static String getChooseCmd(String data) {
-        return getCmdHex(PRE_CODE, CHOOSE_CMD_CODE, data);
+        return getCmdHex(COLLECTOR_PRE_CODE, CHOOSE_CMD_CODE, data);
     }
 
     public static String getUploadCmd(String data) {
-        return getCmdHex(PRE_CODE, UPLOCD_CMD_CODE, data);
+        return getCmdHex(PLATFORM_PRE_CODE, UPLOCD_CMD_CODE, data);
+    }
+
+    public static String getUploadCmd(String platformOrColl, String data) {
+        return getCmdHex(platformOrColl, UPLOCD_CMD_CODE, data);
     }
 
 
     public static String getStartCmd() {
-        return getCmdHex(PRE_CODE, START_STOP_CMD_CODE, "00");
+        return getCmdHex(COLLECTOR_PRE_CODE, START_STOP_CMD_CODE, "00");
     }
 
     public static String getStopCmd() {
-        return getCmdHex(PRE_CODE, START_STOP_CMD_CODE, "01");
+        return getCmdHex(COLLECTOR_PRE_CODE, START_STOP_CMD_CODE, "01");
     }
 
 }

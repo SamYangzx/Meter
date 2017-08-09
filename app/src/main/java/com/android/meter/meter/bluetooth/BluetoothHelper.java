@@ -12,7 +12,6 @@ import android.os.SystemClock;
 import android.util.Log;
 
 import com.android.meter.meter.util.CommandUtil;
-import com.android.meter.meter.util.IMsgListener;
 import com.android.meter.meter.util.LogUtil;
 import com.android.meter.meter.util.StringUtil;
 
@@ -30,6 +29,8 @@ public class BluetoothHelper {
     private final BluetoothAdapter mAdapter;
 
     private static BluetoothHelper mBluetoothHelper;
+    private BluetoothDevice mCurrentDevice;
+
     private Handler mHandler;
     private AcceptThread mAcceptThread;
     private ConnectThread mConnectThread;
@@ -40,11 +41,11 @@ public class BluetoothHelper {
     public static final int STATE_CONNECTING = 2;
     public static final int STATE_CONNECTED = 3;
 
-    private IMsgListener mIMsgListener;
-
-    public void setIMsgListener(IMsgListener iMsgListener) {
-        mIMsgListener = iMsgListener;
-    }
+//    private IMsgListener mIMsgListener;
+//
+//    public void setIMsgListener(IMsgListener iMsgListener) {
+//        mIMsgListener = iMsgListener;
+//    }
 
     private BluetoothHelper(Context context) {
         this(context, null);
@@ -64,6 +65,7 @@ public class BluetoothHelper {
     }
 
     public void setmHandler(Handler handler) {
+        Log.d(TAG, "setmHandler is invoked...");
         if (mHandler != null) {
             mHandler.removeCallbacksAndMessages(null);
             mHandler = null;
@@ -141,6 +143,9 @@ public class BluetoothHelper {
      */
     public synchronized void connect(BluetoothDevice device) {
         if (D) Log.d(TAG, "connect to: " + device);
+        if (device == null) {
+            return;
+        }
 
         // Cancel any thread attempting to make a connection
         if (mState == STATE_CONNECTING) {
@@ -149,6 +154,13 @@ public class BluetoothHelper {
                 mConnectThread = null;
             }
         }
+
+        //If current device is connected, it will not be connected again.add 20170807
+        if (mCurrentDevice != null && mCurrentDevice.getAddress().equals(device.getAddress())) {
+            if ((mConnectedThread != null) && (mConnectedThread.mmSocket != null) && (mConnectedThread.mmSocket.isConnected()))
+                return;
+        }
+
 
         // Cancel any thread currently running a connection
         if (mConnectedThread != null) {
@@ -263,7 +275,6 @@ public class BluetoothHelper {
     private void connectionLost() {
         setState(STATE_LISTEN);
 
-
         Message msg = mHandler.obtainMessage(BtConstant.MESSAGE_TOAST);
         Bundle bundle = new Bundle();
         bundle.putString(BluetoothChatActivity.TOAST, "Device connection was lost");
@@ -339,10 +350,10 @@ public class BluetoothHelper {
 
     private class ConnectThread extends Thread {
         private final BluetoothSocket mmSocket;
-        private final BluetoothDevice mmDevice;
+//        private final BluetoothDevice mCurrentDevice;
 
         public ConnectThread(BluetoothDevice device) {
-            mmDevice = device;
+            mCurrentDevice = device;
             BluetoothSocket tmp = null;
 
 
@@ -381,7 +392,7 @@ public class BluetoothHelper {
             synchronized (BluetoothHelper.this) {
                 mConnectThread = null;
             }
-            connected(mmSocket, mmDevice);
+            connected(mmSocket, mCurrentDevice);
         }
 
         public void cancel() {
@@ -426,7 +437,7 @@ public class BluetoothHelper {
                 try {
                     byteCount = mmInStream.read(preByte);
                     Log.d(TAG, "receive origin head: " + StringUtil.bytes2HexString(preByte));
-                    if (!(byteCount == 1 && CommandUtil.RECEIVE_PRE_CODE.equals(StringUtil.bytes2HexString(preByte)))) {
+                    if (!(byteCount == 1 && CommandUtil.PLATFORM_PRE_CODE.equals(StringUtil.bytes2HexString(preByte)))) {
                         continue;
                     }
                     byte[] lengthByte = new byte[1];
@@ -447,17 +458,11 @@ public class BluetoothHelper {
                     }
                     byte[] endByte = new byte[1];
                     mmInStream.read(endByte, 0, 1);
-                    byte[] wholeByte = CommandUtil.getWholeCmd(preByte, lengthByte, readbuff,endByte);
-                    Log.d(TAG, "checksum: " + CommandUtil.getChecksum(StringUtil.byteMerger(lengthByte, readbuff)) +" ,end: " + StringUtil.byte2int(endByte[0]));
+                    byte[] wholeByte = CommandUtil.getWholeCmd(preByte, lengthByte, readbuff, endByte);
+                    Log.d(TAG, "checksum: " + CommandUtil.getChecksum(StringUtil.byteMerger(lengthByte, readbuff)) + " ,end: " + StringUtil.byte2int(endByte[0]));
                     Log.d(TAG, "origin: " + StringUtil.bytes2HexString(wholeByte));
                     mHandler.obtainMessage(BtConstant.MESSAGE_READ, wholeByte.length, -1, wholeByte)
                             .sendToTarget();
-
-                    if (mIMsgListener != null) {
-//                        Log.d(TAG, "thread: " + Thread.currentThread().getId());
-                        mIMsgListener.received(BtConstant.MESSAGE_READ, StringUtil.bytes2HexString(wholeByte));
-                    }
-
                 } catch (IOException e) {
                     Log.e(TAG, "read exception: ", e);
                     connectionLost();
@@ -483,5 +488,26 @@ public class BluetoothHelper {
                 Log.e(TAG, "close() of connect socket failed", e);
             }
         }
+
+
+        public void disconnect() {
+            try {
+                mmOutStream.close();
+                mmInStream.close();
+                mmSocket.close();
+            } catch (IOException e) {
+                Log.e(TAG, "close() of connect socket failed", e);
+            }
+        }
     }
+
+
+    public void disconnect() {
+        Log.d(TAG, "disconnect is invoked.");
+        if (mConnectedThread != null) {
+            mConnectedThread.disconnect();
+        }
+    }
+
+
 }

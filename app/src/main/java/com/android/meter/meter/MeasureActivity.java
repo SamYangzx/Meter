@@ -22,6 +22,7 @@ import com.android.meter.meter.bluetooth.BtConstant;
 import com.android.meter.meter.http.HTTPConstant;
 import com.android.meter.meter.http.IHttpListener;
 import com.android.meter.meter.http.SocketControl;
+import com.android.meter.meter.numberpicker.LoadPickerView;
 import com.android.meter.meter.numberpicker.NumberPickerView;
 import com.android.meter.meter.util.CommandUtil;
 import com.android.meter.meter.util.Constant;
@@ -29,12 +30,15 @@ import com.android.meter.meter.util.LogUtil;
 import com.android.meter.meter.util.StringUtil;
 import com.android.meter.meter.util.ToastUtil;
 
+import static com.android.meter.meter.util.CommandUtil.PLATFORM_PRE_CODE;
 import static com.android.meter.meter.util.CommandUtil.UPLOCD_CMD_CODE;
 
 public class MeasureActivity extends AppCompatActivity {
     private static final String TAG = LogUtil.COMMON_TAG + MeasureActivity.class.getSimpleName();
 
     public static final String EXTRA_MEASURE_UNIT = "measure_unit";
+    public static final String EXTRA_SAMPLE_UNIT = "sample_unit";
+    public static final String EXTRA_TAP = "tap";
     public static final String EXTRA_STEP = "step";
     public static final String EXTRA_COUNT = "count";
     private static final int MEASURE_MODE = 0;
@@ -45,20 +49,19 @@ public class MeasureActivity extends AppCompatActivity {
     private Context mContext;
 
     private NumberPickerView mMeasurePointPicker;
-    private NumberPickerView mLoadPicker;
+    private LoadPickerView mLoadPicker;
     private NumberPickerView mTimesPicker;
 
     private Button mResetBtn;
     private Button mEnterBtn;
     private Button mCalcelBtn;
-//    private Button mUploadBtn;
-//    private Button mDownloadBtn;
 
-    private String mMeasureValueUnit;
+    private String mMeasureUnit;
     private String mSampleUnit;
 
     private String mMeasurePointValue;
     private String mMeasureValue;
+    private String mTap;
     private float mStep;
     private int mTotalTimes;
     private int mTimes;
@@ -135,10 +138,12 @@ public class MeasureActivity extends AppCompatActivity {
         mContext = this;
         initTitle();
 
-        mSampleUnit = getIntent().getStringExtra(EXTRA_MEASURE_UNIT);
-        mMeasureValueUnit = mSampleUnit;
+        mMeasureUnit = getIntent().getStringExtra(EXTRA_MEASURE_UNIT);
+        mSampleUnit = getIntent().getStringExtra(EXTRA_SAMPLE_UNIT);
+        mTap = getIntent().getStringExtra(EXTRA_TAP);
         mStep = getIntent().getFloatExtra(EXTRA_STEP, 1);
         mTotalTimes = getIntent().getIntExtra(EXTRA_COUNT, 1);
+
         initData();
         initView();
 
@@ -159,11 +164,17 @@ public class MeasureActivity extends AppCompatActivity {
 
     }
 
-    private void initTitle(){
-       Toolbar toolbar = (Toolbar)findViewById(R.id.measure_toolbar);
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        BluetoothHelper.getBluetoothChatService(mContext).setmHandler(null);
+    }
+
+    private void initTitle() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.measure_toolbar);
         mTitleTv = (TextView) findViewById(R.id.measure_title_tv);
         mBtStateTv = (TextView) findViewById(R.id.bt_state_tv);
-        ImageButton ib = (ImageButton)findViewById(R.id.measure_title_ib);
+        ImageButton ib = (ImageButton) findViewById(R.id.measure_title_ib);
         ib.setOnClickListener(mListener);
     }
 
@@ -174,16 +185,17 @@ public class MeasureActivity extends AppCompatActivity {
 
 //        mMeasurePointArray = getResources().getStringArray(R.array.speed_array);
         //mTimesArray = getResources().getStringArray(R.array.check_array);
-        mTimesArray = new String[mTotalTimes];
-        for (int i = 0; i < mTotalTimes; i++) {
-            mTimesArray[i] = String.valueOf(i + 1);
+        mTimesArray = new String[mTotalTimes + 1];
+        mTimesArray[0] = "——>";
+        for (int i = 1; i < mTotalTimes + 1; i++) {
+            mTimesArray[i] = String.valueOf(i);
         }
 
     }
 
     private void initView() {
         mMeasurePointPicker = (NumberPickerView) findViewById(R.id.measure_point_picker);
-        mMeasurePointPicker.setHintText(mSampleUnit);
+        mMeasurePointPicker.setHintText(mMeasureUnit);
         mMeasurePointPicker.setOnValueChangedListener(new NumberPickerView.OnValueChangeListener() {
             @Override
             public void onValueChange(NumberPickerView picker, int oldVal, int newVal) {
@@ -193,9 +205,22 @@ public class MeasureActivity extends AppCompatActivity {
         mTimesPicker = (NumberPickerView) findViewById(R.id.times_picker);
         mMeasurePointPicker.refreshByNewDisplayedValues(getStepArray(mStep));
         mTimesPicker.refreshByNewDisplayedValues(mTimesArray);
-        mLoadPicker = (NumberPickerView) findViewById(R.id.load_picker);
+        mLoadPicker = (LoadPickerView) findViewById(R.id.load_picker);
         mLoadPicker.setIsDrawLine(true);
         mLoadPicker.refreshByNewDisplayedValues(mLoadArray);
+        mLoadPicker.setOnScrollListener(new LoadPickerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChange(LoadPickerView view, int scrollState) {
+
+            }
+
+            @Override
+            public void onScrollFling(LoadPickerView view, float speedRatio) {
+                Log.d(TAG, "speedRatio: " + speedRatio);
+                sendMsg(Float.toString(speedRatio), false);
+
+            }
+        });
 
         mResetBtn = (Button) findViewById(R.id.reset_btn);
         mEnterBtn = (Button) findViewById(R.id.center_btn);
@@ -203,10 +228,6 @@ public class MeasureActivity extends AppCompatActivity {
         mResetBtn.setOnClickListener(mListener);
         mEnterBtn.setOnClickListener(mListener);
         mCalcelBtn.setOnClickListener(mListener);
-//        mUploadBtn = (Button) findViewById(R.id.upload_btn);
-//        mDownloadBtn = (Button) findViewById(R.id.download_btn);
-//        mUploadBtn.setOnClickListener(mListener);
-//        mDownloadBtn.setOnClickListener(mListener);
         mUnitTv = (TextView) findViewById(R.id.unit_tv_measure);
         mUnitTv.setText(getFormatUnit(mSampleUnit));
         mSampleTv = (TextView) findViewById(R.id.measure_value_textView);
@@ -223,11 +244,12 @@ public class MeasureActivity extends AppCompatActivity {
                 case R.id.center_btn:
 //                    BluetoothHelper.getBluetoothChatService(mContext).sendHex(CommandUtil.TEST_HEX_CMD);
 //                    SocketControl.getInstance().sendMsg(CommandUtil.TEST_HEX_CMD);
-                    sendMsg(null);
+                    sendMsg(null, true);
                     mTimes++;
                     break;
                 case R.id.cancel_btn:
-                    ToastUtil.showToast(mContext, getStringById(R.string.cancel));
+//                    ToastUtil.showToast(mContext, getStringById(R.string.cancel));
+                    mSampleTv.setText("0");
                     break;
                 case R.id.measure_title_ib:
 //                    ToastUtil.showToast(mContext, "change UI");
@@ -284,7 +306,7 @@ public class MeasureActivity extends AppCompatActivity {
                 dialog.dismiss();
                 ToastUtil.showToast(mContext, R.string.reset);
 //                MeasureActivity.this.finish();
-                sendMsg(CommandUtil.RESET_CMD_CODE);
+                sendMsg(CommandUtil.RESET_CMD_CODE, true);
             }
         });
         builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -329,45 +351,58 @@ public class MeasureActivity extends AppCompatActivity {
         }
     };
 
-
-    private void sendMsg(String msg) {
+    /**
+     * @param msg
+     * @param changeMode if need change send method BT or http, this will be true.
+     */
+    private void sendMsg(String msg, boolean changeMode) {
+        Log.d(TAG, "sendMsg.msg: " + msg + ", changeMode: " + changeMode);
         String hexCmd;
-        if (MEASURE_MODE == mMode) {
-            if (mFirstTime) {
-                hexCmd = CommandUtil.getUploadCmd(mSampleUnit);
+        if (changeMode) {
+            if (MEASURE_MODE == mMode) {
+                if (mFirstTime) {
+                    hexCmd = CommandUtil.getUploadCmd(PLATFORM_PRE_CODE, mSampleUnit);
+                    SocketControl.getInstance().sendMsg(hexCmd);
+                    hexCmd = CommandUtil.getUploadCmd(mMeasureUnit);
+                    SocketControl.getInstance().sendMsg(hexCmd);
+                    mFirstTime = false;
+                }
+                hexCmd = CommandUtil.getUploadCmd(mSampleTv.getText().toString());
                 SocketControl.getInstance().sendMsg(hexCmd);
-                hexCmd = CommandUtil.getUploadCmd(mMeasureValueUnit);
+                hexCmd = CommandUtil.getUploadCmd(mMeasurePointValue);
                 SocketControl.getInstance().sendMsg(hexCmd);
-                mFirstTime = false;
+                hexCmd = CommandUtil.getUploadCmd(Integer.toString(mTimes));
+                SocketControl.getInstance().sendMsg(hexCmd);
+            } else {
+                hexCmd = CommandUtil.getUploadCmd(mSampleTv.getText().toString());
+                BluetoothHelper.getBluetoothChatService(mContext).sendHex(hexCmd);
             }
-            hexCmd = CommandUtil.getUploadCmd(mSampleTv.getText().toString());
-            SocketControl.getInstance().sendMsg(hexCmd);
-            hexCmd = CommandUtil.getUploadCmd(mMeasurePointValue);
-            SocketControl.getInstance().sendMsg(hexCmd);
-            hexCmd = CommandUtil.getUploadCmd(Integer.toString(mTimes));
-            SocketControl.getInstance().sendMsg(hexCmd);
-        }else{
-            BluetoothHelper.getBluetoothChatService(mContext).sendHex(CommandUtil.TEST_HEX_CMD);
-	}
+        } else {
+            hexCmd = CommandUtil.getUploadCmd(CommandUtil.COLLECTOR_PRE_CODE, msg);
+            BluetoothHelper.getBluetoothChatService(mContext).sendHex(hexCmd);
+        }
     }
 
 
     public void handlerCmd(String hexCmd) {
-        Log.d(TAG, "handlerCmd: "+ hexCmd);
+        Log.d(TAG, "handlerCmd: " + hexCmd);
         byte[] length = StringUtil.hexString2Bytes(hexCmd.substring(2, 4));
         int cmdLength = StringUtil.bytes2int(length);
         String cmdType = hexCmd.substring(4, 6);
         String content = "";
-        if (6 + cmdLength *2 <= hexCmd.length()) {
-            content = hexCmd.substring(6, 6 + cmdLength *2);
-        }else{
+        if (6 + cmdLength * 2 <= hexCmd.length()) {
+            content = hexCmd.substring(6, 6 + cmdLength * 2);
+        } else {
             ToastUtil.showToast(mContext, "cmd lenght is error!");
         }
         Log.d(TAG, "cmdLength: " + cmdLength + " ,cmdType: " + cmdType + " , content: " + content);
         switch (cmdType) {
             case UPLOCD_CMD_CODE:
                 //TODO replease it after separation is OK.
-                String sampleValue = content.substring(18,36);
+                String sampleValue = "";
+                if (content.length() > 36) {
+                    sampleValue = content.substring(18, 36);
+                }
                 mSampleTv.setText(StringUtil.hex2String(sampleValue));
                 mUnitTv.setVisibility(View.GONE);
                 break;

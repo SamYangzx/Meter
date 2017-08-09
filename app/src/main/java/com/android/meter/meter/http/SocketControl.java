@@ -54,6 +54,7 @@ public class SocketControl {
      */
     public void connect(final String server, final int port) {
         Log.d(TAG, "connect server: " + server + " , port: " + port);
+        disconnect();
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -72,9 +73,21 @@ public class SocketControl {
                 } catch (IOException e) {
                     Log.d(TAG, "connect server failed.e: " + e);
                     e.printStackTrace();
+                    mIHttpListener.onResult(HTTPConstant.CONNECT_FAIL, null);
                 }
             }
         }).start();
+    }
+
+    public void disconnect() {
+        Log.d(TAG, "disconnect is invoked.");
+        if (mSocket != null) {
+            try {
+                mSocket.close();
+            } catch (IOException e) {
+                Log.e(TAG, "socket close exception: " + e);
+            }
+        }
     }
 
     public void sendMsg(String data) {
