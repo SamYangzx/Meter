@@ -255,11 +255,12 @@ public class MeasureSetActivity extends AppCompatActivity {
 
             case R.id.debug:
                 final CustomDialog mDebugDialog = new CustomDialog(mContext);
+                mDebugDialog.setMessage(CommandUtil.TEST_HEX_CMD);
                 mDebugDialog.setYesOnclickListener(new CustomDialog.onEnterclickListener() {
                     @Override
                     public void onYesClick() {
                         BluetoothHelper.getBluetoothChatService(mContext).sendHex(mDebugDialog.getMessageStr());
-
+                        SocketControl.getInstance().sendMsg(mDebugDialog.getMessageStr());
                     }
                 });
                 mDebugDialog.setNoOnclickListener(new CustomDialog.onCancelclickListener() {

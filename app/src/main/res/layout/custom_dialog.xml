@@ -21,8 +21,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:hint="BB03E501E7CC" />
+        android:layout_marginRight="20dp"/>
 
 
     <LinearLayout

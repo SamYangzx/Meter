@@ -30,7 +30,6 @@ import com.android.meter.meter.util.LogUtil;
 import com.android.meter.meter.util.StringUtil;
 import com.android.meter.meter.util.ToastUtil;
 
-import static com.android.meter.meter.util.CommandUtil.PLATFORM_PRE_CODE;
 import static com.android.meter.meter.util.CommandUtil.UPLOCD_CMD_CODE;
 
 public class MeasureActivity extends AppCompatActivity {
@@ -51,6 +50,8 @@ public class MeasureActivity extends AppCompatActivity {
     private NumberPickerView mMeasurePointPicker;
     private LoadPickerView mLoadPicker;
     private NumberPickerView mTimesPicker;
+    private String[] mMeasurePointArray = new String[21];
+    private int mMeasurePointIndex = 0;
 
     private Button mResetBtn;
     private Button mEnterBtn;
@@ -75,7 +76,7 @@ public class MeasureActivity extends AppCompatActivity {
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-//            Log.d(TAG, "msg: " + msg.what)
+//            LogUtil.d(TAG, "msg: " + msg.what)
 
             switch (msg.what) {
                 case BtConstant.MESSAGE_STATE_CHANGE:
@@ -147,11 +148,10 @@ public class MeasureActivity extends AppCompatActivity {
         initData();
         initView();
 
-
         mMeasurePointPicker.postDelayed(new Runnable() {
             @Override
             public void run() {
-                mMeasurePointPicker.setPickedIndexRelativeToRaw(mStepArray.length / 2);
+                mMeasurePointPicker.setPickedIndexRelativeToRaw(mMeasurePointArray.length / 2);
             }
         }, Constant.DELAY_REFRESH_TIME);
 
@@ -196,14 +196,17 @@ public class MeasureActivity extends AppCompatActivity {
     private void initView() {
         mMeasurePointPicker = (NumberPickerView) findViewById(R.id.measure_point_picker);
         mMeasurePointPicker.setHintText(mMeasureUnit);
+        mMeasurePointPicker.refreshByNewDisplayedValues(getMeasurePointArray(mStep));
+        mMeasurePointValue = "00"; //init mMeasurePointValue.
         mMeasurePointPicker.setOnValueChangedListener(new NumberPickerView.OnValueChangeListener() {
             @Override
             public void onValueChange(NumberPickerView picker, int oldVal, int newVal) {
-
+                mMeasurePointValue = mMeasurePointArray[newVal];
+                LogUtil.d(TAG, "newVal: " + newVal + ", mMeasurePointValue: " + mMeasurePointValue);
+                mMeasurePointIndex = newVal - 10;
             }
         });
         mTimesPicker = (NumberPickerView) findViewById(R.id.times_picker);
-        mMeasurePointPicker.refreshByNewDisplayedValues(getStepArray(mStep));
         mTimesPicker.refreshByNewDisplayedValues(mTimesArray);
         mLoadPicker = (LoadPickerView) findViewById(R.id.load_picker);
         mLoadPicker.setIsDrawLine(true);
@@ -216,9 +219,9 @@ public class MeasureActivity extends AppCompatActivity {
 
             @Override
             public void onScrollFling(LoadPickerView view, float speedRatio) {
-                Log.d(TAG, "speedRatio: " + speedRatio);
-                sendMsg(Float.toString(speedRatio), false);
-
+                LogUtil.d(TAG, "speedRatio: " + speedRatio);
+//                sendMsg(Float.toString(speedRatio), false);
+                sendCmd(CommandUtil.getCalibrateCmd(Float.toString(speedRatio)), false);
             }
         });
 
@@ -242,9 +245,14 @@ public class MeasureActivity extends AppCompatActivity {
                     dialog();
                     break;
                 case R.id.center_btn:
+                    String floatHexStr;
+//                    floatHexStr = Float.toHexString(Float.valueOf(mMeasurePointValue));
+                    floatHexStr = StringUtil.bytes2HexString(StringUtil.int2byte(mMeasurePointIndex));
+                    LogUtil.d(TAG, "mMeasurePointValue: " + mMeasurePointValue + ", floatHexStr: " + floatHexStr);
 //                    BluetoothHelper.getBluetoothChatService(mContext).sendHex(CommandUtil.TEST_HEX_CMD);
 //                    SocketControl.getInstance().sendMsg(CommandUtil.TEST_HEX_CMD);
-                    sendMsg(null, true);
+
+                    sendCmd(CommandUtil.getCalibrateCmd(floatHexStr), false);
                     mTimes++;
                     break;
                 case R.id.cancel_btn:
@@ -282,17 +290,16 @@ public class MeasureActivity extends AppCompatActivity {
         return mContext.getResources().getString(str);
     }
 
-    private String[] mStepArray = new String[21];
 //    private int mPreMagnification = 1;
 
-    private String[] getStepArray(float magnification) {
+    private String[] getMeasurePointArray(float magnification) {
 //        if (mPreMagnification != magnification) {
         for (int i = 0; i <= 20; i++) {
-            mStepArray[i] = StringUtil.getNumber(magnification * (i - 10));
-//            Log.d(TAG, "i: " + mStepArray[i]);
+            mMeasurePointArray[i] = StringUtil.getNumber(magnification * (i - 10));
+//            LogUtil.d(TAG, "i: " + mMeasurePointArray[i]);
         }
 //        }
-        return mStepArray;
+        return mMeasurePointArray;
     }
 
 
@@ -306,7 +313,9 @@ public class MeasureActivity extends AppCompatActivity {
                 dialog.dismiss();
                 ToastUtil.showToast(mContext, R.string.reset);
 //                MeasureActivity.this.finish();
-                sendMsg(CommandUtil.RESET_CMD_CODE, true);
+//                sendMsg(CommandUtil.RESET_CMD_CODE, true);
+//                SocketControl.getInstance().sendMsg(CommandUtil.RESET_CMD_CODE);
+                BluetoothHelper.getBluetoothChatService(mContext).sendHex(CommandUtil.getResetCmd());
             }
         });
         builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -328,12 +337,12 @@ public class MeasureActivity extends AppCompatActivity {
         public void onResult(int state, String data) {
             switch (state) {
                 case HTTPConstant.CONNECT_SUCCESS:
-                    Log.d(TAG, "connect success");
+                    LogUtil.d(TAG, "connect success");
                     mHandler.sendEmptyMessage(HTTPConstant.CONNECT_SUCCESS);
                     break;
                 case HTTPConstant.CONNECT_FAIL:
                     mHandler.sendEmptyMessage(HTTPConstant.CONNECT_FAIL);
-                    Log.d(TAG, "connect fail");
+                    LogUtil.d(TAG, "connect fail");
                     break;
                 case HTTPConstant.SEND_FAIL:
                     mHandler.sendEmptyMessage(HTTPConstant.SEND_FAIL);
@@ -352,40 +361,48 @@ public class MeasureActivity extends AppCompatActivity {
     };
 
     /**
-     * @param msg
-     * @param changeMode if need change send method BT or http, this will be true.
+     * msg origin string data.
+     * changeMode if need change send method BT or http, this will be true.
      */
-    private void sendMsg(String msg, boolean changeMode) {
-        Log.d(TAG, "sendMsg.msg: " + msg + ", changeMode: " + changeMode);
-        String hexCmd;
-        if (changeMode) {
-            if (MEASURE_MODE == mMode) {
-                if (mFirstTime) {
-                    hexCmd = CommandUtil.getUploadCmd(PLATFORM_PRE_CODE, mSampleUnit);
-                    SocketControl.getInstance().sendMsg(hexCmd);
-                    hexCmd = CommandUtil.getUploadCmd(mMeasureUnit);
-                    SocketControl.getInstance().sendMsg(hexCmd);
-                    mFirstTime = false;
-                }
-                hexCmd = CommandUtil.getUploadCmd(mSampleTv.getText().toString());
-                SocketControl.getInstance().sendMsg(hexCmd);
-                hexCmd = CommandUtil.getUploadCmd(mMeasurePointValue);
-                SocketControl.getInstance().sendMsg(hexCmd);
-                hexCmd = CommandUtil.getUploadCmd(Integer.toString(mTimes));
-                SocketControl.getInstance().sendMsg(hexCmd);
-            } else {
-                hexCmd = CommandUtil.getUploadCmd(mSampleTv.getText().toString());
-                BluetoothHelper.getBluetoothChatService(mContext).sendHex(hexCmd);
-            }
+//    private void sendMsg(String msg, boolean changeMode) {
+//        LogUtil.d(TAG, "sendMsg.msg: " + msg + ", changeMode: " + changeMode);
+//        String hexCmd;
+//        if (changeMode) {
+//            if (MEASURE_MODE == mMode) {
+//                if (mFirstTime) {
+//                    hexCmd = CommandUtil.getUploadCmd(PLATFORM_PRE_CODE, mSampleUnit);
+//                    SocketControl.getInstance().sendMsg(hexCmd);
+//                    hexCmd = CommandUtil.getUploadCmd(mMeasureUnit);
+//                    SocketControl.getInstance().sendMsg(hexCmd);
+//                    mFirstTime = false;
+//                }
+//                hexCmd = CommandUtil.getUploadCmd(mSampleTv.getText().toString());
+//                SocketControl.getInstance().sendMsg(hexCmd);
+//                hexCmd = CommandUtil.getUploadCmd(mMeasurePointValue);
+//                SocketControl.getInstance().sendMsg(hexCmd);
+//                hexCmd = CommandUtil.getUploadCmd(Integer.toString(mTimes));
+//                SocketControl.getInstance().sendMsg(hexCmd);
+//            } else {
+//                hexCmd = CommandUtil.getUploadCmd(mSampleTv.getText().toString());
+//                BluetoothHelper.getBluetoothChatService(mContext).sendHex(hexCmd);
+//            }
+//        } else {
+//            hexCmd = CommandUtil.getUploadCmd(CommandUtil.COLLECTOR_PRE_CODE, msg);
+//            BluetoothHelper.getBluetoothChatService(mContext).sendHex(hexCmd);
+//        }
+//    }
+    private void sendCmd(String cmd, boolean socket) {
+        LogUtil.d(TAG, "sendMsg.msg: " + cmd);
+        if (socket) {
+            SocketControl.getInstance().sendMsg(cmd);
         } else {
-            hexCmd = CommandUtil.getUploadCmd(CommandUtil.COLLECTOR_PRE_CODE, msg);
-            BluetoothHelper.getBluetoothChatService(mContext).sendHex(hexCmd);
+            BluetoothHelper.getBluetoothChatService(mContext).sendHex(cmd);
         }
     }
 
 
     public void handlerCmd(String hexCmd) {
-        Log.d(TAG, "handlerCmd: " + hexCmd);
+        LogUtil.d(TAG, "handlerCmd: " + hexCmd);
         byte[] length = StringUtil.hexString2Bytes(hexCmd.substring(2, 4));
         int cmdLength = StringUtil.bytes2int(length);
         String cmdType = hexCmd.substring(4, 6);
@@ -395,7 +412,7 @@ public class MeasureActivity extends AppCompatActivity {
         } else {
             ToastUtil.showToast(mContext, "cmd lenght is error!");
         }
-        Log.d(TAG, "cmdLength: " + cmdLength + " ,cmdType: " + cmdType + " , content: " + content);
+        LogUtil.d(TAG, "cmdLength: " + cmdLength + " ,cmdType: " + cmdType + " , content: " + content);
         switch (cmdType) {
             case UPLOCD_CMD_CODE:
                 //TODO replease it after separation is OK.

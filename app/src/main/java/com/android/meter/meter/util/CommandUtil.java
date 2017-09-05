@@ -31,15 +31,31 @@ public class CommandUtil {
     public static final String END_CLOLLECT_HEXCMD = "BB03E501CC";
     /***constant cmd end*/
 
-    public static final String TEST_HEX_CMD = "BB03E501E7CC";
+    public static final String TEST_HEX_CMD = "AA05E4414243BBCC";
 
-    public static String getCmdHex(String pre, String cmdCode, String originData) {
+    private static String getCmdHex(String pre, String cmdCode, String originData) {
+        return getCmdHex(pre, cmdCode, originData, false);
+    }
+
+    /**
+     * @param pre
+     * @param cmdCode
+     * @param originData
+     * @param hex        if originData is hex ,this value should be true; else this value is false.
+     * @return
+     */
+    private static String getCmdHex(String pre, String cmdCode, String originData, boolean hex) {
         StringBuilder sb = new StringBuilder();
         if (originData == null) {
             originData = "";
         }
-        String hexData = StringUtil.string2HexString(originData);
-        int length = (cmdCode.length() + hexData.length()) / 2;
+        String hexData;
+        if (hex) {
+            hexData = originData;
+        } else {
+            hexData = StringUtil.string2HexString(originData);
+        }
+        int length = (cmdCode.length() + hexData.length() + 2) / 2; //校验
         String lengthS;
         String check;
         if (length < 0x10) {
@@ -48,16 +64,17 @@ public class CommandUtil {
             lengthS = Integer.toHexString(length);
         }
         check = getChecksum(lengthS + cmdCode + hexData);
-        Log.d(TAG, "originData: " + originData + " ,lengths: " + lengthS + " , cmdCode: " + cmdCode + " ,hexData: " + hexData + " ,check: " + check);
+        Log.w(TAG, "originData: " + originData + " ,lengths: " + lengthS + " , cmdCode: " + cmdCode + " ,hexData: " + hexData + " ,check: " + check);
         sb.append(pre).append(lengthS).append(cmdCode).append(hexData).append(check).append(END_CODE);
-        Log.d(TAG, "getCmdHex: " + sb.toString());
+        Log.w(TAG, "getCmdHex: " + sb.toString());
         return sb.toString();
     }
 
+
     public static String getChecksum(String string) {
         byte[] checksum = new byte[1];
-        checksum[0] = getChecksum(string.getBytes());
-        Log.d(TAG, "checksum[0]: " + checksum[0]);
+        checksum[0] = getChecksum(StringUtil.hexString2Bytes(string));
+        Log.w(TAG, "checksum[0]: " + checksum[0]);
         return StringUtil.bytes2HexString(checksum);
     }
 
@@ -65,10 +82,13 @@ public class CommandUtil {
         if (data == null) {
             return 0;
         }
+        LogUtil.d(TAG, "getChecksum.data: " + StringUtil.bytes2HexString(data));
         byte result = 0x00;
         for (int i = 0; i < data.length; i++) {
             result ^= data[i];
+            Log.w(TAG, "getChecksum.i: " + i + " + result: " + result);
         }
+        Log.w(TAG, "result: " + result);
         return result;
     }
 
@@ -97,11 +117,11 @@ public class CommandUtil {
     }
 
     public static String getResetCmd() {
-        return RESET_CMD_CODE;
+        return getCmdHex(COLLECTOR_PRE_CODE, RESET_CMD_CODE, null);
     }
 
     public static String getCalibrateCmd(String data) {
-        return getCmdHex(COLLECTOR_PRE_CODE, CALIBRATE_CMD_CODE, data);
+        return getCmdHex(COLLECTOR_PRE_CODE, CALIBRATE_CMD_CODE, StringUtil.getCompletedHex(data), true);
     }
 
     public static String getSaveCmd() {
@@ -122,11 +142,11 @@ public class CommandUtil {
 
 
     public static String getStartCmd() {
-        return getCmdHex(COLLECTOR_PRE_CODE, START_STOP_CMD_CODE, "00");
+        return getCmdHex(COLLECTOR_PRE_CODE, START_STOP_CMD_CODE, "01", true);
     }
 
     public static String getStopCmd() {
-        return getCmdHex(COLLECTOR_PRE_CODE, START_STOP_CMD_CODE, "01");
+        return getCmdHex(COLLECTOR_PRE_CODE, START_STOP_CMD_CODE, "00", true);
     }
 
 }

@@ -100,10 +100,12 @@ public class StringUtil {
     public static byte[] hexString2Bytes(String hex) {
         if ((hex == null) || (hex.equals(""))) {
             return null;
-        } else if (hex.length() % 2 != 0) {
-            Log.d(TAG, "hex.length is error number: " + hex.length());
-            return null;
         } else {
+            if (hex.length() % 2 != 0) {
+                Log.d(TAG, "hex.length is error number: " + hex.length());
+                hex = "0" + hex;
+            }
+
             hex = hex.toUpperCase();
             int len = hex.length() / 2;
             byte[] b = new byte[len];
@@ -157,6 +159,22 @@ public class StringUtil {
         return r;
     }
 
+
+    public static String getCompletedHex(String hex) {
+        if (hex == null || hex == "") {
+            return hex;
+        }
+        if (hex.length() % 2 != 0) {
+            hex = "0" + hex;
+        }
+        return hex;
+    }
+
+    public static byte[] int2byte(int s) {
+        byte[] b = new byte[1];
+        b[0] = (byte) (s & 0xFF);
+        return b;
+    }
     /*******String, byte ,hex transform end************************************************/
 
     /********array merger***********************/

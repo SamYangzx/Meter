@@ -10,6 +10,10 @@ public class LogUtil {
 
     public static final String COMMON_TAG = "meter/";
 
+    public static void d(String tag, String msg) {
+        Log.w(tag, msg);
+    }
+
     public static void callStack(String tag, String msg) {
         StringBuilder sb = new StringBuilder();
         sb.append(msg).append("\n").append(track());
