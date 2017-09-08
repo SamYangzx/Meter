@@ -230,10 +230,11 @@ public class MeasureActivity extends AppCompatActivity {
 
             @Override
             public void onScrollFling(LoadPickerView view, float speedRatio) {
-                LogUtil.d(TAG, "speedRatio: " + speedRatio);
 //                sendMsg(Float.toString(speedRatio), false);
-                int ratio = (byte) (speedRatio * 100);
-                sendCmd(CommandUtil.getCalibrateCmd(Integer.toString(ratio)), false);
+                byte[] ratio = new byte[1];
+                ratio[0] = (byte) (speedRatio * 100);
+                LogUtil.d(TAG, "speedRatio: " + speedRatio + " ,intRatio: " + ratio[0] + ", Integer.toString(ratio): " + StringUtil.bytes2HexString(ratio));
+                sendCmd(CommandUtil.getCalibrateCmd(StringUtil.bytes2HexString(ratio)), true);
             }
         });
 
@@ -436,10 +437,10 @@ public class MeasureActivity extends AppCompatActivity {
                 if (content.length() >= (cmdLength - 2) * 2) {
                     sampleValue = content.substring(18);
                     int divideIndex = StringUtil.getValueUnitIndex(sampleValue);
-                    String s = Float.valueOf(StringUtil.hex2String(sampleValue.substring(0, divideIndex))) + StringUtil.hex2String(sampleValue.substring(divideIndex));
+                    String s = Float.valueOf(StringUtil.hex2String(sampleValue.substring(0, divideIndex))).toString();
                     LogUtil.d(TAG, "without more 0: " + s);
                     mSampleTv.setText(s);
-                    mUnitTv.setVisibility(View.GONE);
+                    mUnitTv.setText(getFormatUnit(StringUtil.hex2String(sampleValue.substring(divideIndex))));
                 }
                 break;
             default:
