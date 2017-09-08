@@ -18,9 +18,8 @@ public class SocketSender extends Thread {
     private boolean mContinue = true;
     private Queue<String> mMsgQueue = new LinkedList<String>();
     private IHttpListener mIHttpListener;
-//    private DataOutputStream mOutStream;
+    //    private DataOutputStream mOutStream;
 //    private BufferedWriter mOutStream;
-
     private OutputStream mOutStream;   //优先使用此输出流
 
     public SocketSender(Socket socket, IHttpListener listener) {
@@ -37,8 +36,8 @@ public class SocketSender extends Thread {
             mOutStream = mSocket.getOutputStream();
 
 //            os.write();
+            String msg = "";
             try {
-                String msg;
                 while (mContinue) {
 //                    msg = inputReader.readLine();
                     if (mMsgQueue.isEmpty()) {
@@ -60,13 +59,14 @@ public class SocketSender extends Thread {
 //                    mOutStream.write("\0".getBytes());
 //                    writeMsg(HTTPConstant.HEX_END);
                     mOutStream.flush();
-                    Log.d(TAG, "send: " + msg);
+                    LogUtil.sendCmdResult(TAG, msg, true);
                     if (mIHttpListener != null) {
                         mIHttpListener.onResult(HTTPConstant.SEND_SUCCESS, msg);
                     }
                 }
             } catch (IOException e) {
-                Log.d(TAG, "e: " + e);
+                LogUtil.sendCmdResult(TAG, msg, false);
+                Log.e(TAG, "e: " + e);
                 mIHttpListener.onResult(HTTPConstant.SEND_FAIL, null);
                 if (mOutStream != null) {
                     mOutStream.close();
@@ -81,13 +81,14 @@ public class SocketSender extends Thread {
         }
     }
 
-    public synchronized void sendMsg(String data) {
+    public synchronized void sendMsg(String hex) {
         if (mSocket != null) {
-            Log.d(TAG, "add data");
-            mMsgQueue.offer(data);
+            LogUtil.d(TAG, "add hex");
+            mMsgQueue.offer(hex);
         } else {
-            Log.d(TAG, "add data failed.");
+            LogUtil.d(TAG, "add hex failed.");
             mIHttpListener.onResult(HTTPConstant.SEND_FAIL, null);
+            LogUtil.sendCmdResult(TAG, hex, false);
         }
     }
 

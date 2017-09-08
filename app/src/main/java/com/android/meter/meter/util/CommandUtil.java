@@ -5,7 +5,7 @@ import android.util.Log;
 /**
  * Created by fenghe on 2017/6/16.
  * <p>
- * 网络发送数据时，末尾要接回车和换行符号。用十六进制表示为：0x0A,0x0A.
+ * 网络发送数据时，末尾要接回车和换行符号。用十六进制表示为：0x0D,0x0A.
  */
 
 public class CommandUtil {
@@ -22,9 +22,18 @@ public class CommandUtil {
     public static final String CHOOSE_CMD_CODE = "E3";
     public static final String UPLOCD_CMD_CODE = "E4";
     public static final String START_STOP_CMD_CODE = "E5";
+    /********next code is for socket ***********************/
+    public static final String Socket_DATA_CMD_CODE = "EF";
     /********************** cmdCode end*******************/
+    public static final String RESPONSE_CMD_CODE = "FF";
 
-    public static final String SPERATOR_CODE = "07";
+
+    public static final String UNIT_CONSTANT_M = "M03";
+    public static final String UNIT_CONSTANT_N = "N04";
+    public static final String VALUE_CONSTANT_X = "X03";
+    public static final String VALUE_CONSTANT_Y = "Y04";
+    public static final String BT_HEX_SEPERATOR = "0A";
+    public static final String SEPERATOR = "_";
 
     /***constant cmd begin*/
     public static final String START_CLOLLECT_HEXCMD = "BB03E500CC";
@@ -59,7 +68,7 @@ public class CommandUtil {
         String lengthS;
         String check;
         if (length < 0x10) {
-            lengthS = "0" + Integer.toHexString(length);
+            lengthS = "0" + Integer.toHexString(length).toUpperCase();
         } else {
             lengthS = Integer.toHexString(length);
         }
@@ -74,7 +83,6 @@ public class CommandUtil {
     public static String getChecksum(String string) {
         byte[] checksum = new byte[1];
         checksum[0] = getChecksum(StringUtil.hexString2Bytes(string));
-        Log.w(TAG, "checksum[0]: " + checksum[0]);
         return StringUtil.bytes2HexString(checksum);
     }
 
@@ -82,13 +90,13 @@ public class CommandUtil {
         if (data == null) {
             return 0;
         }
-        LogUtil.d(TAG, "getChecksum.data: " + StringUtil.bytes2HexString(data));
+//        LogUtil.d(TAG, "getChecksum.data: " + StringUtil.bytes2HexString(data));
         byte result = 0x00;
         for (int i = 0; i < data.length; i++) {
             result ^= data[i];
-            Log.w(TAG, "getChecksum.i: " + i + " + result: " + result);
+//            LogUtil.d(TAG, "getChecksum.i: " + i + " + result: " + result);
         }
-        Log.w(TAG, "result: " + result);
+        LogUtil.d(TAG, "result: " + result);
         return result;
     }
 
@@ -108,18 +116,14 @@ public class CommandUtil {
         return b;
     }
 
-    public static byte[] getCheckBytes(int cmdLength, byte[] cmdBody) {
-        if (cmdLength > 1) {
-//            byte[]  checkByte = new byte[];
-//            cmdBody.
-        }
-        return null;
-    }
-
     public static String getResetCmd() {
         return getCmdHex(COLLECTOR_PRE_CODE, RESET_CMD_CODE, null);
     }
 
+    /**
+     * @param data hex String.
+     * @return
+     */
     public static String getCalibrateCmd(String data) {
         return getCmdHex(COLLECTOR_PRE_CODE, CALIBRATE_CMD_CODE, StringUtil.getCompletedHex(data), true);
     }
@@ -147,6 +151,52 @@ public class CommandUtil {
 
     public static String getStopCmd() {
         return getCmdHex(COLLECTOR_PRE_CODE, START_STOP_CMD_CODE, "00", true);
+    }
+
+    public static String getBTUnitHexData(String measureUnit, String sampleUnit) {
+        return StringUtil.string2HexString(measureUnit) + BT_HEX_SEPERATOR + StringUtil.string2HexString(sampleUnit);
+    }
+
+    /**
+     * This is only for socket communication.
+     *
+     * @param tap         tap in measureset UI.eg: a,b,c...
+     * @param measureUnit
+     * @param sampleUnit
+     * @return origin String.
+     */
+    public static String getUnitData(String tap, String measureUnit, String sampleUnit) {
+        if (tap == null || measureUnit == null || sampleUnit == null) {
+            LogUtil.d(TAG, "tap: " + tap + " ,measure: " + measureUnit + ", sampleUnit: " + sampleUnit);
+            return "";
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append(tap).append(UNIT_CONSTANT_M).append(tap).append(UNIT_CONSTANT_N).append(SEPERATOR).
+                append(measureUnit).append(SEPERATOR).append(sampleUnit);
+        LogUtil.d(TAG, "getUnitData: " + sb.toString());
+        return sb.toString();
+    }
+
+    /**
+     * @param tap tap in measureset UI.eg: a,b,c...
+     * @return
+     */
+    public static String getValueData(String tap, int sum, int count, String measure, String sample) {
+        if (tap == null || measure == null || sample == null) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append(tap).append(VALUE_CONSTANT_X).append(tap).append(VALUE_CONSTANT_Y).append(SEPERATOR).append(StringUtil.getCompletedHex(Integer.toString(sum))).append(StringUtil.getCompletedHex(Integer.toString(count))).append(SEPERATOR).append(measure).append(SEPERATOR).append(sample);
+        LogUtil.d(TAG, "getValueData: " + sb.toString());
+        return sb.toString();
+    }
+
+    public static String getSocketDataCmd(String data) {
+        return getCmdHex(COLLECTOR_PRE_CODE, Socket_DATA_CMD_CODE, data, false);
+    }
+
+    public static String getMeasurePointHexValue(int index) {
+        return StringUtil.bytes2HexString(StringUtil.str2Bcd(Integer.toString(index)));
     }
 
 }

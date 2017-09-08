@@ -65,7 +65,7 @@ public class BluetoothHelper {
     }
 
     public void setmHandler(Handler handler) {
-        LogUtil.d(TAG, "setmHandler is invoked...");
+        LogUtil.d(TAG, "setmHandler is invoked. handler: " + handler);
         if (mHandler != null) {
             mHandler.removeCallbacksAndMessages(null);
             mHandler = null;
@@ -258,7 +258,10 @@ public class BluetoothHelper {
         ConnectedThread r;
 
         synchronized (this) {
-            if (mState != STATE_CONNECTED) return;
+            if (mState != STATE_CONNECTED) {
+                LogUtil.sendCmdResult(TAG, out, false);
+                return;
+            }
             r = mConnectedThread;
         }
 
@@ -278,12 +281,13 @@ public class BluetoothHelper {
 
     private void connectionLost() {
         setState(STATE_LISTEN);
-
-        Message msg = mHandler.obtainMessage(BtConstant.MESSAGE_TOAST);
-        Bundle bundle = new Bundle();
-        bundle.putString(BluetoothChatActivity.TOAST, "Device connection was lost");
-        msg.setData(bundle);
-        mHandler.sendMessage(msg);
+        if (mHandler != null) {
+            Message msg = mHandler.obtainMessage(BtConstant.MESSAGE_TOAST);
+            Bundle bundle = new Bundle();
+            bundle.putString(BluetoothChatActivity.TOAST, "Device connection was lost");
+            msg.setData(bundle);
+            mHandler.sendMessage(msg);
+        }
     }
 
 
@@ -482,12 +486,14 @@ public class BluetoothHelper {
         public void write(byte[] buffer) {
             try {
                 mmOutStream.write(buffer);
-                LogUtil.d(TAG, "send buffer: " + buffer.toString());
+                LogUtil.sendCmdResult(TAG, buffer, true);
+//                LogUtil.d(TAG, "send origin String: " + StringUtil.bytes2String(buffer) + " , hex String: " + StringUtil.bytes2HexString(buffer));
                 if (mHandler != null) {
                     mHandler.obtainMessage(BtConstant.MESSAGE_WRITE, -1, -1, buffer)
                             .sendToTarget();
                 }
             } catch (IOException e) {
+                LogUtil.sendCmdResult(TAG, buffer, false);
                 Log.e(TAG, "Exception during write", e);
             }
         }

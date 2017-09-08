@@ -39,6 +39,8 @@ import com.android.meter.meter.util.StringUtil;
 import com.android.meter.meter.util.ToastUtil;
 
 import static com.android.meter.meter.bluetooth.BluetoothChatActivity.TOAST;
+import static com.android.meter.meter.util.CommandUtil.getBTUnitHexData;
+import static com.android.meter.meter.util.CommandUtil.getUnitData;
 
 
 public class MeasureSetActivity extends AppCompatActivity {
@@ -86,7 +88,7 @@ public class MeasureSetActivity extends AppCompatActivity {
     private NetworkDialog mNetworkDialog;
 
     private int mUnitIndex = 0;
-    private String mMeasureUnit;
+    private String mMeasurePointUnit;
     private String mSampleUnit;
     private String mTap;
     private float mStep;
@@ -259,6 +261,8 @@ public class MeasureSetActivity extends AppCompatActivity {
                 mDebugDialog.setYesOnclickListener(new CustomDialog.onEnterclickListener() {
                     @Override
                     public void onYesClick() {
+                        test();
+
                         BluetoothHelper.getBluetoothChatService(mContext).sendHex(mDebugDialog.getMessageStr());
                         SocketControl.getInstance().sendMsg(mDebugDialog.getMessageStr());
                     }
@@ -318,7 +322,10 @@ public class MeasureSetActivity extends AppCompatActivity {
         mTapArray = getResources().getStringArray(R.array.tap_array);
         mCountArray = getResources().getStringArray(R.array.jinhui_array);
 
+        mMeasurePointUnit = mUnitArrays[0][0];
+        mSampleUnit = mUnitArrays[0][0];
         mStep = Float.parseFloat(mStepArray[0]);
+        mTap = mTapArray[0];
         mCount = Integer.valueOf(mCountArray[0]);
 
         BluetoothHelper.getBluetoothChatService(mContext).setmHandler(mHandler);
@@ -340,7 +347,7 @@ public class MeasureSetActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Log.d(TAG, "position: " + position + ", id: " + id);
-                mMeasureUnit = mUnitArrays[mUnitIndex][position];
+                mMeasurePointUnit = mUnitArrays[mUnitIndex][position];
 //                BluetoothHelper.getBluetoothChatService(mContext).sendHex(StringUtil.string2HexString(mUnitArrays[mUnitIndex][position]));
 //                BluetoothHelper.getBluetoothChatService(mContext).sendHex(CommandUtil.TEST_HEX_CMD);
             }
@@ -445,13 +452,14 @@ public class MeasureSetActivity extends AppCompatActivity {
             switch (v.getId()) {
                 case R.id.start_btn:
                     BluetoothHelper.getBluetoothChatService(mContext).sendHex(CommandUtil.getStartCmd());
+                    BluetoothHelper.getBluetoothChatService(mContext).sendHex(CommandUtil.getCalibrateCmd(getBTUnitHexData(mMeasurePointUnit, mSampleUnit)));
+                    SocketControl.getInstance().sendMsg(CommandUtil.getSocketDataCmd(getUnitData(mTap, mMeasurePointUnit, mSampleUnit)));
 
                     Intent intent = new Intent();
-                    intent.putExtra(MeasureActivity.EXTRA_MEASURE_UNIT, mMeasureUnit);
+                    intent.putExtra(MeasureActivity.EXTRA_MEASURE_UNIT, mMeasurePointUnit);
                     intent.putExtra(MeasureActivity.EXTRA_SAMPLE_UNIT, mSampleUnit);
                     intent.putExtra(MeasureActivity.EXTRA_STEP, mStep);
                     intent.putExtra(MeasureActivity.EXTRA_TAP, mTap);
-                    Log.d(TAG, "sendString mStep: " + mStep);
                     intent.putExtra(MeasureActivity.EXTRA_COUNT, mCount);
                     intent.setClass(mContext, MeasureActivity.class);
                     isNeedResetHandler = true;
@@ -459,7 +467,6 @@ public class MeasureSetActivity extends AppCompatActivity {
                     break;
                 case R.id.end_btn:
                     BluetoothHelper.getBluetoothChatService(mContext).sendHex(CommandUtil.getStopCmd());
-//                    test();
                     break;
                 default:
                     break;
@@ -506,6 +513,11 @@ public class MeasureSetActivity extends AppCompatActivity {
     private void test() {
 //        mClient = new SocketControl(HTTPConstant.DEFAULT_SERVER, HTTPConstant.DEFAULT_PORT, mHttpListener);
         SocketControl.getInstance().sendMsg("AA12E4016368616E656C3120303030302E304EBBCC");
+
+        String s = "AM03AN04_kN_N";
+        LogUtil.d(TAG, "origin String: " + s + "cmdString: " + CommandUtil.getSocketDataCmd(s));
+        s = "AX03AY04_0601_3_12.3";
+        LogUtil.d(TAG, "origin String: " + s + "cmdString: " + CommandUtil.getSocketDataCmd(s));
     }
 
     private void connectServer(String server, int ip) {

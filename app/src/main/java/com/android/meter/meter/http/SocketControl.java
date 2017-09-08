@@ -2,6 +2,8 @@ package com.android.meter.meter.http;
 
 import android.util.Log;
 
+import com.android.meter.meter.util.LogUtil;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -90,9 +92,14 @@ public class SocketControl {
         }
     }
 
-    public void sendMsg(String data) {
+    public void sendMsg(String hex) {
         if (mSendThread != null) {
-            mSendThread.sendMsg(data);
+            mSendThread.sendMsg(hex);
+        } else {
+            LogUtil.sendCmdResult(TAG, hex, false);
+            if (mIHttpListener != null) {
+                mIHttpListener.onResult(HTTPConstant.SEND_FAIL, hex);
+            }
         }
 
     }

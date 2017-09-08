@@ -36,4 +36,13 @@ public class LogUtil {
         }
         return sb.toString();
     }
+
+
+    public static void sendCmdResult(String tag, String hexCmd, boolean result) {
+        d(tag, "send origin String: " + StringUtil.hex2String(hexCmd) + " , hex String: " + hexCmd + "  result: " + (result ? "success" : "failed"));
+    }
+
+    public static void sendCmdResult(String tag, byte[] buffer, boolean result) {
+        d(tag, "send origin String: " + StringUtil.bytes2String(buffer) + " , hex String: " + StringUtil.bytes2HexString(buffer) + "  result: " + (result ? "success" : "failed"));
+    }
 }

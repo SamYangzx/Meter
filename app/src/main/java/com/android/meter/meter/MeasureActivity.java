@@ -24,6 +24,7 @@ import com.android.meter.meter.http.IHttpListener;
 import com.android.meter.meter.http.SocketControl;
 import com.android.meter.meter.numberpicker.LoadPickerView;
 import com.android.meter.meter.numberpicker.NumberPickerView;
+import com.android.meter.meter.numberpicker.NumberPickerView.OnValueChangeListener;
 import com.android.meter.meter.util.CommandUtil;
 import com.android.meter.meter.util.Constant;
 import com.android.meter.meter.util.LogUtil;
@@ -31,6 +32,7 @@ import com.android.meter.meter.util.StringUtil;
 import com.android.meter.meter.util.ToastUtil;
 
 import static com.android.meter.meter.util.CommandUtil.UPLOCD_CMD_CODE;
+import static com.android.meter.meter.util.CommandUtil.getValueData;
 
 public class MeasureActivity extends AppCompatActivity {
     private static final String TAG = LogUtil.COMMON_TAG + MeasureActivity.class.getSimpleName();
@@ -42,6 +44,8 @@ public class MeasureActivity extends AppCompatActivity {
     public static final String EXTRA_COUNT = "count";
     private static final int MEASURE_MODE = 0;
     private static final int CALIBRATE_MODE = 1;
+
+    private static final int MEASURE_POINT_INDEX_OFF = 10;//
 
     private String[] mLoadArray = new String[Constant.LINES_COUNT];
     private String[] mTimesArray;
@@ -61,7 +65,7 @@ public class MeasureActivity extends AppCompatActivity {
     private String mSampleUnit;
 
     private String mMeasurePointValue;
-    private String mMeasureValue;
+    //    private String mMeasureValue;
     private String mTap;
     private float mStep;
     private int mTotalTimes;
@@ -190,6 +194,7 @@ public class MeasureActivity extends AppCompatActivity {
         for (int i = 1; i < mTotalTimes + 1; i++) {
             mTimesArray[i] = String.valueOf(i);
         }
+        mMeasurePointIndex = MEASURE_POINT_INDEX_OFF;
 
     }
 
@@ -197,17 +202,23 @@ public class MeasureActivity extends AppCompatActivity {
         mMeasurePointPicker = (NumberPickerView) findViewById(R.id.measure_point_picker);
         mMeasurePointPicker.setHintText(mMeasureUnit);
         mMeasurePointPicker.refreshByNewDisplayedValues(getMeasurePointArray(mStep));
-        mMeasurePointValue = "00"; //init mMeasurePointValue.
-        mMeasurePointPicker.setOnValueChangedListener(new NumberPickerView.OnValueChangeListener() {
+        mMeasurePointValue = "0"; //init mMeasurePointValue.
+        mMeasurePointPicker.setOnValueChangedListener(new OnValueChangeListener() {
             @Override
             public void onValueChange(NumberPickerView picker, int oldVal, int newVal) {
                 mMeasurePointValue = mMeasurePointArray[newVal];
                 LogUtil.d(TAG, "newVal: " + newVal + ", mMeasurePointValue: " + mMeasurePointValue);
-                mMeasurePointIndex = newVal - 10;
+                mMeasurePointIndex = newVal;
             }
         });
         mTimesPicker = (NumberPickerView) findViewById(R.id.times_picker);
         mTimesPicker.refreshByNewDisplayedValues(mTimesArray);
+        mTimesPicker.setOnValueChangedListener(new NumberPickerView.OnValueChangeListener() {
+            @Override
+            public void onValueChange(NumberPickerView picker, int oldVal, int newVal) {
+                mTimes = newVal;
+            }
+        });
         mLoadPicker = (LoadPickerView) findViewById(R.id.load_picker);
         mLoadPicker.setIsDrawLine(true);
         mLoadPicker.refreshByNewDisplayedValues(mLoadArray);
@@ -221,7 +232,8 @@ public class MeasureActivity extends AppCompatActivity {
             public void onScrollFling(LoadPickerView view, float speedRatio) {
                 LogUtil.d(TAG, "speedRatio: " + speedRatio);
 //                sendMsg(Float.toString(speedRatio), false);
-                sendCmd(CommandUtil.getCalibrateCmd(Float.toString(speedRatio)), false);
+                int ratio = (byte) (speedRatio * 100);
+                sendCmd(CommandUtil.getCalibrateCmd(Integer.toString(ratio)), false);
             }
         });
 
@@ -245,15 +257,19 @@ public class MeasureActivity extends AppCompatActivity {
                     dialog();
                     break;
                 case R.id.center_btn:
-                    String floatHexStr;
-//                    floatHexStr = Float.toHexString(Float.valueOf(mMeasurePointValue));
-                    floatHexStr = StringUtil.bytes2HexString(StringUtil.int2byte(mMeasurePointIndex));
-                    LogUtil.d(TAG, "mMeasurePointValue: " + mMeasurePointValue + ", floatHexStr: " + floatHexStr);
+                    String hexStr;
+//                    hexStr = Float.toHexString(Float.valueOf(mMeasurePointValue));
+//                    hexStr = StringUtil.bytes2HexString(StringUtil.int2byte(mMeasurePointIndex));
+                    hexStr = CommandUtil.getMeasurePointHexValue(mMeasurePointIndex);
+                    LogUtil.d(TAG, "mMeasurePointValue: " + mMeasurePointValue + ", hexStr: " + hexStr);
 //                    BluetoothHelper.getBluetoothChatService(mContext).sendHex(CommandUtil.TEST_HEX_CMD);
 //                    SocketControl.getInstance().sendMsg(CommandUtil.TEST_HEX_CMD);
-
-                    sendCmd(CommandUtil.getCalibrateCmd(floatHexStr), false);
-                    mTimes++;
+                    if (CALIBRATE_MODE == mMode) {
+                        sendCmd(CommandUtil.getCalibrateCmd(hexStr), false);
+                    } else {
+                        sendCmd(CommandUtil.getSocketDataCmd(getValueData(mTap, mTotalTimes, mTimes, mMeasurePointValue, mSampleTv.getText().toString())), true);
+                    }
+//                    mTimes++;
                     break;
                 case R.id.cancel_btn:
 //                    ToastUtil.showToast(mContext, getStringById(R.string.cancel));
@@ -263,12 +279,6 @@ public class MeasureActivity extends AppCompatActivity {
 //                    ToastUtil.showToast(mContext, "change UI");
                     changeMode();
                     break;
-//                case R.id.upload_btn:
-//                    ToastUtil.showToast(mContext, "Up");
-//                    break;
-//                case R.id.download_btn:
-//                    ToastUtil.showToast(mContext, "Down");
-//                    break;
                 default:
                     break;
             }
@@ -392,7 +402,7 @@ public class MeasureActivity extends AppCompatActivity {
 //        }
 //    }
     private void sendCmd(String cmd, boolean socket) {
-        LogUtil.d(TAG, "sendMsg.msg: " + cmd);
+//        LogUtil.d(TAG, "sendMsg.msg: " + cmd + ", socket: " + socket);
         if (socket) {
             SocketControl.getInstance().sendMsg(cmd);
         } else {
@@ -407,21 +417,30 @@ public class MeasureActivity extends AppCompatActivity {
         int cmdLength = StringUtil.bytes2int(length);
         String cmdType = hexCmd.substring(4, 6);
         String content = "";
+        /**
+         * 0123456789
+         * AA12E4016368616E656C3120303030302E304EBBCC
+         *
+         */
         if (6 + cmdLength * 2 <= hexCmd.length()) {
-            content = hexCmd.substring(6, 6 + cmdLength * 2);
+            content = hexCmd.substring(6, 6 + cmdLength * 2 - 4);
         } else {
-            ToastUtil.showToast(mContext, "cmd lenght is error!");
+            LogUtil.d(TAG, "cmd length is error");
+            ToastUtil.showToast(mContext, "cmd length is error!");
         }
-        LogUtil.d(TAG, "cmdLength: " + cmdLength + " ,cmdType: " + cmdType + " , content: " + content);
+        LogUtil.d(TAG, "cmdLength: " + cmdLength + " ,cmdType: " + cmdType + " , content hex: " + content + " ,origin: " + StringUtil.hex2String(content));
         switch (cmdType) {
             case UPLOCD_CMD_CODE:
                 //TODO replease it after separation is OK.
                 String sampleValue = "";
-                if (content.length() > 36) {
-                    sampleValue = content.substring(18, 36);
+                if (content.length() >= (cmdLength - 2) * 2) {
+                    sampleValue = content.substring(18);
+                    int divideIndex = StringUtil.getValueUnitIndex(sampleValue);
+                    String s = Float.valueOf(StringUtil.hex2String(sampleValue.substring(0, divideIndex))) + StringUtil.hex2String(sampleValue.substring(divideIndex));
+                    LogUtil.d(TAG, "without more 0: " + s);
+                    mSampleTv.setText(s);
+                    mUnitTv.setVisibility(View.GONE);
                 }
-                mSampleTv.setText(StringUtil.hex2String(sampleValue));
-                mUnitTv.setVisibility(View.GONE);
                 break;
             default:
                 break;
