@@ -19,6 +19,8 @@ import android.widget.TextView;
 
 import com.android.meter.meter.bluetooth.BluetoothHelper;
 import com.android.meter.meter.bluetooth.BtConstant;
+import com.android.meter.meter.excel.ExcelUtils;
+import com.android.meter.meter.excel.Record;
 import com.android.meter.meter.http.HTTPConstant;
 import com.android.meter.meter.http.IHttpListener;
 import com.android.meter.meter.http.SocketControl;
@@ -27,9 +29,13 @@ import com.android.meter.meter.numberpicker.NumberPickerView;
 import com.android.meter.meter.numberpicker.NumberPickerView.OnValueChangeListener;
 import com.android.meter.meter.util.CommandUtil;
 import com.android.meter.meter.util.Constant;
+import com.android.meter.meter.util.FileUtil;
 import com.android.meter.meter.util.LogUtil;
 import com.android.meter.meter.util.StringUtil;
+import com.android.meter.meter.util.TimeUtil;
 import com.android.meter.meter.util.ToastUtil;
+
+import java.util.ArrayList;
 
 import static com.android.meter.meter.util.CommandUtil.UPLOCD_CMD_CODE;
 import static com.android.meter.meter.util.CommandUtil.getValueData;
@@ -46,6 +52,8 @@ public class MeasureActivity extends AppCompatActivity {
     private static final int CALIBRATE_MODE = 1;
 
     private static final int MEASURE_POINT_INDEX_OFF = 10;//
+
+    private static String[] mTitleArray = {"测量点值", "采样值"};
 
     private String[] mLoadArray = new String[Constant.LINES_COUNT];
     private String[] mTimesArray;
@@ -76,6 +84,8 @@ public class MeasureActivity extends AppCompatActivity {
     private TextView mUnitTv;
     private int mMode = MEASURE_MODE;
     private boolean mFirstTime = true;
+    private boolean mNeedOffset = true;
+    private int mInitRow = 0;
 
     private Handler mHandler = new Handler() {
         @Override
@@ -195,6 +205,7 @@ public class MeasureActivity extends AppCompatActivity {
             mTimesArray[i] = String.valueOf(i);
         }
         mMeasurePointIndex = MEASURE_POINT_INDEX_OFF;
+        mNeedOffset = true;
 
     }
 
@@ -269,6 +280,37 @@ public class MeasureActivity extends AppCompatActivity {
                         sendCmd(CommandUtil.getCalibrateCmd(hexStr), false);
                     } else {
                         sendCmd(CommandUtil.getSocketDataCmd(getValueData(mTap, mTotalTimes, mTimes, mMeasurePointValue, mSampleTv.getText().toString())), true);
+                        ExcelUtils.initExcel(FileUtil.getExcelPath(), mTitleArray);
+                        int rows = 0;
+                        if (mNeedOffset) {
+                            mRecordList.clear();
+                            mRecordList.add(new Record(mMeasureUnit, mSampleUnit).toArrayList());
+                            mRecordList.add(new Record(TimeUtil.getDateYearMonthDayHourMinute(), "").toArrayList());
+                            ExcelUtils.writeObjListToExcel(mRecordList, FileUtil.getExcelPath(), mNeedOffset);
+                            mInitRow = ExcelUtils.getRows(FileUtil.getExcelPath());
+                            rows = mInitRow;
+                            mNeedOffset = false;
+                        } else {
+                            rows = ExcelUtils.getRows(FileUtil.getExcelPath());
+                        }
+                        Record record = new Record(mMeasurePointValue, mSampleTv.getText().toString());
+                        LogUtil.d(TAG, "mInitRow: " + mInitRow + ", mTotalTimes: " + mTotalTimes + ", mTimes: " + mTimes + " , ExcelUtils.getRows: " + rows);
+                        if (mInitRow + mTotalTimes >= rows && mTimes == 0) {
+                            mRecordList.clear();
+                            mRecordList.add(record.toArrayList());
+                            ExcelUtils.writeObjListToExcel(mRecordList, FileUtil.getExcelPath(), mNeedOffset);
+                        } else {
+                            if (mTimes == 0) {
+                                ExcelUtils.writeObjToRow(record.toArrayList(), FileUtil.getExcelPath(), mInitRow + 1);
+                            } else {
+                                ExcelUtils.writeObjToRow(record.toArrayList(), FileUtil.getExcelPath(), mInitRow + mTimes);
+                            }
+                        }
+
+                        rows = ExcelUtils.getRows(FileUtil.getExcelPath());
+                        if (mInitRow + mTotalTimes == rows) {
+                            ExcelUtils.writeObjToRow(new Record(TimeUtil.getDateYearMonthDayHourMinute(), "").toArrayList(), FileUtil.getExcelPath(), mInitRow + mTotalTimes + 1);
+                        }
                     }
 //                    mTimes++;
                     break;
@@ -447,4 +489,13 @@ public class MeasureActivity extends AppCompatActivity {
                 break;
         }
     }
+
+    private ArrayList<ArrayList<String>> mRecordList = new ArrayList<ArrayList<String>>();
+
+    private ArrayList<ArrayList<String>> addRecord(ArrayList<String> record) {
+        mRecordList.clear();
+        mRecordList.add(record);
+        return mRecordList;
+    }
+
 }

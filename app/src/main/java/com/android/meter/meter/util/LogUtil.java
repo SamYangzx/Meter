@@ -8,7 +8,7 @@ import android.util.Log;
 
 public class LogUtil {
 
-    public static final String COMMON_TAG = "meter/";
+    public static final String COMMON_TAG = "sam/";
 
     public static void d(String tag, String msg) {
         Log.w(tag, msg);

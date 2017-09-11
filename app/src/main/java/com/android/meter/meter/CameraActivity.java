@@ -123,13 +123,13 @@ public class CameraActivity extends AppCompatActivity implements
             mCameraView.addCallback(mCallback);
         }
 //        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.take_picture);
-        Button fab = (Button)findViewById(R.id.take_picture);
+        Button fab = (Button) findViewById(R.id.take_picture);
         if (fab != null) {
             fab.setOnClickListener(mOnClickListener);
         }
 
         Button completeFab = (Button) findViewById(R.id.take_picture_complete);
-        if (completeFab != null){
+        if (completeFab != null) {
             completeFab.setOnClickListener(mOnClickListener);
         }
 
@@ -268,13 +268,13 @@ public class CameraActivity extends AppCompatActivity implements
         @Override
         public void onPictureTaken(CameraView cameraView, final byte[] data) {
             Log.d(TAG, "onPictureTaken " + data.length);
-            Toast.makeText(cameraView.getContext(),  TimeUtil.getDateYearMonthDayHourMinute(), Toast.LENGTH_SHORT)
+            Toast.makeText(cameraView.getContext(), TimeUtil.getDateYearMonthDayHourMinute(), Toast.LENGTH_SHORT)
                     .show();
             Log.d(TAG, "Pictures Directory: " + Environment.getExternalStorageDirectory());
             getBackgroundHandler().post(new Runnable() {
                 @Override
                 public void run() {
-                    File file = new File(FileUtil.getPicFolder(TimeUtil.getDateYearMonthDay()),
+                    File file = new File(FileUtil.getPicFolder(),
                             FileUtil.getTimeFileName());
                     OutputStream os = null;
                     try {
@@ -353,7 +353,7 @@ public class CameraActivity extends AppCompatActivity implements
     }
 
     private void refreshGallery(File file) {
-        Intent mediaScanIntent = new Intent( Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
         mediaScanIntent.setData(Uri.fromFile(file));
         sendBroadcast(mediaScanIntent);
     }
