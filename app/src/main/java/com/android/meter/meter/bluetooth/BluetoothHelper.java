@@ -467,11 +467,18 @@ public class BluetoothHelper {
                     byte[] endByte = new byte[1];
                     mmInStream.read(endByte, 0, 1);
                     byte[] wholeByte = CommandUtil.getWholeCmd(preByte, lengthByte, readbuff, endByte);
+                    byte chechSum = CommandUtil.getChecksum(StringUtil.byteMerger(lengthByte, readbuff));
+
                     LogUtil.d(TAG, "checksum: " + CommandUtil.getChecksum(StringUtil.byteMerger(lengthByte, readbuff)) + " ,end: " + StringUtil.byte2int(endByte[0]));
                     LogUtil.d(TAG, "receive origin msg: " + StringUtil.bytes2HexString(wholeByte));
                     if (mHandler != null) {
-                        mHandler.obtainMessage(BtConstant.MESSAGE_READ, wholeByte.length, -1, wholeByte)
-                                .sendToTarget();
+                        if (chechSum == 0) {
+                            mHandler.obtainMessage(BtConstant.MESSAGE_READ_SUCCESS, wholeByte.length, -1, wholeByte)
+                                    .sendToTarget();
+                        } else {
+                            mHandler.obtainMessage(BtConstant.MESSAGE_READ_FAILED, wholeByte.length, -1, wholeByte)
+                                    .sendToTarget();
+                        }
                     } else {
                         LogUtil.d(TAG, "ConnectedThread.run.mHandler is null");
                     }

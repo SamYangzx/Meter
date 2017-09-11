@@ -92,9 +92,12 @@ public class SocketControl {
         }
     }
 
+//    private long mCmdSendTime = 0;
     public void sendMsg(String hex) {
         if (mSendThread != null) {
+//            mCmdSendTime = System.currentTimeMillis();
             mSendThread.sendMsg(hex);
+
         } else {
             LogUtil.sendCmdResult(TAG, hex, false);
             if (mIHttpListener != null) {

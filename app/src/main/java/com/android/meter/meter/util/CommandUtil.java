@@ -38,6 +38,7 @@ public class CommandUtil {
     /***constant cmd begin*/
     public static final String START_CLOLLECT_HEXCMD = "BB03E500CC";
     public static final String END_CLOLLECT_HEXCMD = "BB03E501CC";
+    public static final String CHECKSUM_FAILED_HEXCMD = "AA02FFCC";
     /***constant cmd end*/
 
     public static final String TEST_HEX_CMD = "AA05E4414243BBCC";

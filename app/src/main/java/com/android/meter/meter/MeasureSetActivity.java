@@ -126,7 +126,7 @@ public class MeasureSetActivity extends AppCompatActivity {
 //                    mConversationArrayAdapter.add("Me:  " + writeMessage);
                     ToastUtil.showToast(mContext, "sendString : " + writeMessage);
                     break;
-                case BtConstant.MESSAGE_READ:
+                case BtConstant.MESSAGE_READ_SUCCESS:
                     byte[] readBuf = (byte[]) msg.obj;
                     String readMessage = StringUtil.bytes2HexString(readBuf);
                     ToastUtil.showToast(mContext, "Receive: " + readMessage);

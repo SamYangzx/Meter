@@ -29,17 +29,17 @@ public class SocketReceiver extends Thread {
             String content;
             while (true) {
                 if (socket.isClosed()) {
-                    System.out.println("Socket已关闭，无法获取消息");
+                    System.out.println("error: Socket closed, can not receive message!!!");
                     reader.close();
                     socket.close();
                     break;
                 }
                 content = reader.readLine();
-                if(content == null || content ==""){
+                if (content == null || content == "") {
                     continue;
                 }
                 Log.d(TAG, "Receive: " + StringUtil.hex2String(content));
-                if(mIHttpListener != null){
+                if (mIHttpListener != null) {
                     mIHttpListener.onResult(HTTPConstant.RECEIVE_MSG, content);
                 }
 //                if (content.equals("bye")) {

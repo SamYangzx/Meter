@@ -11,11 +11,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.Window;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -222,7 +219,7 @@ public class BluetoothChatActivity extends Activity {
 //                    mConversationArrayAdapter.add("Me:  " + writeMessage);
 
                     break;
-                case BtConstant.MESSAGE_READ:
+                case BtConstant.MESSAGE_READ_SUCCESS:
 //                    byte[] readBuf = (byte[]) msg.obj;
                     // construct a string from the valid bytes in the buffer
 //                    String readMessage = new String(readBuf, 0, msg.arg1);
