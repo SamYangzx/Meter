@@ -32,11 +32,11 @@ public class SocketReceiver extends Thread {
                     socket.close();
                     break;
                 }
-                content = reader.readLine();
+                content = reader.readLine(); //服务器端需要发送一个回车符
                 if (content == null || content == "") {
                     continue;
                 }
-                LogUtil.d(TAG, "Receive: " + StringUtil.hex2String(content));
+                LogUtil.receiveCmdResult(TAG, "Receive: " + StringUtil.hex2String(content));
                 if (mIHttpListener != null) {
                     mIHttpListener.onResult(HTTPConstant.RECEIVE_SUCCESS, content);
                 }

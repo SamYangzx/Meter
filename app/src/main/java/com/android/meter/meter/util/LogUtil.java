@@ -50,4 +50,12 @@ public class LogUtil {
     public static void sendCmdResult(String tag, byte[] buffer, boolean result) {
         d(tag, "send origin String: " + StringUtil.bytes2String(buffer) + " , hex String: " + StringUtil.bytes2HexString(buffer) + "  result: " + (result ? "success" : "failed"));
     }
+
+    public static void receiveCmdResult(String tag, String hexCmd) {
+        d(tag, "receive origin String: " + StringUtil.hex2String(hexCmd) + " , hex String: " + hexCmd);
+    }
+
+    public static void receiveCmdResult(String tag, byte[] buffer) {
+        d(tag, "receive origin String: " + StringUtil.bytes2String(buffer) + " , hex String: " + StringUtil.bytes2HexString(buffer));
+    }
 }

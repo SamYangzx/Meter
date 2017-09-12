@@ -256,7 +256,7 @@ public class MeasureActivity extends AppCompatActivity {
                 byte[] ratio = new byte[1];
                 ratio[0] = (byte) (speedRatio * 100);
                 LogUtil.d(TAG, "speedRatio: " + speedRatio + " ,intRatio: " + ratio[0] + ", Integer.toString(ratio): " + StringUtil.bytes2HexString(ratio));
-                sendCmd(CommandUtil.getCalibrateCmd(StringUtil.bytes2HexString(ratio)), true);
+                sendCmd(CommandUtil.getCalibrateCmd(StringUtil.bytes2HexString(ratio)), false);
             }
         });
 
