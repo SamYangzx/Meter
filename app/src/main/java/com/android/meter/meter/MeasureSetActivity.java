@@ -126,7 +126,7 @@ public class MeasureSetActivity extends AppCompatActivity {
 //                    mConversationArrayAdapter.add("Me:  " + writeMessage);
                     ToastUtil.showToast(mContext, "sendString : " + writeMessage);
                     break;
-                case BtConstant.MESSAGE_READ_SUCCESS:
+                case BtConstant.MESSAGE_RECEIVE_SUCCESS:
                     byte[] readBuf = (byte[]) msg.obj;
                     String readMessage = StringUtil.bytes2HexString(readBuf);
                     ToastUtil.showToast(mContext, "Receive: " + readMessage);
@@ -143,14 +143,14 @@ public class MeasureSetActivity extends AppCompatActivity {
                             Toast.LENGTH_SHORT).show();
                     break;
                 case HTTPConstant.CONNECT_SUCCESS:
-                    ToastUtil.showToast(mContext, "Http connect success");
+                    ToastUtil.showToast(mContext, "Socket connect success");
                     mNetworkDialog.dismiss();
                     break;
                 case HTTPConstant.CONNECT_FAIL:
-                    ToastUtil.showToast(mContext, "Http connect fail");
+                    ToastUtil.showToast(mContext, "Socket connect fail");
                     break;
                 case HTTPConstant.SEND_FAIL:
-                    ToastUtil.showToast(mContext, "Http send msg fail!!");
+                    ToastUtil.showToast(mContext, "Socket send msg fail!!");
                     break;
                 default:
                     break;

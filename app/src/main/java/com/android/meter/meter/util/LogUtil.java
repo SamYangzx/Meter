@@ -14,11 +14,16 @@ public class LogUtil {
         Log.w(tag, msg);
     }
 
+    public static void e(String tag, String msg) {
+        Log.e(tag, msg);
+    }
+
     public static void callStack(String tag, String msg) {
         StringBuilder sb = new StringBuilder();
         sb.append(msg).append("\n").append(track());
         Log.d(tag, sb.toString());
     }
+
 
     private static String track() {
         StackTraceElement[] straceTraceElements = Thread.currentThread().getStackTrace();

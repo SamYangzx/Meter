@@ -1,7 +1,5 @@
 package com.android.meter.meter.http;
 
-import android.util.Log;
-
 import com.android.meter.meter.util.LogUtil;
 import com.android.meter.meter.util.StringUtil;
 
@@ -29,65 +27,69 @@ public class SocketSender extends Thread {
 
     @Override
     public void run() {
+        String msg = "";
         try {
 //            mOutStream = new BufferedWriter(new OutputStreamWriter(mSocket.getOutputStream(), "UTF-8"));
 //            BufferedReader inputReader = new BufferedReader(new InputStreamReader(System.in));
 //            mOutStream = new DataOutputStream(mSocket.getOutputStream());
             mOutStream = mSocket.getOutputStream();
-
 //            os.write();
-            String msg = "";
-            try {
-                while (mContinue) {
+            while (mContinue) {
 //                    msg = inputReader.readLine();
-                    if (mMsgQueue.isEmpty()) {
-                        continue;
-                    }
-                    msg = mMsgQueue.poll();
-                    if (msg == null || msg == "") {
-                        continue;
-                    }
-                    if (mSocket.isClosed()) {
-                        System.out.println("Socket id closed!");
-                        mOutStream.close();
-                        mSocket.close();
-                        break;
-                    }
+                if (mMsgQueue.isEmpty()) {
+                    continue;
+                }
+                msg = mMsgQueue.poll();
+                if (msg == null || msg == "") {
+                    continue;
+                }
+                if (mSocket.isClosed()) {
+                    LogUtil.d(TAG, "Socket id closed!");
+                    break;
+                }
 //                    mOutStream.write(msg);
 //                    mOutStream.newLine();
-                    writeMsg(msg);
+                writeMsg(msg);
 //                    mOutStream.write("\0".getBytes());
 //                    writeMsg(HTTPConstant.HEX_END);
-                    mOutStream.flush();
-                    LogUtil.sendCmdResult(TAG, msg, true);
-                    if (mIHttpListener != null) {
-                        mIHttpListener.onResult(HTTPConstant.SEND_SUCCESS, msg);
-                    }
+                mOutStream.flush();
+                LogUtil.sendCmdResult(TAG, msg, true);
+                if (mIHttpListener != null) {
+                    mIHttpListener.onResult(HTTPConstant.SEND_SUCCESS, msg);
                 }
-            } catch (IOException e) {
-                LogUtil.sendCmdResult(TAG, msg, false);
-                Log.e(TAG, "e: " + e);
-                mIHttpListener.onResult(HTTPConstant.SEND_FAIL, null);
-                if (mOutStream != null) {
-                    mOutStream.close();
-                }
-                if (mSocket != null) {
-                    mSocket.close();
-                }
-                e.printStackTrace();
             }
         } catch (Exception e) {
+            LogUtil.sendCmdResult(TAG, msg, false);
+            LogUtil.e(TAG, "e: " + e);
+            if (mIHttpListener != null) {
+                mIHttpListener.onResult(HTTPConstant.SEND_FAIL, msg);
+            }
             e.printStackTrace();
+        } finally {
+            if (mOutStream != null) {
+                try {
+                    mOutStream.close();
+                } catch (IOException e) {
+
+                }
+            }
+            if (mSocket != null) {
+                try {
+                    mSocket.close();
+                } catch (IOException e) {
+
+                }
+            }
         }
     }
 
     public synchronized void sendMsg(String hex) {
         if (mSocket != null) {
-            LogUtil.d(TAG, "add hex");
+            LogUtil.d(TAG, "sendMsg.add hex");
             mMsgQueue.offer(hex);
         } else {
-            LogUtil.d(TAG, "add hex failed.");
-            mIHttpListener.onResult(HTTPConstant.SEND_FAIL, null);
+            LogUtil.d(TAG, "sendMsg.add hex failed.");
+            mIHttpListener.onResult(HTTPConstant.SEND_FAIL, hex);
             LogUtil.sendCmdResult(TAG, hex, false);
         }
     }

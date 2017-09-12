@@ -219,7 +219,7 @@ public class BluetoothChatActivity extends Activity {
 //                    mConversationArrayAdapter.add("Me:  " + writeMessage);
 
                     break;
-                case BtConstant.MESSAGE_READ_SUCCESS:
+                case BtConstant.MESSAGE_RECEIVE_SUCCESS:
 //                    byte[] readBuf = (byte[]) msg.obj;
                     // construct a string from the valid bytes in the buffer
 //                    String readMessage = new String(readBuf, 0, msg.arg1);

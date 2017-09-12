@@ -473,10 +473,10 @@ public class BluetoothHelper {
                     LogUtil.d(TAG, "receive origin msg: " + StringUtil.bytes2HexString(wholeByte));
                     if (mHandler != null) {
                         if (chechSum == 0) {
-                            mHandler.obtainMessage(BtConstant.MESSAGE_READ_SUCCESS, wholeByte.length, -1, wholeByte)
+                            mHandler.obtainMessage(BtConstant.MESSAGE_RECEIVE_SUCCESS, wholeByte.length, -1, wholeByte)
                                     .sendToTarget();
                         } else {
-                            mHandler.obtainMessage(BtConstant.MESSAGE_READ_FAILED, wholeByte.length, -1, wholeByte)
+                            mHandler.obtainMessage(BtConstant.MESSAGE_RECEIVE_FAILED, wholeByte.length, -1, wholeByte)
                                     .sendToTarget();
                         }
                     } else {

@@ -12,10 +12,13 @@ public class HTTPConstant {
     public static final int SEND_FAIL = 0x102;
     public static final int CONNECT_SUCCESS = 0x103;
     public static final int CONNECT_FAIL = 0x104;
-    public static final int RECEIVE_MSG = 0x105;
+    public static final int RECEIVE_SUCCESS = 0x105;
+    public static final int RECEIVE_FAILED = 0x106;
+    public static final int RECEIVE_CHECK_SUCCESS = 0x107;
+    public static final int RECEIVE_CHECK_FAILED = 0x108;
+    public static final String RECEIVED_SUCCESS = "BB030102CC";
 
     public static final boolean WRITE_HEX = true;
     public static final String HEX_END = "0D0A";
-
 
 }

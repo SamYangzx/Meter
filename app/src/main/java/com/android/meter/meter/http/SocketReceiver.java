@@ -1,7 +1,5 @@
 package com.android.meter.meter.http;
 
-import android.util.Log;
-
 import com.android.meter.meter.util.LogUtil;
 import com.android.meter.meter.util.StringUtil;
 
@@ -22,11 +20,11 @@ public class SocketReceiver extends Thread {
 
     @Override
     public void run() {
+        String content = null;
         try {
             // 获取socket的输 出\入 流
             BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
             //接收到的消息
-            String content;
             while (true) {
                 if (socket.isClosed()) {
                     System.out.println("error: Socket closed, can not receive message!!!");
@@ -38,9 +36,9 @@ public class SocketReceiver extends Thread {
                 if (content == null || content == "") {
                     continue;
                 }
-                Log.d(TAG, "Receive: " + StringUtil.hex2String(content));
+                LogUtil.d(TAG, "Receive: " + StringUtil.hex2String(content));
                 if (mIHttpListener != null) {
-                    mIHttpListener.onResult(HTTPConstant.RECEIVE_MSG, content);
+                    mIHttpListener.onResult(HTTPConstant.RECEIVE_SUCCESS, content);
                 }
 //                if (content.equals("bye")) {
 //                    System.out.println("对方请求关闭连接,无法继续进行聊天");
@@ -53,6 +51,10 @@ public class SocketReceiver extends Thread {
             socket.close();
         } catch (Exception e) {
             e.printStackTrace();
+            LogUtil.d(TAG, "e: " + e);
+            if (mIHttpListener != null) {
+                mIHttpListener.onResult(HTTPConstant.RECEIVE_FAILED, content);
+            }
         }
     }
 

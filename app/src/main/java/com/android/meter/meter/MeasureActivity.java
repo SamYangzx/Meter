@@ -91,7 +91,7 @@ public class MeasureActivity extends AppCompatActivity {
         @Override
         public void handleMessage(Message msg) {
 //            LogUtil.d(TAG, "msg: " + msg.what)
-
+            String data = (String) msg.obj;
             switch (msg.what) {
                 case BtConstant.MESSAGE_STATE_CHANGE:
                     Log.i(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
@@ -118,14 +118,15 @@ public class MeasureActivity extends AppCompatActivity {
 //                    mConversationArrayAdapter.add("Me:  " + writeMessage);
                     ToastUtil.showToast(mContext, "sendString: " + writeMessage);
                     break;
-                case BtConstant.MESSAGE_READ_SUCCESS:
+                case BtConstant.MESSAGE_RECEIVE_SUCCESS:
+                    BluetoothHelper.getBluetoothChatService(mContext).sendHex(CommandUtil.CHECKSUM_SUCCESS_HEXCMD);
                     byte[] readBuf = (byte[]) msg.obj;
                     String readMessage = StringUtil.bytes2HexString(readBuf);
 //                    mSampleTv.setText(readMessage);
                     ToastUtil.showToast(mContext, "receice: " + readMessage);
                     handlerCmd(readMessage);
                     break;
-                case BtConstant.MESSAGE_READ_FAILED:
+                case BtConstant.MESSAGE_RECEIVE_FAILED:
                     BluetoothHelper.getBluetoothChatService(mContext).sendHex(CommandUtil.CHECKSUM_FAILED_HEXCMD);
                     break;
                 case BtConstant.MESSAGE_DEVICE_NAME:
@@ -134,9 +135,16 @@ public class MeasureActivity extends AppCompatActivity {
 //                    Toast.makeText(getApplicationContext(), msg.getData().getString(TOAST),
 //                            Toast.LENGTH_SHORT).show();
                     break;
-                case HTTPConstant.RECEIVE_MSG:
-                    String data = (String) msg.obj;
+                case HTTPConstant.SEND_FAIL:
+                    if (data != null) {
+                        ToastUtil.showToast(mContext, "发送数据失败，请检查连接是否正常!");
+                    }
+                    break;
+                case HTTPConstant.RECEIVE_SUCCESS:
                     handlerCmd(data);
+                    break;
+                case HTTPConstant.RECEIVE_CHECK_FAILED:
+                    ToastUtil.showToast(mContext, "电脑端未回复!");
                     break;
                 default:
                     break;
@@ -391,28 +399,10 @@ public class MeasureActivity extends AppCompatActivity {
     private IHttpListener mHttpListener = new IHttpListener() {
         @Override
         public void onResult(int state, String data) {
-            switch (state) {
-                case HTTPConstant.CONNECT_SUCCESS:
-                    LogUtil.d(TAG, "connect success");
-                    mHandler.sendEmptyMessage(HTTPConstant.CONNECT_SUCCESS);
-                    break;
-                case HTTPConstant.CONNECT_FAIL:
-                    mHandler.sendEmptyMessage(HTTPConstant.CONNECT_FAIL);
-                    LogUtil.d(TAG, "connect fail");
-                    break;
-                case HTTPConstant.SEND_FAIL:
-                    mHandler.sendEmptyMessage(HTTPConstant.SEND_FAIL);
-                    break;
-                case HTTPConstant.RECEIVE_MSG:
-                    Message msg = new Message();
-                    msg.arg1 = HTTPConstant.RECEIVE_MSG;
-                    msg.obj = data;
-                    mHandler.sendMessage(msg);
-                    break;
-                default:
-                    break;
-            }
-
+            Message msg = new Message();
+            msg.what = state;
+            msg.obj = data;
+            mHandler.sendMessage(msg);
         }
     };
 
