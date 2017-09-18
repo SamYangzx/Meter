@@ -20,7 +20,7 @@ public class SocketControl {
     private static final int CONNECT_TIMEOUT = 5 * 1000;
     private static final int READ_TIMEOUT = 1 * 1000;
     private static final int MAX_RESPONSE_MILL_TIME = 1000;
-    private static final int MAX_SEND_TIMES = 3;
+    private static final int MAX_SEND_TIMES = 1;
     private boolean mHasResponsed = true;
 
     private Handler mHanlder = new Handler() {
@@ -162,10 +162,10 @@ public class SocketControl {
     public void sendMsg(String hex) {
         mCmdSendTime = System.currentTimeMillis();
         LogUtil.d(TAG, "sendMsg.hex: " + hex + " ,time: " + mCmdSendTime + ", mSendTimes: " + mSendTimes);
+        mSendTimes++;
+        mHasResponsed = false;
+        mTempString = hex;
         if (mSendThread != null && mHasResponsed) {
-            mSendTimes++;
-            mHasResponsed = false;
-            mTempString = hex;
             mHanlder.postDelayed(mRunnable, MAX_RESPONSE_MILL_TIME);
             mSendThread.sendMsg(hex);
         } else {

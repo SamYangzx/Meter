@@ -261,7 +261,7 @@ public class MeasureSetActivity extends AppCompatActivity {
                 mDebugDialog.setYesOnclickListener(new CustomDialog.onEnterclickListener() {
                     @Override
                     public void onYesClick() {
-                        test();
+//                        test();
 
                         BluetoothHelper.getBluetoothChatService(mContext).sendHex(mDebugDialog.getMessageStr());
                         SocketControl.getInstance().sendMsg(mDebugDialog.getMessageStr());

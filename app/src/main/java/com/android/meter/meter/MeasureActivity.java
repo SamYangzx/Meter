@@ -322,6 +322,7 @@ public class MeasureActivity extends AppCompatActivity {
                         if (mInitRow + mTotalTimes == rows) {
                             ExcelUtils.writeObjToRow(new Record(TimeUtil.getDateYearMonthDayHourMinute(), "").toArrayList(), FileUtil.getExcelPath(), mInitRow + mTotalTimes + 1);
                         }
+
                     }
 //                    mTimes++;
                     break;
