@@ -19,8 +19,8 @@ public class SocketControl {
 
     private static final int CONNECT_TIMEOUT = 5 * 1000;
     private static final int READ_TIMEOUT = 1 * 1000;
-    private static final int MAX_RESPONSE_MILL_TIME = 1000;
-    private static final int MAX_SEND_TIMES = 1;
+    private static final int MAX_RESPONSE_MILL_TIME = 1500;
+    private static final int MAX_SEND_TIMES = 3;
     private boolean mHasResponsed = true;
 
     private Handler mHanlder = new Handler() {
@@ -51,7 +51,7 @@ public class SocketControl {
                             mIHttpListener.onResult(HTTPConstant.RECEIVE_SUCCESS, data);
                             break;
                         } else {
-                            if (System.currentTimeMillis() - mCmdSendTime <= MAX_RESPONSE_MILL_TIME && HTTPConstant.RECEIVED_SUCCESS.equals(data)) {
+                            if (System.currentTimeMillis() - mCmdSendTime <= MAX_RESPONSE_MILL_TIME && data != null && data.startsWith(HTTPConstant.RECEIVED_SUCCESS)) {
 //                            mIHttpListener.onResult(HTTPConstant.RECEIVE_SUCCESS, data);
                                 response(HTTPConstant.SEND_SUCCESS, data);
                                 mSendTimes = 0;
@@ -69,6 +69,9 @@ public class SocketControl {
                         break;
                     case HTTPConstant.SEND_FAIL:
                         retry(HTTPConstant.SEND_FAIL, data);
+                        break;
+                    case HTTPConstant.HAS_NOT_RESPONSE:
+                        response(HTTPConstant.HAS_NOT_RESPONSE, data);
                         break;
                     default:
                         break;
@@ -163,15 +166,34 @@ public class SocketControl {
         mCmdSendTime = System.currentTimeMillis();
         LogUtil.d(TAG, "sendMsg.hex: " + hex + " ,time: " + mCmdSendTime + ", mSendTimes: " + mSendTimes);
         mSendTimes++;
-        mHasResponsed = false;
         mTempString = hex;
-        if (mSendThread != null && mHasResponsed) {
-            mHanlder.postDelayed(mRunnable, MAX_RESPONSE_MILL_TIME);
-            mSendThread.sendMsg(hex);
+//        if (mSendThread != null && mHasResponsed) {
+//            mHasResponsed = false;
+//            mHanlder.postDelayed(mRunnable, MAX_RESPONSE_MILL_TIME);
+//            mSendThread.sendMsg(hex);
+//        } else {
+//            LogUtil.sendCmdResult(TAG, hex, false);
+//            mHasResponsed = false;
+//            if (mControlListener != null) {
+//                mControlListener.onResult(HTTPConstant.SEND_FAIL, hex);
+//            }
+//        }
+
+
+        if (mSendThread == null) {
+            mHasResponsed = false;
+            response(HTTPConstant.SEND_FAIL, hex);
         } else {
-            LogUtil.sendCmdResult(TAG, hex, false);
-            if (mControlListener != null) {
-                mControlListener.onResult(HTTPConstant.SEND_FAIL, hex);
+            if (mHasResponsed) {
+                mHasResponsed = false;
+                mHanlder.postDelayed(mRunnable, MAX_RESPONSE_MILL_TIME);
+                mSendThread.sendMsg(hex);
+            } else {
+                LogUtil.sendCmdResult(TAG, hex, false);
+                mHasResponsed = false;
+                if (mControlListener != null) {
+                    mControlListener.onResult(HTTPConstant.HAS_NOT_RESPONSE, hex);
+                }
             }
         }
 
@@ -180,9 +202,8 @@ public class SocketControl {
     private Runnable mRunnable = new Runnable() {
         @Override
         public void run() {
+            LogUtil.d(TAG, "Timeout!!!");
             mControlListener.onResult(HTTPConstant.RECEIVE_CHECK_FAILED, mTempString);
-//            mSendTimes = 0;
-            mHasResponsed = true;
         }
     };
 

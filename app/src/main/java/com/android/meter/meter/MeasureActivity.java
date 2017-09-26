@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.meter.meter.bluetooth.BluetoothHelper;
 import com.android.meter.meter.bluetooth.BtConstant;
@@ -37,6 +38,7 @@ import com.android.meter.meter.util.ToastUtil;
 
 import java.util.ArrayList;
 
+import static com.android.meter.meter.bluetooth.BluetoothChatActivity.TOAST;
 import static com.android.meter.meter.util.CommandUtil.UPLOCD_CMD_CODE;
 import static com.android.meter.meter.util.CommandUtil.getValueData;
 
@@ -50,6 +52,7 @@ public class MeasureActivity extends AppCompatActivity {
     public static final String EXTRA_COUNT = "count";
     private static final int MEASURE_MODE = 0;
     private static final int CALIBRATE_MODE = 1;
+    private static final int GENERAL_DELAY_TIME = 500;
 
     private static final int MEASURE_POINT_INDEX_OFF = 10;//
 
@@ -69,7 +72,7 @@ public class MeasureActivity extends AppCompatActivity {
     private Button mEnterBtn;
     private Button mCalcelBtn;
 
-    private String mMeasureUnit;
+    private String mMeasurePointUnit;
     private String mSampleUnit;
 
     private String mMeasurePointValue;
@@ -91,7 +94,7 @@ public class MeasureActivity extends AppCompatActivity {
         @Override
         public void handleMessage(Message msg) {
 //            LogUtil.d(TAG, "msg: " + msg.what)
-            String data = (String) msg.obj;
+            String data;
             switch (msg.what) {
                 case BtConstant.MESSAGE_STATE_CHANGE:
                     Log.i(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
@@ -116,14 +119,14 @@ public class MeasureActivity extends AppCompatActivity {
                     // construct a string from the buffer
                     String writeMessage = StringUtil.bytes2HexString(writeBuf);
 //                    mConversationArrayAdapter.add("Me:  " + writeMessage);
-                    ToastUtil.showToast(mContext, "sendString: " + writeMessage);
+                    ToastUtil.showToast(mContext, "BT sendString: " + writeMessage);
                     break;
                 case BtConstant.MESSAGE_RECEIVE_SUCCESS:
-                    BluetoothHelper.getBluetoothChatService(mContext).sendHex(CommandUtil.CHECKSUM_SUCCESS_HEXCMD);
+//                    BluetoothHelper.getBluetoothChatService(mContext).sendHex(CommandUtil.CHECKSUM_SUCCESS_HEXCMD);
                     byte[] readBuf = (byte[]) msg.obj;
                     String readMessage = StringUtil.bytes2HexString(readBuf);
 //                    mSampleTv.setText(readMessage);
-                    ToastUtil.showToast(mContext, "receice: " + readMessage);
+                    ToastUtil.showToast(mContext, "BT receive: " + readMessage);
                     handlerCmd(readMessage);
                     break;
                 case BtConstant.MESSAGE_RECEIVE_FAILED:
@@ -132,19 +135,21 @@ public class MeasureActivity extends AppCompatActivity {
                 case BtConstant.MESSAGE_DEVICE_NAME:
                     break;
                 case BtConstant.MESSAGE_TOAST:
-//                    Toast.makeText(getApplicationContext(), msg.getData().getString(TOAST),
-//                            Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), msg.getData().getString(TOAST),
+                            Toast.LENGTH_SHORT).show();
                     break;
                 case HTTPConstant.SEND_FAIL:
-                    if (data != null) {
-                        ToastUtil.showToast(mContext, "发送数据失败，请检查连接是否正常!");
-                    }
+                    ToastUtil.showToast(mContext, "Socket发送数据失败，请检查网络连接是否正常!");
                     break;
                 case HTTPConstant.RECEIVE_SUCCESS:
+                    data = (String) msg.obj;
                     handlerCmd(data);
                     break;
                 case HTTPConstant.RECEIVE_CHECK_FAILED:
                     ToastUtil.showToast(mContext, "电脑端未回复!");
+                    break;
+                case HTTPConstant.HAS_NOT_RESPONSE:
+                    ToastUtil.showToast(mContext, "上一条指令还未处理完，请等待！");
                     break;
                 default:
                     break;
@@ -164,7 +169,7 @@ public class MeasureActivity extends AppCompatActivity {
         mContext = this;
         initTitle();
 
-        mMeasureUnit = getIntent().getStringExtra(EXTRA_MEASURE_UNIT);
+        mMeasurePointUnit = getIntent().getStringExtra(EXTRA_MEASURE_UNIT);
         mSampleUnit = getIntent().getStringExtra(EXTRA_SAMPLE_UNIT);
         mTap = getIntent().getStringExtra(EXTRA_TAP);
         mStep = getIntent().getFloatExtra(EXTRA_STEP, 1);
@@ -191,6 +196,7 @@ public class MeasureActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        LogUtil.d(TAG, "onDestroy is invoked.");
         super.onDestroy();
         BluetoothHelper.getBluetoothChatService(mContext).setmHandler(null);
     }
@@ -218,11 +224,18 @@ public class MeasureActivity extends AppCompatActivity {
         mMeasurePointIndex = MEASURE_POINT_INDEX_OFF;
         mNeedOffset = true;
 
+
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                BluetoothHelper.getBluetoothChatService(mContext).sendHex(CommandUtil.getCalibrateCmd(CommandUtil.getBTUnitHexData(mMeasurePointUnit, mSampleUnit)));
+            }
+        }, GENERAL_DELAY_TIME);
     }
 
     private void initView() {
         mMeasurePointPicker = (NumberPickerView) findViewById(R.id.measure_point_picker);
-        mMeasurePointPicker.setHintText(mMeasureUnit);
+        mMeasurePointPicker.setHintText(mMeasurePointUnit);
         mMeasurePointPicker.refreshByNewDisplayedValues(getMeasurePointArray(mStep));
         mMeasurePointValue = "0"; //init mMeasurePointValue.
         mMeasurePointPicker.setOnValueChangedListener(new OnValueChangeListener() {
@@ -256,7 +269,7 @@ public class MeasureActivity extends AppCompatActivity {
                 byte[] ratio = new byte[1];
                 ratio[0] = (byte) (speedRatio * 100);
                 LogUtil.d(TAG, "speedRatio: " + speedRatio + " ,intRatio: " + ratio[0] + ", Integer.toString(ratio): " + StringUtil.bytes2HexString(ratio));
-                sendCmd(CommandUtil.getCalibrateCmd(StringUtil.bytes2HexString(ratio)), false);
+                sendCmd(CommandUtil.getLoadCmd(StringUtil.bytes2HexString(ratio)), false);
             }
         });
 
@@ -288,14 +301,14 @@ public class MeasureActivity extends AppCompatActivity {
 //                    BluetoothHelper.getBluetoothChatService(mContext).sendHex(CommandUtil.TEST_HEX_CMD);
 //                    SocketControl.getInstance().sendMsg(CommandUtil.TEST_HEX_CMD);
                     if (CALIBRATE_MODE == mMode) {
-                        sendCmd(CommandUtil.getCalibrateCmd(hexStr), false);
+                        sendCmd(CommandUtil.getSaveCmd(hexStr), false);
                     } else {
                         sendCmd(CommandUtil.getSocketDataCmd(getValueData(mTap, mTotalTimes, mTimes, mMeasurePointValue, mSampleTv.getText().toString())), true);
                         ExcelUtils.initExcel(FileUtil.getExcelPath(), mTitleArray);
                         int rows = 0;
                         if (mNeedOffset) {
                             mRecordList.clear();
-                            mRecordList.add(new Record(mMeasureUnit, mSampleUnit).toArrayList());
+                            mRecordList.add(new Record(mMeasurePointUnit, mSampleUnit).toArrayList());
                             mRecordList.add(new Record(TimeUtil.getDateYearMonthDayHourMinute(), "").toArrayList());
                             ExcelUtils.writeObjListToExcel(mRecordList, FileUtil.getExcelPath(), mNeedOffset);
                             mInitRow = ExcelUtils.getRows(FileUtil.getExcelPath());
@@ -417,9 +430,9 @@ public class MeasureActivity extends AppCompatActivity {
 //        if (changeMode) {
 //            if (MEASURE_MODE == mMode) {
 //                if (mFirstTime) {
-//                    hexCmd = CommandUtil.getUploadCmd(PLATFORM_PRE_CODE, mSampleUnit);
+//                    hexCmd = CommandUtil.getUploadCmd(COLLECTOR_PRE_CODE, mSampleUnit);
 //                    SocketControl.getInstance().sendMsg(hexCmd);
-//                    hexCmd = CommandUtil.getUploadCmd(mMeasureUnit);
+//                    hexCmd = CommandUtil.getUploadCmd(mMeasurePointUnit);
 //                    SocketControl.getInstance().sendMsg(hexCmd);
 //                    mFirstTime = false;
 //                }
@@ -434,7 +447,7 @@ public class MeasureActivity extends AppCompatActivity {
 //                BluetoothHelper.getBluetoothChatService(mContext).sendHex(hexCmd);
 //            }
 //        } else {
-//            hexCmd = CommandUtil.getUploadCmd(CommandUtil.COLLECTOR_PRE_CODE, msg);
+//            hexCmd = CommandUtil.getUploadCmd(CommandUtil.PLATFORM_PRE_CODE, msg);
 //            BluetoothHelper.getBluetoothChatService(mContext).sendHex(hexCmd);
 //        }
 //    }

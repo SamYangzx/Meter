@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
-import android.util.Log;
 
 import com.android.meter.meter.util.CommandUtil;
 import com.android.meter.meter.util.LogUtil;
@@ -146,8 +145,9 @@ public class BluetoothHelper {
      * @param device The BluetoothDevice to connect
      */
     public synchronized void connect(BluetoothDevice device) {
-        if (D) LogUtil.d(TAG, "connect to: " + device);
+        LogUtil.d(TAG, "connect to: " + device);
         if (device == null) {
+            LogUtil.d(TAG, "device == null");
             return;
         }
 
@@ -161,8 +161,10 @@ public class BluetoothHelper {
 
         //If current device is connected, it will not be connected again.add 20170807
         if (mCurrentDevice != null && mCurrentDevice.getAddress().equals(device.getAddress())) {
-            if ((mConnectedThread != null) && (mConnectedThread.mmSocket != null) && (mConnectedThread.mmSocket.isConnected()))
+            if ((mConnectedThread != null) && (mConnectedThread.mmSocket != null) && (mConnectedThread.mmSocket.isConnected())) {
+                LogUtil.d(TAG, "mmSocket has connect!");
                 return;
+            }
         }
 
 
@@ -180,7 +182,7 @@ public class BluetoothHelper {
 
 
     public synchronized void connected(BluetoothSocket socket, BluetoothDevice device) {
-        if (D) LogUtil.d(TAG, "connected");
+        if (D) LogUtil.d(TAG, "connected is invoked");
 
 
         if (mConnectThread != null) {
@@ -260,6 +262,9 @@ public class BluetoothHelper {
         synchronized (this) {
             if (mState != STATE_CONNECTED) {
                 LogUtil.sendCmdResult(TAG, out, false);
+                if (mHandler != null) {
+                    connectionLost();
+                }
                 return;
             }
             r = mConnectedThread;
@@ -271,11 +276,13 @@ public class BluetoothHelper {
 
     private void connectionFailed() {
         setState(STATE_LISTEN);
-        Message msg = mHandler.obtainMessage(BtConstant.MESSAGE_TOAST);
-        Bundle bundle = new Bundle();
-        bundle.putString(BluetoothChatActivity.TOAST, "Unable to connect device");
-        msg.setData(bundle);
-        mHandler.sendMessage(msg);
+        if (mHandler != null) {
+            Message msg = mHandler.obtainMessage(BtConstant.MESSAGE_TOAST);
+            Bundle bundle = new Bundle();
+            bundle.putString(BluetoothChatActivity.TOAST, "Unable to connect device");
+            msg.setData(bundle);
+            mHandler.sendMessage(msg);
+        }
     }
 
 
@@ -284,10 +291,11 @@ public class BluetoothHelper {
         if (mHandler != null) {
             Message msg = mHandler.obtainMessage(BtConstant.MESSAGE_TOAST);
             Bundle bundle = new Bundle();
-            bundle.putString(BluetoothChatActivity.TOAST, "Device connection was lost");
+            bundle.putString(BluetoothChatActivity.TOAST, "蓝牙链接已经断开");
             msg.setData(bundle);
             mHandler.sendMessage(msg);
         }
+        disconnect();
     }
 
 
@@ -301,7 +309,7 @@ public class BluetoothHelper {
             try {
                 tmp = mAdapter.listenUsingRfcommWithServiceRecord(NAME, MY_UUID);
             } catch (IOException e) {
-                Log.e(TAG, "listen() failed", e);
+                LogUtil.e(TAG, "listen() failed", e);
             }
             mmServerSocket = tmp;
         }
@@ -317,7 +325,7 @@ public class BluetoothHelper {
 
                     socket = mmServerSocket.accept();
                 } catch (IOException e) {
-                    Log.e(TAG, "accept() failed", e);
+                    LogUtil.e(TAG, "accept() failed", e);
                     break;
                 }
 
@@ -335,14 +343,14 @@ public class BluetoothHelper {
                                 try {
                                     socket.close();
                                 } catch (IOException e) {
-                                    Log.e(TAG, "Could not close unwanted socket", e);
+                                    LogUtil.e(TAG, "Could not close unwanted socket", e);
                                 }
                                 break;
                         }
                     }
                 }
             }
-            if (D) Log.i(TAG, "END mAcceptThread");
+            if (D) LogUtil.i(TAG, "END mAcceptThread");
         }
 
         public void cancel() {
@@ -350,7 +358,7 @@ public class BluetoothHelper {
             try {
                 mmServerSocket.close();
             } catch (IOException e) {
-                Log.e(TAG, "close() of server failed", e);
+                LogUtil.e(TAG, "close() of server failed", e);
             }
         }
     }
@@ -368,13 +376,13 @@ public class BluetoothHelper {
             try {
                 tmp = device.createRfcommSocketToServiceRecord(MY_UUID);
             } catch (IOException e) {
-                Log.e(TAG, "create() failed", e);
+                LogUtil.e(TAG, "create() failed", e);
             }
             mmSocket = tmp;
         }
 
         public void run() {
-            Log.i(TAG, "BEGIN mConnectThread");
+            LogUtil.i(TAG, "BEGIN mConnectThread");
             setName("ConnectThread");
 
 
@@ -382,7 +390,6 @@ public class BluetoothHelper {
 
 
             try {
-
                 mmSocket.connect();
             } catch (IOException e) {
                 connectionFailed();
@@ -390,7 +397,7 @@ public class BluetoothHelper {
                 try {
                     mmSocket.close();
                 } catch (IOException e2) {
-                    Log.e(TAG, "unable to close() socket during connection failure", e2);
+                    LogUtil.e(TAG, "unable to close() socket during connection failure", e2);
                 }
 
                 BluetoothHelper.this.start();
@@ -407,7 +414,7 @@ public class BluetoothHelper {
             try {
                 mmSocket.close();
             } catch (IOException e) {
-                Log.e(TAG, "close() of connect socket failed", e);
+                LogUtil.e(TAG, "close() of connect socket failed", e);
             }
         }
     }
@@ -429,7 +436,7 @@ public class BluetoothHelper {
                 tmpIn = socket.getInputStream();
                 tmpOut = socket.getOutputStream();
             } catch (IOException e) {
-                Log.e(TAG, "temp sockets not created", e);
+                LogUtil.e(TAG, "temp sockets not created", e);
             }
 
             mmInStream = tmpIn;
@@ -437,7 +444,7 @@ public class BluetoothHelper {
         }
 
         public void run() {
-            Log.i(TAG, "BEGIN mConnectedThread");
+            LogUtil.i(TAG, "BEGIN mConnectedThread");
             byte[] preByte = new byte[1];
             int byteCount;
 
@@ -445,7 +452,7 @@ public class BluetoothHelper {
                 try {
                     byteCount = mmInStream.read(preByte);
                     LogUtil.d(TAG, "origin head: " + StringUtil.bytes2HexString(preByte));
-                    if (!(byteCount == 1 && CommandUtil.PLATFORM_PRE_CODE.equals(StringUtil.bytes2HexString(preByte)))) {
+                    if (!(byteCount == 1 && CommandUtil.COLLECTOR_PRE_CODE.equals(StringUtil.bytes2HexString(preByte)))) {
                         continue;
                     }
                     byte[] lengthByte = new byte[1];
@@ -483,7 +490,7 @@ public class BluetoothHelper {
                         LogUtil.d(TAG, "ConnectedThread.run.mHandler is null");
                     }
                 } catch (IOException e) {
-                    Log.e(TAG, "read exception: ", e);
+                    LogUtil.e(TAG, "read exception: ", e);
                     connectionLost();
                     break;
                 }
@@ -500,8 +507,9 @@ public class BluetoothHelper {
                             .sendToTarget();
                 }
             } catch (IOException e) {
+                connectionLost();
                 LogUtil.sendCmdResult(TAG, buffer, false);
-                Log.e(TAG, "Exception during write", e);
+                LogUtil.e(TAG, "Exception during write", e);
             }
         }
 
@@ -509,7 +517,7 @@ public class BluetoothHelper {
             try {
                 mmSocket.close();
             } catch (IOException e) {
-                Log.e(TAG, "close() of connect socket failed", e);
+                LogUtil.e(TAG, "close() of connect socket failed", e);
             }
         }
 
@@ -520,7 +528,7 @@ public class BluetoothHelper {
                 mmInStream.close();
                 mmSocket.close();
             } catch (IOException e) {
-                Log.e(TAG, "close() of connect socket failed", e);
+                LogUtil.e(TAG, "close() of connect socket failed", e);
             }
         }
     }

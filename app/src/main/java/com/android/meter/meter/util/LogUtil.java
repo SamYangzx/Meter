@@ -17,12 +17,63 @@ public class LogUtil {
 
     public static final String TAG = LogUtil.class.getSimpleName();
     public static final String COMMON_TAG = "sam/";
-    private static final String LOG_FOLDER = "com.android.meter";
+    private static final String LOG_FOLDER = "Meter";
     private static final String LOG_PATH = android.os.Environment.getExternalStorageDirectory()
             .getAbsolutePath() + File.separator + LOG_FOLDER;
     private static final String LOG_FILE = android.os.Environment.getExternalStorageDirectory()
             .getAbsolutePath() + File.separator + LOG_FOLDER + File.separator + "log.txt";
     private static boolean LOG_TO_FILE = true;
+
+    private static final int LOG_VERBOSE = 0;
+    private static final int LOG_DEBUG = 1;
+    private static final int LOG_INFO = 2;
+    private static final int LOG_WARN = 3;
+    private static final int LOG_ERROR = 4;
+
+    private static final int LOG_LEVEL = LOG_VERBOSE;
+
+
+    public static void v(String tag, String msg) {
+        v(tag, msg, null);
+    }
+
+    public static void v(String tag, String msg, Throwable tr) {
+//        tag = appendTag(tag);
+        if (LOG_LEVEL <= LOG_VERBOSE) {
+            Log.v(tag, msg, tr);
+        }
+        if (LOG_TO_FILE) {
+            logtoFile("V", tag, msg, tr);
+        }
+    }
+
+//    public static void d(String tag, String msg) {
+//        d(tag, msg, null);
+//    }
+
+//    public static void d(String tag, String msg, Throwable tr) {
+//        tag = appendTag(tag);
+//        if (LOG_LEVEL <= LOG_DEBUG) {
+//            Log.d(tag, msg, tr);
+//        }
+//        if (LOG_TO_FILE) {
+//            logtoFile("D", tag, msg, tr);
+//        }
+//    }
+
+    public static void i(String tag, String msg) {
+        i(tag, msg, null);
+    }
+
+    public static void i(String tag, String msg, Throwable tr) {
+//        tag = appendTag(tag);
+        if (LOG_LEVEL <= LOG_INFO) {
+            Log.i(tag, msg, tr);
+        }
+        if (LOG_TO_FILE) {
+            logtoFile("I", tag, msg, tr);
+        }
+    }
 
 
     public static void d(String tag, String msg) {
@@ -39,11 +90,15 @@ public class LogUtil {
         }
     }
 
-    public static void e(String tag, String msg) {
-        Log.e(tag, msg);
+    public static void e(String tag, String msg, Throwable tr) {
+        Log.e(tag, msg, tr);
         if (LOG_TO_FILE) {
             logtoFile("E", tag, msg, null);
         }
+    }
+
+    public static void e(String tag, String msg) {
+        e(tag, msg, null);
     }
 
     public static void callStack(String tag, String msg) {

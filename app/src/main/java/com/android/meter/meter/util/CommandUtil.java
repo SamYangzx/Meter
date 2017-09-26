@@ -11,8 +11,8 @@ import android.util.Log;
 public class CommandUtil {
     private static final String TAG = LogUtil.COMMON_TAG + CommandUtil.class.getSimpleName();
 
-    public static final String COLLECTOR_PRE_CODE = "BB";
-    public static final String PLATFORM_PRE_CODE = "AA";
+    public static final String COLLECTOR_PRE_CODE = "AA";
+    public static final String PLATFORM_PRE_CODE = "BB";
 
     public static final String END_CODE = "CC";
     /********* cmdCode begin*********************/
@@ -22,6 +22,7 @@ public class CommandUtil {
     public static final String CHOOSE_CMD_CODE = "E3";
     public static final String UPLOCD_CMD_CODE = "E4";
     public static final String START_STOP_CMD_CODE = "E5";
+    public static final String LOAD_CMD_CODE = "E6";
     /********next code is for socket ***********************/
     public static final String Socket_DATA_CMD_CODE = "EF";
     /********************** cmdCode end*******************/
@@ -38,8 +39,7 @@ public class CommandUtil {
     /***constant cmd begin*/
     public static final String START_CLOLLECT_HEXCMD = "BB03E500CC";
     public static final String END_CLOLLECT_HEXCMD = "BB03E501CC";
-    public static final String CHECKSUM_SUCCESS_HEXCMD = "AA02E0CC";
-    public static final String CHECKSUM_FAILED_HEXCMD = "AA02FFCC";
+    public static final String CHECKSUM_FAILED_HEXCMD = "BB02FFFDCC";
     /***constant cmd end*/
 
     public static final String TEST_HEX_CMD = "AA05E4414243BBCC";
@@ -119,7 +119,7 @@ public class CommandUtil {
     }
 
     public static String getResetCmd() {
-        return getCmdHex(COLLECTOR_PRE_CODE, RESET_CMD_CODE, null);
+        return getCmdHex(PLATFORM_PRE_CODE, RESET_CMD_CODE, null);
     }
 
     /**
@@ -127,32 +127,36 @@ public class CommandUtil {
      * @return
      */
     public static String getCalibrateCmd(String data) {
-        return getCmdHex(COLLECTOR_PRE_CODE, CALIBRATE_CMD_CODE, StringUtil.getCompletedHex(data), true);
+        return getCmdHex(PLATFORM_PRE_CODE, CALIBRATE_CMD_CODE, StringUtil.getCompletedHex(data), true);
     }
 
-    public static String getSaveCmd() {
-        return getCmdHex(COLLECTOR_PRE_CODE, SAVE_CMD_CODE, null);
+    public static String getSaveCmd(String data) {
+        return getCmdHex(PLATFORM_PRE_CODE, SAVE_CMD_CODE, StringUtil.getCompletedHex(data), true);
     }
 
     public static String getChooseCmd(String data) {
-        return getCmdHex(COLLECTOR_PRE_CODE, CHOOSE_CMD_CODE, data);
+        return getCmdHex(PLATFORM_PRE_CODE, CHOOSE_CMD_CODE, data);
     }
 
     public static String getUploadCmd(String data) {
-        return getCmdHex(PLATFORM_PRE_CODE, UPLOCD_CMD_CODE, data);
+        return getCmdHex(COLLECTOR_PRE_CODE, UPLOCD_CMD_CODE, data);
     }
 
     public static String getUploadCmd(String platformOrColl, String data) {
         return getCmdHex(platformOrColl, UPLOCD_CMD_CODE, data);
     }
 
+    public static String getLoadCmd(String data) {
+        return getCmdHex(PLATFORM_PRE_CODE, LOAD_CMD_CODE, data, true);
+    }
+
 
     public static String getStartCmd() {
-        return getCmdHex(COLLECTOR_PRE_CODE, START_STOP_CMD_CODE, "01", true);
+        return getCmdHex(PLATFORM_PRE_CODE, START_STOP_CMD_CODE, "01", true);
     }
 
     public static String getStopCmd() {
-        return getCmdHex(COLLECTOR_PRE_CODE, START_STOP_CMD_CODE, "00", true);
+        return getCmdHex(PLATFORM_PRE_CODE, START_STOP_CMD_CODE, "00", true);
     }
 
     public static String getBTUnitHexData(String measureUnit, String sampleUnit) {
@@ -194,7 +198,7 @@ public class CommandUtil {
     }
 
     public static String getSocketDataCmd(String data) {
-        return getCmdHex(COLLECTOR_PRE_CODE, Socket_DATA_CMD_CODE, data, false);
+        return getCmdHex(PLATFORM_PRE_CODE, Socket_DATA_CMD_CODE, data, false);
     }
 
     public static String getMeasurePointHexValue(int index) {

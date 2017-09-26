@@ -126,7 +126,7 @@ public class StringUtil {
         try {
             r = new String(b, "UTF-8");
         } catch (Exception e) {
-            Log.e(TAG, "UnsupportedOperationException.e :" + e.getMessage());
+            LogUtil.e(TAG, "UnsupportedOperationException.e :" + e.getMessage());
         }
         return r;
     }
@@ -147,7 +147,7 @@ public class StringUtil {
             return "";
         }
         String r = bytes2String(hexString2Bytes(hex));
-        Log.d(TAG, "hex2String generate string: " + r);
+        LogUtil.d(TAG, "hex2String generate string: " + r);
         return r;
     }
 

@@ -39,7 +39,6 @@ import com.android.meter.meter.util.StringUtil;
 import com.android.meter.meter.util.ToastUtil;
 
 import static com.android.meter.meter.bluetooth.BluetoothChatActivity.TOAST;
-import static com.android.meter.meter.util.CommandUtil.getBTUnitHexData;
 import static com.android.meter.meter.util.CommandUtil.getUnitData;
 
 
@@ -190,6 +189,7 @@ public class MeasureSetActivity extends AppCompatActivity {
             BluetoothHelper.getBluetoothChatService(mContext).setmHandler(mHandler);
             isNeedResetHandler = false;
         }
+        setTitles(BluetoothHelper.getBluetoothChatService(mContext).getStateString());
     }
 
     private boolean isNeedResetHandler = false;
@@ -308,7 +308,7 @@ public class MeasureSetActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        Log.d(TAG, "onDestroy is invoked...");
+        LogUtil.d(TAG, "onDestroy is invoked...");
         BluetoothHelper.getBluetoothChatService(mContext).setmHandler(null);
 //        BluetoothHelper.getBluetoothChatService(mContext).setIMsgListener(null);
         SocketControl.getInstance().setListener(null);
@@ -452,7 +452,7 @@ public class MeasureSetActivity extends AppCompatActivity {
             switch (v.getId()) {
                 case R.id.start_btn:
                     BluetoothHelper.getBluetoothChatService(mContext).sendHex(CommandUtil.getStartCmd());
-                    BluetoothHelper.getBluetoothChatService(mContext).sendHex(CommandUtil.getCalibrateCmd(getBTUnitHexData(mMeasurePointUnit, mSampleUnit)));
+//                    BluetoothHelper.getBluetoothChatService(mContext).sendHex(CommandUtil.getCalibrateCmd(getBTUnitHexData(mMeasurePointUnit, mSampleUnit)));
                     SocketControl.getInstance().sendMsg(CommandUtil.getSocketDataCmd(getUnitData(mTap, mMeasurePointUnit, mSampleUnit)));
 
                     Intent intent = new Intent();

@@ -4,6 +4,7 @@ import com.android.meter.meter.util.LogUtil;
 import com.android.meter.meter.util.StringUtil;
 
 import java.io.BufferedReader;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.Socket;
 
@@ -20,11 +21,12 @@ public class SocketReceiver extends Thread {
 
     @Override
     public void run() {
-        String content = null;
+        byte input[] = new byte[10]; //此值根据实际情况做修改
         try {
             // 获取socket的输 出\入 流
             BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
-            //接收到的消息
+            InputStream inputStream = socket.getInputStream();
+            byte btyeCount;
             while (true) {
                 if (socket.isClosed()) {
                     System.out.println("error: Socket closed, can not receive message!!!");
@@ -32,13 +34,18 @@ public class SocketReceiver extends Thread {
                     socket.close();
                     break;
                 }
-                content = reader.readLine(); //服务器端需要发送一个回车符
-                if (content == null || content == "") {
+//                content = reader.readLine(); //服务器端需要发送一个回车符
+//
+//                if (content == null || content == "") {
+//                    continue;
+//                }
+
+                if(inputStream.read(input) == -1){
                     continue;
                 }
-                LogUtil.receiveCmdResult(TAG, "Receive: " + StringUtil.hex2String(content));
+                LogUtil.receiveCmdResult(TAG, input);
                 if (mIHttpListener != null) {
-                    mIHttpListener.onResult(HTTPConstant.RECEIVE_SUCCESS, content);
+                    mIHttpListener.onResult(HTTPConstant.RECEIVE_SUCCESS, StringUtil.bytes2HexString(input));
                 }
 //                if (content.equals("bye")) {
 //                    System.out.println("对方请求关闭连接,无法继续进行聊天");
@@ -53,7 +60,7 @@ public class SocketReceiver extends Thread {
             e.printStackTrace();
             LogUtil.d(TAG, "e: " + e);
             if (mIHttpListener != null) {
-                mIHttpListener.onResult(HTTPConstant.RECEIVE_FAILED, content);
+                mIHttpListener.onResult(HTTPConstant.RECEIVE_FAILED, StringUtil.bytes2HexString(input));
             }
         }
     }
