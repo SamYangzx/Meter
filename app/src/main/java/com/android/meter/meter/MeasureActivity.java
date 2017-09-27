@@ -119,14 +119,14 @@ public class MeasureActivity extends AppCompatActivity {
                     // construct a string from the buffer
                     String writeMessage = StringUtil.bytes2HexString(writeBuf);
 //                    mConversationArrayAdapter.add("Me:  " + writeMessage);
-                    ToastUtil.showToast(mContext, "BT sendString: " + writeMessage);
+                    ToastUtil.showToast(mContext, "BT sendString: " + writeMessage,ToastUtil.DEBUG);
                     break;
                 case BtConstant.MESSAGE_RECEIVE_SUCCESS:
 //                    BluetoothHelper.getBluetoothChatService(mContext).sendHex(CommandUtil.CHECKSUM_SUCCESS_HEXCMD);
                     byte[] readBuf = (byte[]) msg.obj;
                     String readMessage = StringUtil.bytes2HexString(readBuf);
 //                    mSampleTv.setText(readMessage);
-                    ToastUtil.showToast(mContext, "BT receive: " + readMessage);
+                    ToastUtil.showToast(mContext, "BT receive: " + readMessage,ToastUtil.DEBUG);
                     handlerCmd(readMessage);
                     break;
                 case BtConstant.MESSAGE_RECEIVE_FAILED:
