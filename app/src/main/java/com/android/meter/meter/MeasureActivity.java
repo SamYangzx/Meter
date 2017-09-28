@@ -66,7 +66,10 @@ public class MeasureActivity extends AppCompatActivity {
     private NumberPickerView mMeasurePointPicker;
     private LoadPickerView mLoadPicker;
     private NumberPickerView mTimesPicker;
-    private String[] mMeasurePointArray = new String[21];
+    private String[] mMeasurePointArray;
+    private String[] mTempMeaseureArray = new String[2001];
+    private String[] mTempCalculArray = new String[21];
+
     private int mMeasurePointIndex = 0;
 
     private Button mResetBtn;
@@ -223,6 +226,16 @@ public class MeasureActivity extends AppCompatActivity {
         for (int i = 1; i < mTotalTimes + 1; i++) {
             mTimesArray[i] = String.valueOf(i);
         }
+
+        for (int i = 0; i <= 20; i++) {
+            mTempCalculArray[i] = StringUtil.getNumber(mStep * (i - 10));
+//            LogUtil.d(TAG, "i: " + mMeasurePointArray[i]);
+        }
+        for (int i = 0; i <= 2000; i++) {
+            mTempMeaseureArray[i] = StringUtil.getNumber(mStep * (i - 1000));
+//            LogUtil.d(TAG, "i: " + mMeasurePointArray[i]);
+        }
+
         mMeasurePointIndex = MEASURE_POINT_INDEX_OFF;
         mNeedOffset = true;
 
@@ -379,6 +392,8 @@ public class MeasureActivity extends AppCompatActivity {
             mTitleTv.setText(R.string.measure_title_measure);
             mCalcelBtn.setText(R.string.cancel);
         }
+        mMeasurePointPicker.refreshByNewDisplayedValues(getMeasurePointArray(mStep));
+        mMeasurePointPicker.setPickedIndexRelativeToRaw(mMeasurePointArray.length / 2);
     }
 
     private String getStringById(int str) {
@@ -388,12 +403,22 @@ public class MeasureActivity extends AppCompatActivity {
 //    private int mPreMagnification = 1;
 
     private String[] getMeasurePointArray(float magnification) {
-//        if (mPreMagnification != magnification) {
-        for (int i = 0; i <= 20; i++) {
-            mMeasurePointArray[i] = StringUtil.getNumber(magnification * (i - 10));
-//            LogUtil.d(TAG, "i: " + mMeasurePointArray[i]);
+        if (CALIBRATE_MODE == mMode) {
+//            mMeasurePointArray = new String[21];
+//            for (int i = 0; i <= 20; i++) {
+//                mMeasurePointArray[i] = StringUtil.getNumber(magnification * (i - 10));
+////            LogUtil.d(TAG, "i: " + mMeasurePointArray[i]);
+//            }
+
+            mMeasurePointArray = mTempCalculArray;
+        } else {
+//            mMeasurePointArray = new String[2001];
+//            for (int i = 0; i <= 2000; i++) {
+//                mMeasurePointArray[i] = StringUtil.getNumber(magnification * (i - 1000));
+////            LogUtil.d(TAG, "i: " + mMeasurePointArray[i]);
+//            }
+            mMeasurePointArray = mTempMeaseureArray;
         }
-//        }
         return mMeasurePointArray;
     }
 

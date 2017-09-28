@@ -1105,6 +1105,7 @@ public class LoadPickerView extends View {
                 getParent().requestDisallowInterceptTouchEvent(true);
                 break;
             case MotionEvent.ACTION_MOVE:
+                LogUtil.d(TAG, "onTouchEvent.ACTION_MOVE");
                 mSpanY = downY - currY;
                 if (mOnScrollListener != null) {
                     mOnScrollListener.onScrollFling(LoadPickerView.this, calculateSpeedRatio(OnScrollListener.SCROLL_STATE_TOUCH_SCROLL));
@@ -1121,8 +1122,9 @@ public class LoadPickerView extends View {
                 onScrollStateChange(OnScrollListener.SCROLL_STATE_TOUCH_SCROLL);
                 break;
             case MotionEvent.ACTION_UP:
+                LogUtil.d(TAG, "onTouchEvent.ACTION_UP mFlagMayPress: " + mFlagMayPress);
                 if (mFlagMayPress) {
-                    click(event);
+//                    click(event);
                 } else {
                     final VelocityTracker velocityTracker = mVelocityTracker;
                     velocityTracker.computeCurrentVelocity(1000);
@@ -1141,6 +1143,8 @@ public class LoadPickerView extends View {
                 }
                 break;
             case MotionEvent.ACTION_CANCEL:
+                LogUtil.d(TAG, "onTouchEvent.ACTION_CANCEL");
+
                 downYGlobal = mCurrDrawGlobalY;
                 stopScrolling();
                 mHandlerInNewThread.sendMessageDelayed(getMsg(HANDLER_WHAT_REFRESH), 0);
@@ -1707,12 +1711,15 @@ public class LoadPickerView extends View {
                 }
             }
         } else if (OnScrollListener.SCROLL_STATE_CYCLE == mode) {
-            float v = ((float)velocityY) / MAX_FLING_SPEED;
-            if(v >=1){
+            float v = ((float) velocityY) / MAX_FLING_SPEED;
+            if (v >= 1) {
                 return StringUtil.big2(1f);
-            }else if(v <=-1){
+            } else if (v <= -1) {
                 return StringUtil.big2(-1f);
-            }else{
+            } else {
+                if (Math.abs(v) < 0.1) { //速度小于刻度值时，停止。
+                    reset();
+                }
                 return StringUtil.big2(v);
             }
         }
@@ -1736,5 +1743,10 @@ public class LoadPickerView extends View {
         mCycleCount = 0;
         mHandlerInNewThread.removeCallbacksAndMessages(null);
     }
+
+//    private int getUIScrollSpeed(){
+//
+//        return
+//    }
 
 }
