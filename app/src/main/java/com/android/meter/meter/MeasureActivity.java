@@ -120,14 +120,14 @@ public class MeasureActivity extends AppCompatActivity {
                     // construct a string from the buffer
                     String writeMessage = StringUtil.bytes2HexString(writeBuf);
 //                    mConversationArrayAdapter.add("Me:  " + writeMessage);
-                    ToastUtil.showToast(mContext, "BT sendString: " + writeMessage,ToastUtil.DEBUG);
+                    ToastUtil.showToast(mContext, "BT sendString: " + writeMessage, ToastUtil.DEBUG);
                     break;
                 case BtConstant.MESSAGE_RECEIVE_SUCCESS:
 //                    BluetoothHelper.getBluetoothChatService(mContext).sendHex(CommandUtil.CHECKSUM_SUCCESS_HEXCMD);
                     byte[] readBuf = (byte[]) msg.obj;
                     String readMessage = StringUtil.bytes2HexString(readBuf);
 //                    mSampleTv.setText(readMessage);
-                    ToastUtil.showToast(mContext, "BT receive: " + readMessage,ToastUtil.DEBUG);
+                    ToastUtil.showToast(mContext, "BT receive: " + readMessage, ToastUtil.DEBUG);
                     handlerCmd(readMessage);
                     break;
                 case BtConstant.MESSAGE_RECEIVE_FAILED:
@@ -304,7 +304,7 @@ public class MeasureActivity extends AppCompatActivity {
 //                    BluetoothHelper.getBluetoothChatService(mContext).sendHex(CommandUtil.TEST_HEX_CMD);
 //                    SocketControl.getInstance().sendMsg(CommandUtil.TEST_HEX_CMD);
                     if (CALIBRATE_MODE == mMode) {
-                        sendCmd(CommandUtil.getSaveCmd(hexStr), false);
+                        sendCmd(CommandUtil.getConfirmCalibrateCmd(hexStr, mMeasurePointValue), false);
                     } else {
                         sendCmd(CommandUtil.getSocketDataCmd(getValueData(mTap, mTotalTimes, mTimes, mMeasurePointValue, mSampleTv.getText().toString())), true);
                         ExcelUtils.initExcel(FileUtil.getExcelPath(), mTitleArray);
@@ -345,7 +345,11 @@ public class MeasureActivity extends AppCompatActivity {
                 case R.id.cancel_btn:
 //                    ToastUtil.showToast(mContext, getStringById(R.string.cancel));
                     VibratorHelper.vibrate(mContext);
-                    mSampleTv.setText("0");
+                    if (MEASURE_MODE == mMode) {
+                        mSampleTv.setText("0");
+                    } else {
+                        sendCmd(CommandUtil.getSaveCalibrateCmd(), false);
+                    }
                     break;
                 case R.id.measure_title_ib:
                     changeModeDialog();
@@ -361,9 +365,11 @@ public class MeasureActivity extends AppCompatActivity {
         if (MEASURE_MODE == mMode) {
             mMode = CALIBRATE_MODE;
             mTitleTv.setText(R.string.measure_title_calibrate);
+            mCalcelBtn.setText(R.string.save_calibrate);
         } else {
             mMode = MEASURE_MODE;
             mTitleTv.setText(R.string.measure_title_measure);
+            mCalcelBtn.setText(R.string.cancel);
         }
     }
 

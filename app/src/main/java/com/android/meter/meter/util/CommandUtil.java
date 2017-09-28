@@ -18,11 +18,12 @@ public class CommandUtil {
     /********* cmdCode begin*********************/
     public static final String RESET_CMD_CODE = "E0";
     public static final String CALIBRATE_CMD_CODE = "E1";
-    public static final String SAVE_CMD_CODE = "E2";
+    public static final String CONFIRM_CAL_CMD_CODE = "E2";
     public static final String CHOOSE_CMD_CODE = "E3";
     public static final String UPLOCD_CMD_CODE = "E4";
     public static final String START_STOP_CMD_CODE = "E5";
     public static final String LOAD_CMD_CODE = "E6";
+    public static final String SAVE_CALIBRATE_CMD_CODE = "E7";
     /********next code is for socket ***********************/
     public static final String Socket_DATA_CMD_CODE = "EF";
     /********************** cmdCode end*******************/
@@ -130,8 +131,8 @@ public class CommandUtil {
         return getCmdHex(PLATFORM_PRE_CODE, CALIBRATE_CMD_CODE, StringUtil.getCompletedHex(data), true);
     }
 
-    public static String getSaveCmd(String data) {
-        return getCmdHex(PLATFORM_PRE_CODE, SAVE_CMD_CODE, StringUtil.getCompletedHex(data), true);
+    public static String getConfirmCalibrateCmd(String step, String measurePointVaule) {
+        return getCmdHex(PLATFORM_PRE_CODE, CONFIRM_CAL_CMD_CODE, StringUtil.getCompletedHex(step) + StringUtil.string2HexString(measurePointVaule), true);
     }
 
     public static String getChooseCmd(String data) {
@@ -157,6 +158,10 @@ public class CommandUtil {
 
     public static String getStopCmd() {
         return getCmdHex(PLATFORM_PRE_CODE, START_STOP_CMD_CODE, "00", true);
+    }
+
+    public static String getSaveCalibrateCmd(){
+        return getCmdHex(PLATFORM_PRE_CODE, SAVE_CALIBRATE_CMD_CODE, null, true);
     }
 
     public static String getBTUnitHexData(String measureUnit, String sampleUnit) {
