@@ -12,7 +12,7 @@ public class ToastUtil {
     public static final int DEBUG = 1;
     public static final int INFO = 2;
 
-    private static final int SHOW_TOAST_LEVEL = DEBUG;
+    private static final int SHOW_TOAST_LEVEL = INFO;
 
     public static void showToast(Context context, int strId) {
         Toast.makeText(context, strId, Toast.LENGTH_SHORT).show();

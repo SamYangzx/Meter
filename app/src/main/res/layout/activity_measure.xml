@@ -88,6 +88,14 @@
                 android:textSize="@dimen/measure_unit_size" />
         </LinearLayout>
 
+        <TextView
+            android:id="@+id/load_speed_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:gravity="center"
+            android:visibility="visible"/>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -42,7 +42,7 @@
     <dimen name="measure_settings_layout_width">30dp</dimen>
     <dimen name="measure_value_size">45sp</dimen>
     <dimen name="measure_unit_size">45sp</dimen>
-    <dimen name="measure_load_picker_height">180dp</dimen>
+    <dimen name="measure_load_picker_height">190dp</dimen>
     <!--MeasureActivity end-->
 
 </resources>

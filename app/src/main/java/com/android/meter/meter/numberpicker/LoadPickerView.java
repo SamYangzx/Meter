@@ -13,7 +13,6 @@ import android.support.v4.widget.ScrollerCompat;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
@@ -80,6 +79,7 @@ public class LoadPickerView extends View {
 
     // message's what argument to request layout, used by mHandlerInMainThread
     private static final int HANDLER_WHAT_REQUEST_LAYOUT = 3;
+    private static final int HANDLER_SCROLL_CYCLE = 4;
 
     // interval time to scroll the distance of one item's height
     private static final int HANDLER_INTERVAL_REFRESH = 32;//millisecond
@@ -208,6 +208,7 @@ public class LoadPickerView extends View {
         int SCROLL_STATE_IDLE = 0;
         int SCROLL_STATE_TOUCH_SCROLL = 1;
         int SCROLL_STATE_FLING = 2;
+        int SCROLL_STATE_CYCLE = 3;
 
         void onScrollStateChange(LoadPickerView view, int scrollState);
 
@@ -352,7 +353,7 @@ public class LoadPickerView extends View {
         mHandlerInNewThread = new Handler(mHandlerThread.getLooper()) {
             @Override
             public void handleMessage(Message msg) {
-                printD("HANDLER_WHAT_REFRESH: " + mScroller.isFinished() + ", mScrollState: " + mScrollState + ", currentV: " + mScroller.getCurrVelocity());
+                printD("msg: " + msg.what + ", HANDLER_WHAT_REFRESH: " + mScroller.isFinished() + ", mScrollState: " + mScrollState + ", currentV: " + mScroller.getCurrVelocity());
 
                 switch (msg.what) {
                     case HANDLER_WHAT_REFRESH:
@@ -404,6 +405,14 @@ public class LoadPickerView extends View {
                         break;
                     case HANDLER_WHAT_LISTENER_VALUE_CHANGED:
                         respondPickedValueChanged(msg.arg1, msg.arg2, msg.obj);
+                        break;
+                    case HANDLER_SCROLL_CYCLE:
+                        mCycleCount++;
+                        onScrollStateChange(OnScrollListener.SCROLL_STATE_CYCLE);
+                        calculateFirstItemParameterByGlobalY();
+                        postInvalidate();
+                        mOnScrollListener.onScrollFling(LoadPickerView.this, calculateSpeedRatio(OnScrollListener.SCROLL_STATE_CYCLE));
+                        this.sendEmptyMessageDelayed(HANDLER_SCROLL_CYCLE, 50);
                         break;
                 }
             }
@@ -1084,6 +1093,8 @@ public class LoadPickerView extends View {
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
+                reset();
+
                 mFlagMayPress = true;
                 mHandlerInNewThread.removeMessages(HANDLER_WHAT_REFRESH);
                 stopScrolling();
@@ -1117,20 +1128,23 @@ public class LoadPickerView extends View {
                     velocityTracker.computeCurrentVelocity(1000);
                     velocityY = (int) (velocityTracker.getYVelocity() * mFriction);
                     printD("velocityY: " + velocityY);
-                    if (Math.abs(velocityY) > mMiniVelocityFling) {
-                        mScroller.fling(0, mCurrDrawGlobalY, 0, -velocityY,
-                                Integer.MIN_VALUE, Integer.MAX_VALUE, limitY(Integer.MIN_VALUE), limitY(Integer.MAX_VALUE));
-                        invalidate();
-                        onScrollStateChange(OnScrollListener.SCROLL_STATE_FLING);
-                    }
-                    mHandlerInNewThread.sendMessageDelayed(getMsg(HANDLER_WHAT_REFRESH), 0);
+//                    if (Math.abs(velocityY) > mMiniVelocityFling) {
+//                        mScroller.fling(0, mCurrDrawGlobalY, 0, -velocityY,
+//                                Integer.MIN_VALUE, Integer.MAX_VALUE, limitY(Integer.MIN_VALUE), limitY(Integer.MAX_VALUE));
+//                        invalidate();
+//                        onScrollStateChange(OnScrollListener.SCROLL_STATE_FLING);
+//                    }
+//                    mHandlerInNewThread.sendMessageDelayed(getMsg(HANDLER_WHAT_REFRESH), 0);
                     releaseVelocityTracker();
+                    mHandlerInNewThread.removeCallbacksAndMessages(null);
+                    mHandlerInNewThread.sendEmptyMessageDelayed(HANDLER_SCROLL_CYCLE, 0);
                 }
                 break;
             case MotionEvent.ACTION_CANCEL:
                 downYGlobal = mCurrDrawGlobalY;
                 stopScrolling();
                 mHandlerInNewThread.sendMessageDelayed(getMsg(HANDLER_WHAT_REFRESH), 0);
+                reset();
                 break;
         }
         return true;
@@ -1201,16 +1215,22 @@ public class LoadPickerView extends View {
         if (mItemHeight == 0) return;
         if (mScroller.computeScrollOffset()) {
             mCurrDrawGlobalY = mScroller.getCurrY();
+            printD("computeScroll.mCurrDrawGlobalY: " + mCurrDrawGlobalY);
             calculateFirstItemParameterByGlobalY();
             postInvalidate();
         }
     }
 
+    private int mCycleCount = 0;
+
+    /**
+     * 计算第一个文本从哪里开始绘制。
+     */
     private void calculateFirstItemParameterByGlobalY() {
         mCurrDrawFirstItemIndex = (int) Math.floor((float) mCurrDrawGlobalY / mItemHeight);
         mCurrDrawFirstItemY = -(mCurrDrawGlobalY - mCurrDrawFirstItemIndex * mItemHeight);
-//        printD("mCurrDrawGlobalY: " + mCurrDrawGlobalY + " , mItemHeight: " + mItemHeight + " ,mCurrDrawFirstItemIndex: " + mCurrDrawFirstItemIndex);
-//        printD("mCurrDrawFirstItemY: " + mCurrDrawFirstItemY);
+        printD("mCurrDrawGlobalY: " + mCurrDrawGlobalY + " , mItemHeight: " + mItemHeight + " ,mCurrDrawFirstItemIndex: " + mCurrDrawFirstItemIndex);
+        printD("before.mCurrDrawFirstItemY: " + mCurrDrawFirstItemY);
         if (mOnValueChangeListenerInScrolling != null) {
             if (-mCurrDrawFirstItemY > mItemHeight / 2) {
                 mInScrollingPickedNewValue = mCurrDrawFirstItemIndex + 1 + mShowCount / 2;
@@ -1225,6 +1245,11 @@ public class LoadPickerView extends View {
                 respondPickedValueChangedInScrolling(mInScrollingPickedNewValue, mInScrollingPickedOldValue);
             }
             mInScrollingPickedOldValue = mInScrollingPickedNewValue;
+        }
+
+        if (OnScrollListener.SCROLL_STATE_CYCLE == mScrollState) {
+            mCurrDrawFirstItemY = velocityY * mCycleCount % mItemHeight;
+            printD("after.mCurrDrawFirstItemY: " + mCurrDrawFirstItemY);
         }
     }
 
@@ -1656,6 +1681,7 @@ public class LoadPickerView extends View {
      * @return
      */
     public float calculateSpeedRatio(int mode) {
+        LogUtil.d(TAG, "calculateSpeedRatio.mode: " + mode);
         if (OnScrollListener.SCROLL_STATE_TOUCH_SCROLL == mode) {
             float diffY = currY - mLastY;
             if (diffY > MAX_Y_DIFF) {
@@ -1680,6 +1706,15 @@ public class LoadPickerView extends View {
                     return velocityY > 0 ? StringUtil.big2(currentV / MAX_FLING_SPEED) : StringUtil.big2(-currentV / MAX_FLING_SPEED);
                 }
             }
+        } else if (OnScrollListener.SCROLL_STATE_CYCLE == mode) {
+            float v = ((float)velocityY) / MAX_FLING_SPEED;
+            if(v >=1){
+                return StringUtil.big2(1f);
+            }else if(v <=-1){
+                return StringUtil.big2(-1f);
+            }else{
+                return StringUtil.big2(v);
+            }
         }
         return 0f;
     }
@@ -1689,11 +1724,17 @@ public class LoadPickerView extends View {
     private void printD(String msg) {
         if (D) {
             if (mIsDrawLine) {
-                Log.d(TAG, "---" + msg);
+                LogUtil.d(TAG, "---" + msg);
             } else {
-                Log.d(TAG, "++" + msg);
+                LogUtil.d(TAG, "++" + msg);
             }
         }
+    }
+
+    private void reset() {
+        velocityY = 0;
+        mCycleCount = 0;
+        mHandlerInNewThread.removeCallbacksAndMessages(null);
     }
 
 }

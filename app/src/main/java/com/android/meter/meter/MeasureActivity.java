@@ -86,6 +86,7 @@ public class MeasureActivity extends AppCompatActivity {
     private TextView mBtStateTv;
     private TextView mSampleTv;
     private TextView mUnitTv;
+    private TextView mLoadSpeedTv;
     private int mMode = MEASURE_MODE;
     private boolean mFirstTime = true;
     private boolean mNeedOffset = true;
@@ -265,12 +266,18 @@ public class MeasureActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onScrollFling(LoadPickerView view, float speedRatio) {
+            public void onScrollFling(LoadPickerView view, final float speedRatio) {
 //                sendMsg(Float.toString(speedRatio), false);
                 byte[] ratio = new byte[1];
                 ratio[0] = (byte) (speedRatio * 100);
                 LogUtil.d(TAG, "speedRatio: " + speedRatio + " ,intRatio: " + ratio[0] + ", Integer.toString(ratio): " + StringUtil.bytes2HexString(ratio));
                 sendCmd(CommandUtil.getLoadCmd(StringUtil.bytes2HexString(ratio)), false);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mLoadSpeedTv.setText(Float.toString(speedRatio));
+                    }
+                });
             }
         });
 
@@ -283,6 +290,7 @@ public class MeasureActivity extends AppCompatActivity {
         mUnitTv = (TextView) findViewById(R.id.unit_tv_measure);
         mUnitTv.setText(getFormatUnit(mSampleUnit));
         mSampleTv = (TextView) findViewById(R.id.measure_value_textView);
+        mLoadSpeedTv = (TextView) findViewById(R.id.load_speed_tv);
     }
 
     private View.OnClickListener mListener = new View.OnClickListener() {
