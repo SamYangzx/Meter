@@ -35,6 +35,7 @@ import com.android.meter.meter.util.LogUtil;
 import com.android.meter.meter.util.StringUtil;
 import com.android.meter.meter.util.TimeUtil;
 import com.android.meter.meter.util.ToastUtil;
+import com.android.meter.meter.util.VibratorHelper;
 
 import java.util.ArrayList;
 
@@ -290,9 +291,11 @@ public class MeasureActivity extends AppCompatActivity {
             switch (v.getId()) {
                 case R.id.reset_btn:
 //                    ToastUtil.showToast(mContext, getStringById(R.string.reset));
+                    VibratorHelper.vibrate(mContext);
                     dialog();
                     break;
                 case R.id.center_btn:
+                    VibratorHelper.vibrate(mContext);
                     String hexStr;
 //                    hexStr = Float.toHexString(Float.valueOf(mMeasurePointValue));
 //                    hexStr = StringUtil.bytes2HexString(StringUtil.int2byte(mMeasurePointIndex));
@@ -341,11 +344,11 @@ public class MeasureActivity extends AppCompatActivity {
                     break;
                 case R.id.cancel_btn:
 //                    ToastUtil.showToast(mContext, getStringById(R.string.cancel));
+                    VibratorHelper.vibrate(mContext);
                     mSampleTv.setText("0");
                     break;
                 case R.id.measure_title_ib:
-//                    ToastUtil.showToast(mContext, "change UI");
-                    changeMode();
+                    changeModeDialog();
                     break;
                 default:
                     break;
@@ -404,6 +407,28 @@ public class MeasureActivity extends AppCompatActivity {
         });
         builder.create().show();
     }
+
+
+    private void changeModeDialog() {
+        AlertDialog.Builder builder = new android.app.AlertDialog.Builder(mContext);
+        builder.setMessage(R.string.change_confirm);
+        builder.setTitle(R.string.warn);
+        builder.setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                changeMode();
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        builder.create().show();
+    }
+
 
     private String getFormatUnit(String unit) {
         return "(" + unit + ")";

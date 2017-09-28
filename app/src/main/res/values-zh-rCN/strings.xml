@@ -24,6 +24,7 @@
     <string name="reset">清零</string>
     <string name="confirm">确认</string>
     <string name="reset_confirm">确认清零吗？</string>
+    <string name="change_confirm">确认切换模式吗？</string>
 
 
     <string name="sample_value">采样值</string>
