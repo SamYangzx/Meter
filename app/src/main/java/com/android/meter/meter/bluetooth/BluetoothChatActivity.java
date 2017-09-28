@@ -208,7 +208,7 @@ public class BluetoothChatActivity extends Activity {
                             break;
                         case BluetoothHelper.STATE_LISTEN:
                         case BluetoothHelper.STATE_NONE:
-//                            mTitle.setText(R.string.title_not_connected);
+//                            mTitle.setText(R.string.title_not_bt_connected);
                             break;
                     }
                     break;

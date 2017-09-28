@@ -39,9 +39,9 @@
     <string name="send">发送</string>
     <string name="not_connected">你没有连接一个设备</string>
     <string name="bt_not_enabled_leaving">蓝牙没有打开</string>
-    <string name="title_connecting">连接中...</string>
+    <string name="title_bt_connecting">蓝牙连接中...</string>
     <string name="title_connected_to">连接到: </string>
-    <string name="title_not_connected">无连接</string>
+    <string name="title_not_bt_connected">无蓝牙连接</string>
     <string name="debug">调试</string>
     <string name="about">关于</string>
     <string name="about_msg">1.蓝牙处可以连接想要连接的蓝牙设备；

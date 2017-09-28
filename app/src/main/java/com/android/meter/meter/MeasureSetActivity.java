@@ -35,10 +35,13 @@ import com.android.meter.meter.util.CommandUtil;
 import com.android.meter.meter.util.Constant;
 import com.android.meter.meter.util.IMsgListener;
 import com.android.meter.meter.util.LogUtil;
+import com.android.meter.meter.util.SharedPreferenceUtils;
 import com.android.meter.meter.util.StringUtil;
 import com.android.meter.meter.util.ToastUtil;
 
 import static com.android.meter.meter.bluetooth.BluetoothChatActivity.TOAST;
+import static com.android.meter.meter.http.HTTPConstant.SAVE_IP;
+import static com.android.meter.meter.http.HTTPConstant.SAVE_PORT;
 import static com.android.meter.meter.util.CommandUtil.getUnitData;
 
 
@@ -95,24 +98,23 @@ public class MeasureSetActivity extends AppCompatActivity {
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-//            Log.d(TAG, "msg: " + msg.what)
+            LogUtil.d(TAG, "msg: " + msg.what);
             switch (msg.what) {
                 case BtConstant.MESSAGE_STATE_CHANGE:
                     Log.i(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
                     switch (msg.arg1) {
                         case BluetoothHelper.STATE_CONNECTED:
-                            setTitles("connected");
-//                            ToastUtil.showToast(mContext, "connected");
+//                            setTitles("BT connected");
+                            ToastUtil.showToast(mContext, "BT connected");
                             break;
                         case BluetoothHelper.STATE_CONNECTING:
-                            setTitles(R.string.title_connecting);
-//                            ToastUtil.showToast(mContext, R.string.title_connecting);
-
+//                            setTitles(R.string.title_connecting);
+                            ToastUtil.showToast(mContext, R.string.title_bt_connecting);
                             break;
                         case BluetoothHelper.STATE_LISTEN:
                         case BluetoothHelper.STATE_NONE:
-                            setTitles(R.string.title_not_connected);
-//                            ToastUtil.showToast(mContext, R.string.title_not_connected);
+//                            setTitles(R.string.title_not_bt_connected);
+                            ToastUtil.showToast(mContext, R.string.title_not_bt_connected);
                             break;
                         default:
                             break;
@@ -143,7 +145,9 @@ public class MeasureSetActivity extends AppCompatActivity {
                     break;
                 case HTTPConstant.CONNECT_SUCCESS:
                     ToastUtil.showToast(mContext, "Socket connect success");
-                    mNetworkDialog.dismiss();
+                    if (mNetworkDialog != null) {
+                        mNetworkDialog.dismiss();
+                    }
                     break;
                 case HTTPConstant.CONNECT_FAIL:
                     ToastUtil.showToast(mContext, "Socket connect fail");
@@ -186,10 +190,10 @@ public class MeasureSetActivity extends AppCompatActivity {
     protected void onRestart() {
         super.onRestart();
         if (isNeedResetHandler) {
-            BluetoothHelper.getBluetoothChatService(mContext).setmHandler(mHandler);
+            BluetoothHelper.getBluetoothHelper(mContext).setmHandler(mHandler);
             isNeedResetHandler = false;
         }
-        setTitles(BluetoothHelper.getBluetoothChatService(mContext).getStateString());
+        setTitles(BluetoothHelper.getBluetoothHelper(mContext).getStateString());
     }
 
     private boolean isNeedResetHandler = false;
@@ -263,7 +267,7 @@ public class MeasureSetActivity extends AppCompatActivity {
                     public void onYesClick() {
 //                        test();
 
-                        BluetoothHelper.getBluetoothChatService(mContext).sendHex(mDebugDialog.getMessageStr());
+                        BluetoothHelper.getBluetoothHelper(mContext).sendHex(mDebugDialog.getMessageStr());
                         SocketControl.getInstance().sendMsg(mDebugDialog.getMessageStr());
                     }
                 });
@@ -302,15 +306,15 @@ public class MeasureSetActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        BluetoothHelper.getBluetoothChatService(mContext).disconnect();
+        BluetoothHelper.getBluetoothHelper(mContext).disconnect();
         SocketControl.getInstance().disconnect();
     }
 
     @Override
     protected void onDestroy() {
         LogUtil.d(TAG, "onDestroy is invoked...");
-        BluetoothHelper.getBluetoothChatService(mContext).setmHandler(null);
-//        BluetoothHelper.getBluetoothChatService(mContext).setIMsgListener(null);
+        BluetoothHelper.getBluetoothHelper(mContext).setmHandler(null);
+//        BluetoothHelper.getBluetoothHelper(mContext).setIMsgListener(null);
         SocketControl.getInstance().setListener(null);
         mHandler.removeCallbacksAndMessages(null);
         mHandler = null;
@@ -328,11 +332,19 @@ public class MeasureSetActivity extends AppCompatActivity {
         mTap = mTapArray[0];
         mCount = Integer.valueOf(mCountArray[0]);
 
-        BluetoothHelper.getBluetoothChatService(mContext).setmHandler(mHandler);
+        BluetoothHelper.getBluetoothHelper(mContext).setmHandler(mHandler);
+
+        String server = (String) SharedPreferenceUtils.getParam(mContext, HTTPConstant.SAVE_IP, "");
+        int port = (int) SharedPreferenceUtils.getParam(mContext, HTTPConstant.SAVE_PORT, 1);
+        SocketControl.getInstance().setListener(mHttpListener);
+
+        SocketControl.getInstance().connect(server, port);
+        String btAddress = (String) SharedPreferenceUtils.getParam(mContext, BtConstant.SAVE_BT_ADDRESS, "");
+        BluetoothHelper.getBluetoothHelper(mContext).connect(btAddress);
     }
 
     private void initBtStatus() {
-        setTitles(BluetoothHelper.getBluetoothChatService(mContext).getStateString());
+        setTitles(BluetoothHelper.getBluetoothHelper(mContext).getStateString());
     }
 
     private void initView() {
@@ -348,8 +360,8 @@ public class MeasureSetActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Log.d(TAG, "position: " + position + ", id: " + id);
                 mMeasurePointUnit = mUnitArrays[mUnitIndex][position];
-//                BluetoothHelper.getBluetoothChatService(mContext).sendHex(StringUtil.string2HexString(mUnitArrays[mUnitIndex][position]));
-//                BluetoothHelper.getBluetoothChatService(mContext).sendHex(CommandUtil.TEST_HEX_CMD);
+//                BluetoothHelper.getBluetoothHelper(mContext).sendHex(StringUtil.string2HexString(mUnitArrays[mUnitIndex][position]));
+//                BluetoothHelper.getBluetoothHelper(mContext).sendHex(CommandUtil.TEST_HEX_CMD);
             }
 
             @Override
@@ -362,7 +374,7 @@ public class MeasureSetActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 mSampleUnit = mUnitArrays[mUnitIndex][position];
-//                BluetoothHelper.getBluetoothChatService(mContext).sendHex(StringUtil.string2HexString(mUnitArrays[mUnitIndex][position]));
+//                BluetoothHelper.getBluetoothHelper(mContext).sendHex(StringUtil.string2HexString(mUnitArrays[mUnitIndex][position]));
             }
 
             @Override
@@ -384,7 +396,7 @@ public class MeasureSetActivity extends AppCompatActivity {
             public void onValueChange(NumberPickerView picker, int oldVal, int newVal) {
                 Log.d(TAG, "oldVal: " + oldVal + ", newVal: " + newVal + ", Value: " + mStepArray[newVal]);
                 mStep = Float.parseFloat(mStepArray[newVal]);
-//                BluetoothHelper.getBluetoothChatService(mContext).sendString(mStepArray[newVal] + " unit");
+//                BluetoothHelper.getBluetoothHelper(mContext).sendString(mStepArray[newVal] + " unit");
 
             }
         });
@@ -422,10 +434,14 @@ public class MeasureSetActivity extends AppCompatActivity {
                     String address = data.getExtras()
                             .getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
                     // Get the BLuetoothDevice object
-                    BluetoothDevice device = BluetoothHelper.getBluetoothChatService(mContext).getBluetoothAdapter().getRemoteDevice(address);
-                    // Attempt to connect to the device
-                    BluetoothHelper.getBluetoothChatService(mContext).connect(device);
-//                    BluetoothHelper.getBluetoothChatService(mContext).setIMsgListener(mIBtMsgListener);
+
+                    BluetoothDevice device = BluetoothHelper.getBluetoothHelper(mContext).getBluetoothAdapter().getRemoteDevice(address);
+                    if (device != null) {
+                        // Attempt to connect to the device
+                        BluetoothHelper.getBluetoothHelper(mContext).connect(device);
+                        SharedPreferenceUtils.setParam(mContext, BtConstant.SAVE_BT_ADDRESS, device.getAddress());
+//                    BluetoothHelper.getBluetoothHelper(mContext).setIMsgListener(mIBtMsgListener);
+                    }
                 }
                 break;
 //            case REQUEST_ENABLE_BT:
@@ -451,8 +467,8 @@ public class MeasureSetActivity extends AppCompatActivity {
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.start_btn:
-                    BluetoothHelper.getBluetoothChatService(mContext).sendHex(CommandUtil.getStartCmd());
-//                    BluetoothHelper.getBluetoothChatService(mContext).sendHex(CommandUtil.getCalibrateCmd(getBTUnitHexData(mMeasurePointUnit, mSampleUnit)));
+                    BluetoothHelper.getBluetoothHelper(mContext).sendHex(CommandUtil.getStartCmd());
+//                    BluetoothHelper.getBluetoothHelper(mContext).sendHex(CommandUtil.getCalibrateCmd(getBTUnitHexData(mMeasurePointUnit, mSampleUnit)));
                     SocketControl.getInstance().sendMsg(CommandUtil.getSocketDataCmd(getUnitData(mTap, mMeasurePointUnit, mSampleUnit)));
 
                     Intent intent = new Intent();
@@ -466,7 +482,7 @@ public class MeasureSetActivity extends AppCompatActivity {
                     startActivity(intent);
                     break;
                 case R.id.end_btn:
-                    BluetoothHelper.getBluetoothChatService(mContext).sendHex(CommandUtil.getStopCmd());
+                    BluetoothHelper.getBluetoothHelper(mContext).sendHex(CommandUtil.getStopCmd());
                     break;
                 default:
                     break;
@@ -520,9 +536,10 @@ public class MeasureSetActivity extends AppCompatActivity {
         LogUtil.d(TAG, "origin String: " + s + "cmdString: " + CommandUtil.getSocketDataCmd(s));
     }
 
-    private void connectServer(String server, int ip) {
-        SocketControl.getInstance().setListener(mHttpListener);
-        SocketControl.getInstance().connect(server, ip);
+    private void connectServer(String server, int port) {
+        SharedPreferenceUtils.setParam(mContext, SAVE_IP, server);
+        SharedPreferenceUtils.setParam(mContext, SAVE_PORT, port);
+        SocketControl.getInstance().connect(server, port);
     }
 
     private void sendTest(String data) {
@@ -544,12 +561,12 @@ public class MeasureSetActivity extends AppCompatActivity {
         public void onResult(int state, String data) {
             switch (state) {
                 case HTTPConstant.CONNECT_SUCCESS:
-                    Log.d(TAG, "connect success");
+                    LogUtil.d(TAG, "connect success");
                     mHandler.sendEmptyMessage(HTTPConstant.CONNECT_SUCCESS);
                     break;
                 case HTTPConstant.CONNECT_FAIL:
                     mHandler.sendEmptyMessage(HTTPConstant.CONNECT_FAIL);
-                    Log.d(TAG, "connect fail");
+                    LogUtil.d(TAG, "connect fail");
                     break;
                 case HTTPConstant.SEND_FAIL:
                     mHandler.sendEmptyMessage(HTTPConstant.SEND_FAIL);

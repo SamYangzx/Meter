@@ -105,13 +105,13 @@ public class MeasureActivity extends AppCompatActivity {
                             mBtStateTv.setText("Connected");
                             break;
                         case BluetoothHelper.STATE_CONNECTING:
-                            mBtStateTv.setText(R.string.title_connecting);
+                            mBtStateTv.setText(R.string.title_bt_connecting);
 //                            ToastUtil.showToast(mContext, R.string.title_connecting);
                             break;
                         case BluetoothHelper.STATE_LISTEN:
                         case BluetoothHelper.STATE_NONE:
-                            mBtStateTv.setText(R.string.title_not_connected);
-//                            ToastUtil.showToast(mContext, R.string.title_not_connected);
+                            mBtStateTv.setText(R.string.title_not_bt_connected);
+//                            ToastUtil.showToast(mContext, R.string.title_not_bt_connected);
                             break;
                     }
                     break;
@@ -123,7 +123,7 @@ public class MeasureActivity extends AppCompatActivity {
                     ToastUtil.showToast(mContext, "BT sendString: " + writeMessage, ToastUtil.DEBUG);
                     break;
                 case BtConstant.MESSAGE_RECEIVE_SUCCESS:
-//                    BluetoothHelper.getBluetoothChatService(mContext).sendHex(CommandUtil.CHECKSUM_SUCCESS_HEXCMD);
+//                    BluetoothHelper.getBluetoothHelper(mContext).sendHex(CommandUtil.CHECKSUM_SUCCESS_HEXCMD);
                     byte[] readBuf = (byte[]) msg.obj;
                     String readMessage = StringUtil.bytes2HexString(readBuf);
 //                    mSampleTv.setText(readMessage);
@@ -131,7 +131,7 @@ public class MeasureActivity extends AppCompatActivity {
                     handlerCmd(readMessage);
                     break;
                 case BtConstant.MESSAGE_RECEIVE_FAILED:
-                    BluetoothHelper.getBluetoothChatService(mContext).sendHex(CommandUtil.CHECKSUM_FAILED_HEXCMD);
+                    BluetoothHelper.getBluetoothHelper(mContext).sendHex(CommandUtil.CHECKSUM_FAILED_HEXCMD);
                     break;
                 case BtConstant.MESSAGE_DEVICE_NAME:
                     break;
@@ -199,7 +199,7 @@ public class MeasureActivity extends AppCompatActivity {
     protected void onDestroy() {
         LogUtil.d(TAG, "onDestroy is invoked.");
         super.onDestroy();
-        BluetoothHelper.getBluetoothChatService(mContext).setmHandler(null);
+        BluetoothHelper.getBluetoothHelper(mContext).setmHandler(null);
     }
 
     private void initTitle() {
@@ -212,7 +212,7 @@ public class MeasureActivity extends AppCompatActivity {
 
 
     private void initData() {
-        BluetoothHelper.getBluetoothChatService(mContext).setmHandler(mHandler);
+        BluetoothHelper.getBluetoothHelper(mContext).setmHandler(mHandler);
         SocketControl.getInstance().setListener(mHttpListener);
 
 //        mMeasurePointArray = getResources().getStringArray(R.array.speed_array);
@@ -229,7 +229,7 @@ public class MeasureActivity extends AppCompatActivity {
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                BluetoothHelper.getBluetoothChatService(mContext).sendHex(CommandUtil.getCalibrateCmd(CommandUtil.getBTUnitHexData(mMeasurePointUnit, mSampleUnit)));
+                BluetoothHelper.getBluetoothHelper(mContext).sendHex(CommandUtil.getCalibrateCmd(CommandUtil.getBTUnitHexData(mMeasurePointUnit, mSampleUnit)));
             }
         }, GENERAL_DELAY_TIME);
     }
@@ -301,7 +301,7 @@ public class MeasureActivity extends AppCompatActivity {
 //                    hexStr = StringUtil.bytes2HexString(StringUtil.int2byte(mMeasurePointIndex));
                     hexStr = CommandUtil.getMeasurePointHexValue(mMeasurePointIndex);
                     LogUtil.d(TAG, "mMeasurePointValue: " + mMeasurePointValue + ", hexStr: " + hexStr);
-//                    BluetoothHelper.getBluetoothChatService(mContext).sendHex(CommandUtil.TEST_HEX_CMD);
+//                    BluetoothHelper.getBluetoothHelper(mContext).sendHex(CommandUtil.TEST_HEX_CMD);
 //                    SocketControl.getInstance().sendMsg(CommandUtil.TEST_HEX_CMD);
                     if (CALIBRATE_MODE == mMode) {
                         sendCmd(CommandUtil.getConfirmCalibrateCmd(hexStr, mMeasurePointValue), false);
@@ -402,7 +402,7 @@ public class MeasureActivity extends AppCompatActivity {
 //                MeasureActivity.this.finish();
 //                sendMsg(CommandUtil.RESET_CMD_CODE, true);
 //                SocketControl.getInstance().sendMsg(CommandUtil.RESET_CMD_CODE);
-                BluetoothHelper.getBluetoothChatService(mContext).sendHex(CommandUtil.getResetCmd());
+                BluetoothHelper.getBluetoothHelper(mContext).sendHex(CommandUtil.getResetCmd());
             }
         });
         builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -475,11 +475,11 @@ public class MeasureActivity extends AppCompatActivity {
 //                SocketControl.getInstance().sendMsg(hexCmd);
 //            } else {
 //                hexCmd = CommandUtil.getUploadCmd(mSampleTv.getText().toString());
-//                BluetoothHelper.getBluetoothChatService(mContext).sendHex(hexCmd);
+//                BluetoothHelper.getBluetoothHelper(mContext).sendHex(hexCmd);
 //            }
 //        } else {
 //            hexCmd = CommandUtil.getUploadCmd(CommandUtil.PLATFORM_PRE_CODE, msg);
-//            BluetoothHelper.getBluetoothChatService(mContext).sendHex(hexCmd);
+//            BluetoothHelper.getBluetoothHelper(mContext).sendHex(hexCmd);
 //        }
 //    }
     private void sendCmd(String cmd, boolean socket) {
@@ -487,7 +487,7 @@ public class MeasureActivity extends AppCompatActivity {
         if (socket) {
             SocketControl.getInstance().sendMsg(cmd);
         } else {
-            BluetoothHelper.getBluetoothChatService(mContext).sendHex(cmd);
+            BluetoothHelper.getBluetoothHelper(mContext).sendHex(cmd);
         }
     }
 

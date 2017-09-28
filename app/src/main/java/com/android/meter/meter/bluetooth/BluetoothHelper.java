@@ -17,6 +17,7 @@ import com.android.meter.meter.util.StringUtil;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Set;
 import java.util.UUID;
 
 public class BluetoothHelper {
@@ -50,7 +51,7 @@ public class BluetoothHelper {
         this(context, null);
     }
 
-    public static BluetoothHelper getBluetoothChatService(Context context) {
+    public static BluetoothHelper getBluetoothHelper(Context context) {
         if (mBluetoothHelper == null) {
             mBluetoothHelper = new BluetoothHelper(context);
         }
@@ -74,6 +75,21 @@ public class BluetoothHelper {
 
     public BluetoothAdapter getBluetoothAdapter() {
         return mAdapter;
+    }
+
+
+    private BluetoothDevice getSavedBTDevice(String address) {
+        Set<BluetoothDevice> pairedDevices = mAdapter.getBondedDevices();
+
+        // If there are paired devices, add each one to the ArrayAdapter
+        if (pairedDevices.size() > 0) {
+            for (BluetoothDevice device : pairedDevices) {
+                if (device.getAddress().equals(address)) {
+                    return device;
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -139,6 +155,11 @@ public class BluetoothHelper {
         setState(STATE_LISTEN);
     }
 
+    public void connect(String address){
+        connect(getSavedBTDevice(address));
+    }
+
+
     /**
      * Start the ConnectThread to initiate a connection to a remote device.
      *
@@ -181,7 +202,7 @@ public class BluetoothHelper {
     }
 
 
-    public synchronized void connected(BluetoothSocket socket, BluetoothDevice device) {
+    private synchronized void connected(BluetoothSocket socket, BluetoothDevice device) {
         if (D) LogUtil.d(TAG, "connected is invoked");
 
 

@@ -13,4 +13,6 @@ public class BtConstant {
     public static final int MESSAGE_TOAST = 5;
     public static final int MESSAGE_RECEIVE_FAILED = 6; //checksum is failed.
 
+    public static final String SAVE_BT_ADDRESS = "save_bt_address";
+
 }

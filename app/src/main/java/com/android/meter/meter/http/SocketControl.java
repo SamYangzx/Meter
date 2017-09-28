@@ -15,7 +15,7 @@ import java.net.Socket;
  * 极大上升。（此程序暂时未对此中情况做判断处理。）
  */
 public class SocketControl {
-    private static final String TAG = SocketControl.class.getSimpleName();
+    private static final String TAG = LogUtil.COMMON_TAG + SocketControl.class.getSimpleName();
 
     private static final int CONNECT_TIMEOUT = 5 * 1000;
     private static final int READ_TIMEOUT = 1 * 1000;

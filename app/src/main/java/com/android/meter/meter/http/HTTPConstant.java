@@ -22,4 +22,7 @@ public class HTTPConstant {
     public static final boolean WRITE_HEX = true;
     public static final String HEX_END = "0D0A";
 
+    public static final String SAVE_IP = "save_ip";
+    public static final String SAVE_PORT = "save_port";
+
 }
