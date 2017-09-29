@@ -38,6 +38,7 @@ import com.android.meter.meter.util.LogUtil;
 import com.android.meter.meter.util.SharedPreferenceUtils;
 import com.android.meter.meter.util.StringUtil;
 import com.android.meter.meter.util.ToastUtil;
+import com.android.meter.meter.util.WifiUtil;
 
 import static com.android.meter.meter.bluetooth.BluetoothChatActivity.TOAST;
 import static com.android.meter.meter.http.HTTPConstant.SAVE_IP;
@@ -483,6 +484,7 @@ public class MeasureSetActivity extends AppCompatActivity {
                     break;
                 case R.id.end_btn:
                     BluetoothHelper.getBluetoothHelper(mContext).sendHex(CommandUtil.getStopCmd());
+                    ToastUtil.showToast(mContext,WifiUtil.getWifiAddress(mContext));
                     break;
                 default:
                     break;

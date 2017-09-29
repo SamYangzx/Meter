@@ -236,6 +236,7 @@ public class StringUtil {
             byte b = (byte) a;
             bbt[p] = b;
         }
+        LogUtil.d(TAG,"str2Bcd.asc: " + asc + ", bbt: " + bbt );
         return bbt;
     }
 

@@ -53,7 +53,7 @@ public class MeasureActivity extends AppCompatActivity {
     public static final String EXTRA_COUNT = "count";
     private static final int MEASURE_MODE = 0;
     private static final int CALIBRATE_MODE = 1;
-    private static final int GENERAL_DELAY_TIME = 500;
+    private static final int GENERAL_DELAY_TIME = 300;
 
     private static final int MEASURE_POINT_INDEX_OFF = 10;//
 
@@ -253,14 +253,8 @@ public class MeasureActivity extends AppCompatActivity {
         mMeasurePointPicker.setHintText(mMeasurePointUnit);
         mMeasurePointPicker.refreshByNewDisplayedValues(getMeasurePointArray(mStep));
         mMeasurePointValue = "0"; //init mMeasurePointValue.
-        mMeasurePointPicker.setOnValueChangedListener(new OnValueChangeListener() {
-            @Override
-            public void onValueChange(NumberPickerView picker, int oldVal, int newVal) {
-                mMeasurePointValue = mMeasurePointArray[newVal];
-                LogUtil.d(TAG, "newVal: " + newVal + ", mMeasurePointValue: " + mMeasurePointValue);
-                mMeasurePointIndex = newVal;
-            }
-        });
+        updateMeasurePointPicker();
+
         mTimesPicker = (NumberPickerView) findViewById(R.id.times_picker);
         mTimesPicker.refreshByNewDisplayedValues(mTimesArray);
         mTimesPicker.setOnValueChangedListener(new NumberPickerView.OnValueChangeListener() {
@@ -306,6 +300,18 @@ public class MeasureActivity extends AppCompatActivity {
         mLoadSpeedTv = (TextView) findViewById(R.id.load_speed_tv);
     }
 
+    private void updateMeasurePointPicker() {
+        mMeasurePointPicker.setOnValueChangedListener(new OnValueChangeListener() {
+            @Override
+            public void onValueChange(NumberPickerView picker, int oldVal, int newVal) {
+                mMeasurePointValue = mMeasurePointArray[newVal];
+                LogUtil.d(TAG, "newVal: " + newVal + ", mMeasurePointValue: " + mMeasurePointValue);
+                mMeasurePointIndex = newVal;
+            }
+        });
+    }
+
+
     private View.OnClickListener mListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -317,11 +323,15 @@ public class MeasureActivity extends AppCompatActivity {
                     break;
                 case R.id.center_btn:
                     VibratorHelper.vibrate(mContext);
+                    if (CALIBRATE_MODE == mMode && mMeasurePointIndex > 20) { //切换数据时短时间内未及时更新。
+                        LogUtil.d(TAG, "force calibrate!!");
+                        mMeasurePointIndex = mMeasurePointIndex - 990;
+                    }
                     String hexStr;
 //                    hexStr = Float.toHexString(Float.valueOf(mMeasurePointValue));
 //                    hexStr = StringUtil.bytes2HexString(StringUtil.int2byte(mMeasurePointIndex));
                     hexStr = CommandUtil.getMeasurePointHexValue(mMeasurePointIndex);
-                    LogUtil.d(TAG, "mMeasurePointValue: " + mMeasurePointValue + ", hexStr: " + hexStr);
+                    LogUtil.d(TAG, "mMeasurePointValue: " + mMeasurePointValue + ", mMeasurePointIndex: " + mMeasurePointIndex + ", hexStr: " + hexStr);
 //                    BluetoothHelper.getBluetoothHelper(mContext).sendHex(CommandUtil.TEST_HEX_CMD);
 //                    SocketControl.getInstance().sendMsg(CommandUtil.TEST_HEX_CMD);
                     if (CALIBRATE_MODE == mMode) {
@@ -384,16 +394,19 @@ public class MeasureActivity extends AppCompatActivity {
 
     private void changeMode() {
         if (MEASURE_MODE == mMode) {
+            LogUtil.d(TAG, "changeMode CALIBRATE_MODE");
             mMode = CALIBRATE_MODE;
             mTitleTv.setText(R.string.measure_title_calibrate);
             mCalcelBtn.setText(R.string.save_calibrate);
         } else {
             mMode = MEASURE_MODE;
+            LogUtil.d(TAG, "changeMode MEASURE_MODE");
             mTitleTv.setText(R.string.measure_title_measure);
             mCalcelBtn.setText(R.string.cancel);
         }
         mMeasurePointPicker.refreshByNewDisplayedValues(getMeasurePointArray(mStep));
         mMeasurePointPicker.setPickedIndexRelativeToRaw(mMeasurePointArray.length / 2);
+        updateMeasurePointPicker();
     }
 
     private String getStringById(int str) {
@@ -419,6 +432,7 @@ public class MeasureActivity extends AppCompatActivity {
 //            }
             mMeasurePointArray = mTempMeaseureArray;
         }
+        LogUtil.d(TAG, "mMeasurePointArray.length: " + mMeasurePointArray.length);
         return mMeasurePointArray;
     }
 
