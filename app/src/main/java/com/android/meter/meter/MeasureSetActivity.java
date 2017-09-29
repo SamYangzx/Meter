@@ -104,17 +104,17 @@ public class MeasureSetActivity extends AppCompatActivity {
                     Log.i(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
                     switch (msg.arg1) {
                         case BluetoothHelper.STATE_CONNECTED:
-//                            setTitles("BT connected");
-                            ToastUtil.showToast(mContext, "BT connected");
+                            setTitles("BT connected");
+//                            ToastUtil.showToast(mContext, "BT connected");
                             break;
                         case BluetoothHelper.STATE_CONNECTING:
-//                            setTitles(R.string.title_connecting);
-                            ToastUtil.showToast(mContext, R.string.title_bt_connecting);
+                            setTitles(R.string.title_bt_connecting);
+//                            ToastUtil.showToast(mContext, R.string.title_bt_connecting);
                             break;
                         case BluetoothHelper.STATE_LISTEN:
                         case BluetoothHelper.STATE_NONE:
-//                            setTitles(R.string.title_not_bt_connected);
-                            ToastUtil.showToast(mContext, R.string.title_not_bt_connected);
+                            setTitles(R.string.title_not_bt_connected);
+//                            ToastUtil.showToast(mContext, R.string.title_not_bt_connected);
                             break;
                         default:
                             break;
@@ -125,13 +125,12 @@ public class MeasureSetActivity extends AppCompatActivity {
                     // construct a string from the buffer
                     String writeMessage = StringUtil.bytes2HexString(writeBuf);
 //                    mConversationArrayAdapter.add("Me:  " + writeMessage);
-                    ToastUtil.showToast(mContext, "sendString : " + writeMessage);
+                    ToastUtil.showToast(mContext, "sendString : " + writeMessage, ToastUtil.DEBUG);
                     break;
                 case BtConstant.MESSAGE_RECEIVE_SUCCESS:
                     byte[] readBuf = (byte[]) msg.obj;
                     String readMessage = StringUtil.bytes2HexString(readBuf);
-                    ToastUtil.showToast(mContext, "Receive: " + readMessage);
-
+                    ToastUtil.showToast(mContext, "Receive: " + readMessage, ToastUtil.DEBUG);
                     break;
                 case BtConstant.MESSAGE_DEVICE_NAME:
                     // save the connected device's name

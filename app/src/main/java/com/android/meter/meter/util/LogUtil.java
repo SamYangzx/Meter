@@ -101,10 +101,12 @@ public class LogUtil {
         e(tag, msg, null);
     }
 
-    public static void callStack(String tag, String msg) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(msg).append("\n").append(track());
-        Log.d(tag, sb.toString());
+    public static void printStack(String tag) {
+        String s = track();
+        d(tag, s);
+        if (LOG_TO_FILE) {
+            logtoFile("D", tag, s, null);
+        }
     }
 
 

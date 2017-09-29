@@ -69,6 +69,8 @@ public class BluetoothHelper {
         if (mHandler != null) {
             mHandler.removeCallbacksAndMessages(null);
             mHandler = null;
+        }else{
+            LogUtil.printStack(TAG);
         }
         mHandler = handler;
     }
@@ -112,11 +114,11 @@ public class BluetoothHelper {
     public String getStateString() {
         switch (getState()) {
             case STATE_NONE:
-                return "no device";
+                return "no BT device";
             case STATE_CONNECTING:
-                return "connecting";
+                return "BT connecting";
             case STATE_CONNECTED:
-                return "connected";
+                return "BT connected";
         }
         return "";
     }
@@ -155,7 +157,7 @@ public class BluetoothHelper {
         setState(STATE_LISTEN);
     }
 
-    public void connect(String address){
+    public void connect(String address) {
         connect(getSavedBTDevice(address));
     }
 
@@ -227,12 +229,13 @@ public class BluetoothHelper {
         mConnectedThread = new ConnectedThread(socket);
         mConnectedThread.start();
 
-
-        Message msg = mHandler.obtainMessage(BtConstant.MESSAGE_DEVICE_NAME);
-        Bundle bundle = new Bundle();
-        bundle.putString(BluetoothChatActivity.DEVICE_NAME, device.getName());
-        msg.setData(bundle);
-        mHandler.sendMessage(msg);
+        if (mHandler != null) {
+            Message msg = mHandler.obtainMessage(BtConstant.MESSAGE_DEVICE_NAME);
+            Bundle bundle = new Bundle();
+            bundle.putString(BluetoothChatActivity.DEVICE_NAME, device.getName());
+            msg.setData(bundle);
+            mHandler.sendMessage(msg);
+        }
 
         setState(STATE_CONNECTED);
     }

@@ -203,7 +203,7 @@ public class MeasureActivity extends AppCompatActivity {
     protected void onDestroy() {
         LogUtil.d(TAG, "onDestroy is invoked.");
         super.onDestroy();
-        BluetoothHelper.getBluetoothHelper(mContext).setmHandler(null);
+//        BluetoothHelper.getBluetoothHelper(mContext).setmHandler(null);
     }
 
     private void initTitle() {
