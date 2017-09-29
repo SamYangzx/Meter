@@ -331,6 +331,7 @@ public class MeasureSetActivity extends AppCompatActivity {
         mTap = mTapArray[0];
         mCount = Integer.valueOf(mCountArray[0]);
 
+        BluetoothHelper.getBluetoothHelper(mContext).enableBT();
         BluetoothHelper.getBluetoothHelper(mContext).setmHandler(mHandler);
 
         String server = (String) SharedPreferenceUtils.getParam(mContext, HTTPConstant.SAVE_IP, "");

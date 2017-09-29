@@ -69,7 +69,7 @@ public class BluetoothHelper {
         if (mHandler != null) {
             mHandler.removeCallbacksAndMessages(null);
             mHandler = null;
-        }else{
+        } else {
             LogUtil.printStack(TAG);
         }
         mHandler = handler;
@@ -77,6 +77,12 @@ public class BluetoothHelper {
 
     public BluetoothAdapter getBluetoothAdapter() {
         return mAdapter;
+    }
+
+    public void enableBT() {
+        if (mAdapter != null) {
+            mAdapter.enable();
+        }
     }
 
 

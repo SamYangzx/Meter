@@ -47,6 +47,7 @@ import android.widget.Toast;
 
 import com.android.meter.meter.camera.AspectRatioFragment;
 import com.android.meter.meter.util.FileUtil;
+import com.android.meter.meter.util.PermissionsCheckUtil;
 import com.android.meter.meter.util.TimeUtil;
 import com.google.android.cameraview.AspectRatio;
 import com.google.android.cameraview.CameraView;
@@ -147,18 +148,12 @@ public class CameraActivity extends AppCompatActivity implements
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
                 == PackageManager.PERMISSION_GRANTED) {
             mCameraView.start();
-        } else if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                Manifest.permission.CAMERA)) {
-            ConfirmationDialogFragment
-                    .newInstance(R.string.camera_permission_confirmation,
-                            new String[]{Manifest.permission.CAMERA},
-                            REQUEST_CAMERA_PERMISSION,
-                            R.string.camera_permission_not_granted)
-                    .show(getSupportFragmentManager(), FRAGMENT_DIALOG);
         } else {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA},
                     REQUEST_CAMERA_PERMISSION);
         }
+
+        PermissionsCheckUtil.verifyStoragePermissions(mContext);
     }
 
     @Override
