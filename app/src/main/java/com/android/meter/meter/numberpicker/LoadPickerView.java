@@ -29,6 +29,7 @@ import com.android.meter.meter.util.StringUtil;
  */
 public class LoadPickerView extends View {
     private static final String TAG = LogUtil.COMMON_TAG + LoadPickerView.class.getSimpleName();
+    private static final float MIN_SPEED = 0.02f;
 
     // default text color of not selected item
     private static final int DEFAULT_TEXT_COLOR_NORMAL = 0XFF888888;
@@ -353,7 +354,7 @@ public class LoadPickerView extends View {
         mHandlerInNewThread = new Handler(mHandlerThread.getLooper()) {
             @Override
             public void handleMessage(Message msg) {
-                printD("msg: " + msg.what + ", HANDLER_WHAT_REFRESH: " + mScroller.isFinished() + ", mScrollState: " + mScrollState + ", currentV: " + mScroller.getCurrVelocity());
+                printD("msg: " + msg.what + ", mScroller.isFinished: " + mScroller.isFinished() + ", mScrollState: " + mScrollState + ", currentV: " + mScroller.getCurrVelocity());
 
                 switch (msg.what) {
                     case HANDLER_WHAT_REFRESH:
@@ -411,7 +412,7 @@ public class LoadPickerView extends View {
                         onScrollStateChange(OnScrollListener.SCROLL_STATE_CYCLE);
                         calculateFirstItemParameterByGlobalY();
                         postInvalidate();
-                        mOnScrollListener.onScrollFling(LoadPickerView.this, calculateSpeedRatio(OnScrollListener.SCROLL_STATE_CYCLE));
+//                        mOnScrollListener.onScrollFling(LoadPickerView.this, calculateSpeedRatio(OnScrollListener.SCROLL_STATE_CYCLE));
                         this.sendEmptyMessageDelayed(HANDLER_SCROLL_CYCLE, 50);
                         break;
                 }
@@ -1090,10 +1091,11 @@ public class LoadPickerView extends View {
         }
         mVelocityTracker.addMovement(event);
         currY = event.getY();
+        LogUtil.d(TAG, "event.getAction: " + event.getAction());
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                reset();
+                reset(false);
 
                 mFlagMayPress = true;
                 mHandlerInNewThread.removeMessages(HANDLER_WHAT_REFRESH);
@@ -1114,17 +1116,19 @@ public class LoadPickerView extends View {
                 if (mFlagMayPress && (-mScaledTouchSlop < mSpanY && mSpanY < mScaledTouchSlop)) {
 
                 } else {
+                    LogUtil.d(TAG, "mFlagMayPress turn to false");
                     mFlagMayPress = false;
                     mCurrDrawGlobalY = limitY((int) (downYGlobal + mSpanY));
                     calculateFirstItemParameterByGlobalY();
                     invalidate();
+                    onScrollStateChange(OnScrollListener.SCROLL_STATE_TOUCH_SCROLL);
                 }
-                onScrollStateChange(OnScrollListener.SCROLL_STATE_TOUCH_SCROLL);
                 break;
             case MotionEvent.ACTION_UP:
                 LogUtil.d(TAG, "onTouchEvent.ACTION_UP mFlagMayPress: " + mFlagMayPress);
                 if (mFlagMayPress) {
 //                    click(event);
+                    reset();
                 } else {
                     final VelocityTracker velocityTracker = mVelocityTracker;
                     velocityTracker.computeCurrentVelocity(1000);
@@ -1138,8 +1142,10 @@ public class LoadPickerView extends View {
 //                    }
 //                    mHandlerInNewThread.sendMessageDelayed(getMsg(HANDLER_WHAT_REFRESH), 0);
                     releaseVelocityTracker();
+                    stopScrolling();
                     mHandlerInNewThread.removeCallbacksAndMessages(null);
                     mHandlerInNewThread.sendEmptyMessageDelayed(HANDLER_SCROLL_CYCLE, 0);
+                    mOnScrollListener.onScrollFling(LoadPickerView.this, calculateSpeedRatio(OnScrollListener.SCROLL_STATE_CYCLE));
                 }
                 break;
             case MotionEvent.ACTION_CANCEL:
@@ -1252,7 +1258,7 @@ public class LoadPickerView extends View {
         }
 
         if (OnScrollListener.SCROLL_STATE_CYCLE == mScrollState) {
-            mCurrDrawFirstItemY = velocityY * mCycleCount % mItemHeight;
+            mCurrDrawFirstItemY = mCycleFirstY * mCycleCount % mItemHeight;
             printD("after.mCurrDrawFirstItemY: " + mCurrDrawFirstItemY);
         }
     }
@@ -1686,7 +1692,9 @@ public class LoadPickerView extends View {
      */
     public float calculateSpeedRatio(int mode) {
         LogUtil.d(TAG, "calculateSpeedRatio.mode: " + mode);
-        if (OnScrollListener.SCROLL_STATE_TOUCH_SCROLL == mode) {
+        if (OnScrollListener.SCROLL_STATE_IDLE == mode) {
+            return StringUtil.big2(0f);
+        } else if (OnScrollListener.SCROLL_STATE_TOUCH_SCROLL == mode) {
             float diffY = currY - mLastY;
             if (diffY > MAX_Y_DIFF) {
                 diffY = MAX_Y_DIFF;
@@ -1712,13 +1720,17 @@ public class LoadPickerView extends View {
             }
         } else if (OnScrollListener.SCROLL_STATE_CYCLE == mode) {
             float v = ((float) velocityY) / MAX_FLING_SPEED;
+
+            mCycleFirstY = getUIScrollSpeed(v);
+            LogUtil.d(TAG, "v: " + v + " ,mCycleFirstY: " + mCycleFirstY);
             if (v >= 1) {
                 return StringUtil.big2(1f);
             } else if (v <= -1) {
                 return StringUtil.big2(-1f);
             } else {
-                if (Math.abs(v) < 0.1) { //速度小于刻度值时，停止。
+                if (Math.abs(v) < MIN_SPEED) { //速度小最小刻度值时，停止。
                     reset();
+                    return StringUtil.big2(0);
                 }
                 return StringUtil.big2(v);
             }
@@ -1739,14 +1751,58 @@ public class LoadPickerView extends View {
     }
 
     private void reset() {
+        reset(true);
+    }
+
+    private void reset(boolean draw) {
         velocityY = 0;
         mCycleCount = 0;
         mHandlerInNewThread.removeCallbacksAndMessages(null);
+        mUIScrollSpeed = 0;
+        mOnScrollListener.onScrollFling(LoadPickerView.this, calculateSpeedRatio(OnScrollListener.SCROLL_STATE_IDLE));
+        if (draw) {
+            calculateFirstItemParameterByGlobalY();
+            postInvalidate();
+        }
     }
 
-//    private int getUIScrollSpeed(){
-//
-//        return
-//    }
+    private static final int TAP[] = new int[]{0, 1, 5, 10, 15};
+
+    private int mUIScrollSpeed = 0;
+    private int mCycleFirstY = 0;
+
+    private int getUIScrollSpeed(float signedTapV) {
+        int count = TAP.length;
+        float didV = ((float) 1) / (count - 1);
+        LogUtil.d(TAG, "getUIScrollSpeed.signedTapV: " + signedTapV + ", didV: " + didV);
+        if (Math.abs(signedTapV) < MIN_SPEED) {
+            return 0;
+        }
+        if (signedTapV >= 1) {
+            return TAP[count - 1];
+        } else if (signedTapV <= -1) {
+            return -TAP[count - 1];
+        }
+
+        int i = 0;
+        if (signedTapV > 0) {
+            for (i = 1; i < count; i++) {
+                if (didV * i > signedTapV) {
+                    LogUtil.d(TAG, "i: " + i);
+                    return TAP[i];
+                }
+            }
+        } else {
+            for (i = count - 2; i >= 0; i--) {
+                if (-didV * i > signedTapV) {
+                    LogUtil.d(TAG, "i: " + i);
+                    return -TAP[i + 1];
+                }
+            }
+
+        }
+        return 0;
+
+    }
 
 }

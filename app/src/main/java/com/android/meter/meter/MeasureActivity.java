@@ -553,7 +553,7 @@ public class MeasureActivity extends AppCompatActivity {
                     String s = Float.valueOf(StringUtil.hex2String(sampleValue.substring(0, divideIndex))).toString();
                     LogUtil.d(TAG, "without more 0: " + s);
                     mSampleTv.setText(s);
-                    mUnitTv.setText(getFormatUnit(StringUtil.hex2String(sampleValue.substring(divideIndex))));
+//                    mUnitTv.setText(getFormatUnit(StringUtil.hex2String(sampleValue.substring(divideIndex))));
                 }
                 break;
             default:
