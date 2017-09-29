@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.android.meter.meter.R;
 import com.android.meter.meter.http.HTTPConstant;
+import com.android.meter.meter.util.SharedPreferenceUtils;
 
 /**
  * Created by fenghe on 2017/6/17.
@@ -29,6 +30,7 @@ public class NetworkDialog extends Dialog {
 
     private onCancelclickListener noOnclickListener;//取消按钮被点击了的监听器
     private onEnterclickListener yesOnclickListener;//确定按钮被点击了的监听器
+    private Context mContext;
 
     /**
      * 设置取消按钮的显示内容和监听
@@ -66,12 +68,14 @@ public class NetworkDialog extends Dialog {
 
     public NetworkDialog(Context context) {
         super(context, R.style.MyDialog);
+        mContext = context;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.network_dialog);
+
         //按空白处不能取消动画
         setCanceledOnTouchOutside(false);
 
@@ -151,10 +155,12 @@ public class NetworkDialog extends Dialog {
         no = (Button) findViewById(R.id.no);
         mServerTv = (TextView) findViewById(R.id.server_toast);
         mServerEt = (EditText) findViewById(R.id.server_et);
-        mServerEt.setText(HTTPConstant.DEFAULT_SERVER);
+//        mServerEt.setText(HTTPConstant.DEFAULT_SERVER);
+        mServerEt.setText((String) SharedPreferenceUtils.getParam(mContext, HTTPConstant.SAVE_IP, HTTPConstant.DEFAULT_SERVER));
         mPortTv = (TextView) findViewById(R.id.port_toast);
         mPortEt = (EditText) findViewById(R.id.port_et);
-        mPortEt.setText(Integer.toString(HTTPConstant.DEFAULT_PORT));
+//        mPortEt.setText(Integer.toString(HTTPConstant.DEFAULT_PORT));
+        mPortEt.setText(Integer.toString((int) SharedPreferenceUtils.getParam(mContext, HTTPConstant.SAVE_PORT, HTTPConstant.DEFAULT_PORT)));
     }
 
     /**

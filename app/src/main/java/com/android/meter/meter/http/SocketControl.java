@@ -17,7 +17,7 @@ import java.net.Socket;
 public class SocketControl {
     private static final String TAG = LogUtil.COMMON_TAG + SocketControl.class.getSimpleName();
 
-    private static final int CONNECT_TIMEOUT = 5 * 1000;
+    private static final int CONNECT_TIMEOUT = 3 * 1000;
     private static final int READ_TIMEOUT = 1 * 1000;
     private static final int MAX_RESPONSE_MILL_TIME = 1500;
     private static final int MAX_SEND_TIMES = 3;
