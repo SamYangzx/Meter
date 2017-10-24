@@ -24,12 +24,13 @@
     <string name="reset">清零</string>
     <string name="confirm">确认</string>
     <string name="reset_confirm">确认清零吗？</string>
+    <string name="back_confirm">确认返回上一界面吗？</string>
     <string name="change_confirm">确认切换模式吗？</string>
     <string name="save_calibrate">保存</string>
 
 
     <string name="sample_value">采样值</string>
     <string name="measure_point">测量点</string>
-    <string name="warn">警告</string>
+    <string name="warn">提示</string>
 
 </resources>

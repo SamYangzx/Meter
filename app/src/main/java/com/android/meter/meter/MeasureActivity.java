@@ -300,6 +300,11 @@ public class MeasureActivity extends AppCompatActivity {
         mLoadSpeedTv = (TextView) findViewById(R.id.load_speed_tv);
     }
 
+    @Override
+    public void onBackPressed() {
+        backDialog();
+    }
+
     private void updateMeasurePointPicker() {
         mMeasurePointPicker.setOnValueChangedListener(new OnValueChangeListener() {
             @Override
@@ -461,6 +466,25 @@ public class MeasureActivity extends AppCompatActivity {
         builder.create().show();
     }
 
+    private void backDialog(){
+        AlertDialog.Builder builder = new android.app.AlertDialog.Builder(mContext);
+        builder.setMessage(R.string.back_confirm);
+        builder.setTitle(R.string.warn);
+        builder.setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                finish();
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        builder.create().show();
+    }
 
     private void changeModeDialog() {
         AlertDialog.Builder builder = new android.app.AlertDialog.Builder(mContext);
