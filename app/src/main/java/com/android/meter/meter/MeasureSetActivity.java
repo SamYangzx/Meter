@@ -335,8 +335,8 @@ public class MeasureSetActivity extends AppCompatActivity {
         BluetoothHelper.getBluetoothHelper(mContext).enableBT();
         BluetoothHelper.getBluetoothHelper(mContext).setmHandler(mHandler);
 
-        String server = (String) SharedPreferenceUtils.getParam(mContext, HTTPConstant.SAVE_IP, "");
-        int port = (int) SharedPreferenceUtils.getParam(mContext, HTTPConstant.SAVE_PORT, 1);
+        String server = (String) SharedPreferenceUtils.getParam(mContext, HTTPConstant.SAVE_IP, HTTPConstant.DEFAULT_SERVER);
+        int port = (int) SharedPreferenceUtils.getParam(mContext, HTTPConstant.SAVE_PORT, HTTPConstant.DEFAULT_PORT);
         SocketControl.getInstance().setListener(mHttpListener);
 
         SocketControl.getInstance().connect(server, port);
