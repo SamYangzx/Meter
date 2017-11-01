@@ -24,31 +24,34 @@ import android.widget.Toast;
 import com.android.meter.meter.bluetooth.BluetoothHelper;
 import com.android.meter.meter.bluetooth.BtConstant;
 import com.android.meter.meter.bluetooth.DeviceListActivity;
-import com.android.meter.meter.general_ui.CustomDialog;
+import com.android.meter.meter.general_ui.CustomEtDialog;
 import com.android.meter.meter.general_ui.CustomToastDialog;
 import com.android.meter.meter.general_ui.NetworkDialog;
-import com.android.meter.meter.http.HTTPConstant;
+import com.android.meter.meter.http.SocketConstant;
 import com.android.meter.meter.http.IHttpListener;
 import com.android.meter.meter.http.SocketControl;
 import com.android.meter.meter.numberpicker.NumberPickerView;
 import com.android.meter.meter.util.CommandUtil;
 import com.android.meter.meter.util.Constant;
+import com.android.meter.meter.util.FileUtil;
 import com.android.meter.meter.util.IMsgListener;
 import com.android.meter.meter.util.LogUtil;
 import com.android.meter.meter.util.SharedPreferenceUtils;
 import com.android.meter.meter.util.StringUtil;
 import com.android.meter.meter.util.ToastUtil;
-import com.android.meter.meter.util.WifiUtil;
+
+import java.io.File;
 
 import static com.android.meter.meter.bluetooth.BluetoothChatActivity.TOAST;
-import static com.android.meter.meter.http.HTTPConstant.SAVE_IP;
-import static com.android.meter.meter.http.HTTPConstant.SAVE_PORT;
+import static com.android.meter.meter.http.SocketConstant.SAVE_IP;
+import static com.android.meter.meter.http.SocketConstant.SAVE_PORT;
 import static com.android.meter.meter.util.CommandUtil.getUnitData;
 
 
 public class MeasureSetActivity extends AppCompatActivity {
     private static final String TAG = LogUtil.COMMON_TAG + MeasureSetActivity.class.getSimpleName();
     private static final int REQUEST_CONNECT_DEVICE = 1;
+    public static final String EXTRA_PHOTO = "photo";
 
     private final static String mUnitArrays[][] = {
             {"N", "kN", "cN", "mN", "kgf", "daN", "Lbf"},
@@ -66,6 +69,7 @@ public class MeasureSetActivity extends AppCompatActivity {
             {"W", "kW", "mW"},
             {"m3/h", "m3/min", "m3/s", "L/h", "L/min", "L/s", "mL/h", "mL/min", "mL/s", "ft3/h", "ft3/min", "ft3/s", "UKgal/s", "U.Sgal/s", "USbbl/s"},
             {"℃", "K", "οF", "οRa", "οR"},
+            {"J"},
     };
 
     private Context mContext;
@@ -87,6 +91,8 @@ public class MeasureSetActivity extends AppCompatActivity {
     //    private ActionBar mActionBar;
     private Toolbar mToolbar;
     private TextView mCustomerTitle;
+
+    private String mPhotoName;
 
     private NetworkDialog mNetworkDialog;
 
@@ -143,16 +149,16 @@ public class MeasureSetActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), msg.getData().getString(TOAST),
                             Toast.LENGTH_SHORT).show();
                     break;
-                case HTTPConstant.CONNECT_SUCCESS:
+                case SocketConstant.CONNECT_SUCCESS:
                     ToastUtil.showToast(mContext, "Socket connect success");
                     if (mNetworkDialog != null) {
                         mNetworkDialog.dismiss();
                     }
                     break;
-                case HTTPConstant.CONNECT_FAIL:
+                case SocketConstant.CONNECT_FAIL:
                     ToastUtil.showToast(mContext, "Socket connect fail");
                     break;
-                case HTTPConstant.SEND_FAIL:
+                case SocketConstant.SEND_FAIL:
                     ToastUtil.showToast(mContext, "Socket send msg fail!!");
                     break;
                 default:
@@ -164,6 +170,7 @@ public class MeasureSetActivity extends AppCompatActivity {
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        LogUtil.v(TAG, "onCreate");
 //        if (getActionBar() != null) {
 //            getActionBar().setDisplayShowHomeEnabled(false);
 ////            getActionBar().setBackgroundDrawable(getResources().getDrawable(R.drawable.title_background));
@@ -260,9 +267,9 @@ public class MeasureSetActivity extends AppCompatActivity {
                 return true;
 
             case R.id.debug:
-                final CustomDialog mDebugDialog = new CustomDialog(mContext);
+                final CustomEtDialog mDebugDialog = new CustomEtDialog(mContext);
                 mDebugDialog.setMessage(CommandUtil.TEST_HEX_CMD);
-                mDebugDialog.setYesOnclickListener(new CustomDialog.onEnterclickListener() {
+                mDebugDialog.setYesOnclickListener(new CustomEtDialog.onEnterclickListener() {
                     @Override
                     public void onYesClick() {
 //                        test();
@@ -271,7 +278,7 @@ public class MeasureSetActivity extends AppCompatActivity {
                         SocketControl.getInstance().sendMsg(mDebugDialog.getMessageStr());
                     }
                 });
-                mDebugDialog.setNoOnclickListener(new CustomDialog.onCancelclickListener() {
+                mDebugDialog.setNoOnclickListener(new CustomEtDialog.onCancelclickListener() {
                     @Override
                     public void onNoClick() {
                         mDebugDialog.cancel();
@@ -283,13 +290,13 @@ public class MeasureSetActivity extends AppCompatActivity {
                 final CustomToastDialog mDialog = new CustomToastDialog(mContext);
                 mDialog.setTitle(R.string.about);
                 mDialog.setMessage(R.string.about_msg);
-                mDialog.setNoOnclickListener(new CustomToastDialog.onCancelclickListener() {
+                mDialog.setNegativeButton(new CustomToastDialog.onCancelclickListener() {
                     @Override
                     public void onNoClick() {
                         mDialog.cancel();
                     }
                 });
-                mDialog.setYesOnclickListener(new CustomToastDialog.onEnterclickListener() {
+                mDialog.setPositiveButton(new CustomToastDialog.onEnterclickListener() {
                     @Override
                     public void onYesClick() {
                         mDialog.cancel();
@@ -322,6 +329,7 @@ public class MeasureSetActivity extends AppCompatActivity {
     }
 
     private void initData() {
+        mPhotoName = getIntent().getStringExtra(EXTRA_PHOTO);
         mStepArray = getResources().getStringArray(R.array.step_array);
         mTapArray = getResources().getStringArray(R.array.tap_array);
         mCountArray = getResources().getStringArray(R.array.jinhui_array);
@@ -335,13 +343,15 @@ public class MeasureSetActivity extends AppCompatActivity {
         BluetoothHelper.getBluetoothHelper(mContext).enableBT();
         BluetoothHelper.getBluetoothHelper(mContext).setmHandler(mHandler);
 
-        String server = (String) SharedPreferenceUtils.getParam(mContext, HTTPConstant.SAVE_IP, HTTPConstant.DEFAULT_SERVER);
-        int port = (int) SharedPreferenceUtils.getParam(mContext, HTTPConstant.SAVE_PORT, HTTPConstant.DEFAULT_PORT);
         SocketControl.getInstance().setListener(mHttpListener);
+//        String server = (String) SharedPreferenceUtils.getParam(mContext, SocketConstant.SAVE_IP, SocketConstant.DEFAULT_SERVER);
+//        int port = (int) SharedPreferenceUtils.getParam(mContext, SocketConstant.SAVE_PORT, SocketConstant.DEFAULT_PORT);
+//        SocketControl.getInstance().connect(server, port);
+        SocketControl.getInstance().sendFile(FileUtil.getPicFolder() + File.separator + mPhotoName);
 
-        SocketControl.getInstance().connect(server, port);
         String btAddress = (String) SharedPreferenceUtils.getParam(mContext, BtConstant.SAVE_BT_ADDRESS, "");
         BluetoothHelper.getBluetoothHelper(mContext).connect(btAddress);
+
     }
 
     private void initBtStatus() {
@@ -484,7 +494,7 @@ public class MeasureSetActivity extends AppCompatActivity {
                     break;
                 case R.id.end_btn:
                     BluetoothHelper.getBluetoothHelper(mContext).sendHex(CommandUtil.getStopCmd());
-                    ToastUtil.showToast(mContext,WifiUtil.getWifiAddress(mContext));
+//                    ToastUtil.showToast(mContext,WifiUtil.getWifiAddress(mContext));
                     break;
                 default:
                     break;
@@ -529,7 +539,7 @@ public class MeasureSetActivity extends AppCompatActivity {
 //    SocketControl mClient;
 
     private void test() {
-//        mClient = new SocketControl(HTTPConstant.DEFAULT_SERVER, HTTPConstant.DEFAULT_PORT, mHttpListener);
+//        mClient = new SocketControl(SocketConstant.DEFAULT_SERVER, SocketConstant.DEFAULT_PORT, mHttpListener);
         SocketControl.getInstance().sendMsg("AA12E4016368616E656C3120303030302E304EBBCC");
 
         String s = "AM03AN04_kN_N";
@@ -562,16 +572,16 @@ public class MeasureSetActivity extends AppCompatActivity {
         @Override
         public void onResult(int state, String data) {
             switch (state) {
-                case HTTPConstant.CONNECT_SUCCESS:
+                case SocketConstant.CONNECT_SUCCESS:
                     LogUtil.d(TAG, "connect success");
-                    mHandler.sendEmptyMessage(HTTPConstant.CONNECT_SUCCESS);
+                    mHandler.sendEmptyMessage(SocketConstant.CONNECT_SUCCESS);
                     break;
-                case HTTPConstant.CONNECT_FAIL:
-                    mHandler.sendEmptyMessage(HTTPConstant.CONNECT_FAIL);
+                case SocketConstant.CONNECT_FAIL:
+                    mHandler.sendEmptyMessage(SocketConstant.CONNECT_FAIL);
                     LogUtil.d(TAG, "connect fail");
                     break;
-                case HTTPConstant.SEND_FAIL:
-                    mHandler.sendEmptyMessage(HTTPConstant.SEND_FAIL);
+                case SocketConstant.SEND_FAIL:
+                    mHandler.sendEmptyMessage(SocketConstant.SEND_FAIL);
                     break;
                 default:
                     break;

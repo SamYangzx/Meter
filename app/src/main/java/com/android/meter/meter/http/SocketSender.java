@@ -1,13 +1,21 @@
 package com.android.meter.meter.http;
 
+import com.android.meter.meter.util.FileUtil;
 import com.android.meter.meter.util.LogUtil;
 import com.android.meter.meter.util.StringUtil;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.LinkedList;
 import java.util.Queue;
+
+import static com.android.meter.meter.util.CommandUtil.SEPERATOR;
+import static com.android.meter.meter.util.FileUtil.FILE_END;
+import static com.android.meter.meter.util.FileUtil.FILE_START;
 
 public class SocketSender extends Thread {
     private static final String TAG = LogUtil.COMMON_TAG + SocketSender.class.getSimpleName();
@@ -49,20 +57,24 @@ public class SocketSender extends Thread {
                 }
 //                    mOutStream.write(msg);
 //                    mOutStream.newLine();
-                writeMsg(msg);
+                if (isFile(msg)) {
+                    sendFile(msg);
+                } else {
+                    writeMsg(msg);
+                }
 //                    mOutStream.write("\0".getBytes());
-//                    writeMsg(HTTPConstant.HEX_END);
+//                    writeMsg(SocketConstant.HEX_END);
                 mOutStream.flush();
                 LogUtil.sendCmdResult(TAG, msg, true);
                 if (mIHttpListener != null) {
-                    mIHttpListener.onResult(HTTPConstant.SEND_SUCCESS, msg);
+                    mIHttpListener.onResult(SocketConstant.SEND_SUCCESS, msg);
                 }
             }
         } catch (Exception e) {
             LogUtil.sendCmdResult(TAG, msg, false);
             LogUtil.e(TAG, "e: " + e);
             if (mIHttpListener != null) {
-                mIHttpListener.onResult(HTTPConstant.SEND_FAIL, msg);
+                mIHttpListener.onResult(SocketConstant.SEND_FAIL, msg);
             }
             e.printStackTrace();
         } finally {
@@ -83,19 +95,24 @@ public class SocketSender extends Thread {
         }
     }
 
+    /**
+     * Use string if the msg is file path.
+     *
+     * @param hex
+     */
     public synchronized void sendMsg(String hex) {
         if (mSocket != null) {
-            LogUtil.d(TAG, "sendMsg.add hex");
+            LogUtil.d(TAG, "sendMsg.add: " + hex);
             mMsgQueue.offer(hex);
         } else {
             LogUtil.d(TAG, "sendMsg.add hex failed.");
-            mIHttpListener.onResult(HTTPConstant.SEND_FAIL, hex);
+            mIHttpListener.onResult(SocketConstant.SEND_FAIL, hex);
             LogUtil.sendCmdResult(TAG, hex, false);
         }
     }
 
     private void writeMsg(String data) throws IOException {
-        if (HTTPConstant.WRITE_HEX) {
+        if (SocketConstant.WRITE_HEX) {
             mOutStream.write(StringUtil.hexString2Bytes(data));
         } else {
             mOutStream.write(StringUtil.string2Bytes(data));
@@ -104,6 +121,53 @@ public class SocketSender extends Thread {
 
     public void setContinue(boolean conti) {
         mContinue = conti;
+    }
+
+
+    //开始符，文件格式，文件大小，文件名，文件，结束符号
+    private void sendFile(String file) {
+        LogUtil.d(TAG, "sendFile: " + file);
+        File f = new File(file);
+        if (f == null || !f.exists()) {
+            return;
+        }
+        try {
+            InputStream is = new FileInputStream(f);
+            String ext = FileUtil.getExtensionName(file);
+            String name = f.getName();
+
+            long fileLength = f.length();
+            StringBuilder sb = new StringBuilder();
+            sb.append(FILE_START).append(SEPERATOR)
+                    .append(ext).append(SEPERATOR)
+                    .append(Long.toString(fileLength)).append(SEPERATOR)
+                    .append(name).append(SEPERATOR);
+            LogUtil.v(TAG, "file is pref: " + sb);
+            mOutStream.write(sb.toString().getBytes());
+
+          /*发送图片文件，对应image*/
+            int length;
+            byte[] b = new byte[1024];
+            while ((length = is.read(b)) > 0) {
+                mOutStream.write(b, 0, length);
+            }
+            mOutStream.write((SEPERATOR + FILE_END).getBytes());
+        } catch (IOException e) {
+            LogUtil.e(TAG, "send: " + file + " failed");
+        }
+    }
+
+    /**
+     * 根据字符串是否包含文件路径来判断是否是传输文件。
+     *
+     * @param hexOrFile
+     * @return
+     */
+    private boolean isFile(String hexOrFile) {
+        if (hexOrFile.startsWith(FileUtil.FOLDER_PATH)) {
+            return true;
+        }
+        return false;
     }
 
 }

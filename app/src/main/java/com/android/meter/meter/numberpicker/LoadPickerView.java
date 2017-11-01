@@ -159,12 +159,12 @@ public class LoadPickerView extends View {
     // if you want you set to linear mode from wrap mode when scrolling, then this value will be true.
     private boolean mPendingWrapToLinear = false;
 
-    // if this view is used in same dialog or PopupWindow more than once, and there are several
+    // if this view is used in same resetDialog or PopupWindow more than once, and there are several
     // NumberPickerViews linked, such as Gregorian Calendar with MonthPicker and DayPicker linked,
     // set mRespondChangeWhenDetach true to respond onValueChanged callbacks if this view is scrolling
     // when detach from window, but this solution is unlovely and may cause NullPointerException
     // (even i haven't found this NullPointerException),
-    // so I highly recommend that every time setting up a reusable dialog with a NumberPickerView in it,
+    // so I highly recommend that every time setting up a reusable resetDialog with a NumberPickerView in it,
     // please initialize NumberPickerView's data, and in this way, you can set mRespondChangeWhenDetach false.
     private boolean mRespondChangeOnDetach = DEFAULT_RESPOND_CHANGE_ON_DETACH;
 
@@ -488,7 +488,7 @@ public class LoadPickerView extends View {
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         mHandlerThread.quit();
-        //These codes are for dialog or PopupWindow which will be used for more than once.
+        //These codes are for resetDialog or PopupWindow which will be used for more than once.
         //Not an elegant solution, if you have any good idea, please let me know, thank you.
         if (mItemHeight == 0) return;
         if (!mScroller.isFinished()) {

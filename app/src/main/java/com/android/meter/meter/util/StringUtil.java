@@ -236,7 +236,7 @@ public class StringUtil {
             byte b = (byte) a;
             bbt[p] = b;
         }
-        LogUtil.d(TAG,"str2Bcd.asc: " + asc + ", bbt: " + bbt );
+        LogUtil.d(TAG, "str2Bcd.asc: " + asc + ", bbt: " + bbt);
         return bbt;
     }
 
@@ -267,6 +267,31 @@ public class StringUtil {
             }
         }
         return index * 2;
+    }
+
+
+    public static int getValueCharIndex(String string, char c) {
+        if (string == null || string == "") {
+            return -1;
+        }
+        int length = string.length();
+        for (int i = 0; i < length; i++) {
+            if (string.charAt(i) == c) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public static String getStrWithoutFront0(String string) {
+        String newStr = string.replaceFirst("^0*", "");
+        if(newStr== null || newStr.length() <1){
+            return newStr;
+        }
+        if(newStr.charAt(0) == '.'){
+            newStr = "0" +newStr;
+        }
+        return newStr;
     }
 
 

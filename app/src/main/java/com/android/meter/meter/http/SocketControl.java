@@ -42,36 +42,36 @@ public class SocketControl {
             LogUtil.d(TAG, "state: " + state + " ,data: " + data);
             if (mIHttpListener != null) {
                 switch (state) {
-                    case HTTPConstant.CONNECT_SUCCESS:
-                    case HTTPConstant.CONNECT_FAIL:
+                    case SocketConstant.CONNECT_SUCCESS:
+                    case SocketConstant.CONNECT_FAIL:
                         mIHttpListener.onResult(state, data);
                         break;
-                    case HTTPConstant.RECEIVE_SUCCESS:
+                    case SocketConstant.RECEIVE_SUCCESS:
                         if (mHasResponsed) {
-                            mIHttpListener.onResult(HTTPConstant.RECEIVE_SUCCESS, data);
+                            mIHttpListener.onResult(SocketConstant.RECEIVE_SUCCESS, data);
                             break;
                         } else {
-                            if (System.currentTimeMillis() - mCmdSendTime <= MAX_RESPONSE_MILL_TIME && data != null && data.startsWith(HTTPConstant.RECEIVED_SUCCESS)) {
-//                            mIHttpListener.onResult(HTTPConstant.RECEIVE_SUCCESS, data);
-                                response(HTTPConstant.SEND_SUCCESS, data);
+                            if (System.currentTimeMillis() - mCmdSendTime <= MAX_RESPONSE_MILL_TIME && data != null && data.startsWith(SocketConstant.RECEIVED_SUCCESS)) {
+//                            mIHttpListener.onResult(SocketConstant.RECEIVE_SUCCESS, data);
+                                response(SocketConstant.SEND_SUCCESS, data);
                                 mSendTimes = 0;
                                 mHasResponsed = true;
                                 mHanlder.removeCallbacksAndMessages(null);
                             } else {
-                                retry(HTTPConstant.RECEIVE_CHECK_FAILED, data);
+                                retry(SocketConstant.RECEIVE_CHECK_FAILED, data);
                             }
                         }
                         break;
-//                    case HTTPConstant.RECEIVE_CHECK_SUCCESS:
+//                    case SocketConstant.RECEIVE_CHECK_SUCCESS:
 //                        break;
-                    case HTTPConstant.RECEIVE_CHECK_FAILED:
-                        retry(HTTPConstant.RECEIVE_CHECK_FAILED, data);
+                    case SocketConstant.RECEIVE_CHECK_FAILED:
+                        retry(SocketConstant.RECEIVE_CHECK_FAILED, data);
                         break;
-                    case HTTPConstant.SEND_FAIL:
-                        retry(HTTPConstant.SEND_FAIL, data);
+                    case SocketConstant.SEND_FAIL:
+                        retry(SocketConstant.SEND_FAIL, data);
                         break;
-                    case HTTPConstant.HAS_NOT_RESPONSE:
-                        response(HTTPConstant.HAS_NOT_RESPONSE, data);
+                    case SocketConstant.HAS_NOT_RESPONSE:
+                        response(SocketConstant.HAS_NOT_RESPONSE, data);
                         break;
                     default:
                         break;
@@ -129,7 +129,7 @@ public class SocketControl {
                             CONNECT_TIMEOUT);
                     LogUtil.d(TAG, "connect success");
                     if (mControlListener != null) {
-                        mControlListener.onResult(HTTPConstant.CONNECT_SUCCESS, null);
+                        mControlListener.onResult(SocketConstant.CONNECT_SUCCESS, null);
                     }
                     mSendThread = new SocketSender(mSocket, mControlListener);
                     mReceiverThread = new SocketReceiver(mSocket, mControlListener);
@@ -138,7 +138,7 @@ public class SocketControl {
                 } catch (Exception e) {
                     LogUtil.e(TAG, "connect server failed.e: " + e);
                     e.printStackTrace();
-                    mControlListener.onResult(HTTPConstant.CONNECT_FAIL, null);
+                    mControlListener.onResult(SocketConstant.CONNECT_FAIL, null);
                 }
             }
         }).start();
@@ -162,6 +162,13 @@ public class SocketControl {
     private long mCmdSendTime = 0;
     private String mTempString;
 
+    public void sendFile(String fileName) {
+        if (mSendThread != null) {
+            mSendThread.sendMsg(fileName);
+        }
+    }
+
+
     public void sendMsg(String hex) {
         mCmdSendTime = System.currentTimeMillis();
         LogUtil.d(TAG, "sendMsg.hex: " + hex + " ,time: " + mCmdSendTime + ", mSendTimes: " + mSendTimes);
@@ -175,14 +182,14 @@ public class SocketControl {
 //            LogUtil.sendCmdResult(TAG, hex, false);
 //            mHasResponsed = false;
 //            if (mControlListener != null) {
-//                mControlListener.onResult(HTTPConstant.SEND_FAIL, hex);
+//                mControlListener.onResult(SocketConstant.SEND_FAIL, hex);
 //            }
 //        }
 
 
         if (mSendThread == null) {
             mHasResponsed = false;
-            response(HTTPConstant.SEND_FAIL, hex);
+            response(SocketConstant.SEND_FAIL, hex);
         } else {
             if (mHasResponsed) {
                 mHasResponsed = false;
@@ -192,7 +199,7 @@ public class SocketControl {
                 LogUtil.sendCmdResult(TAG, hex, false);
                 mHasResponsed = false;
                 if (mControlListener != null) {
-                    mControlListener.onResult(HTTPConstant.HAS_NOT_RESPONSE, hex);
+                    mControlListener.onResult(SocketConstant.HAS_NOT_RESPONSE, hex);
                 }
             }
         }
@@ -203,7 +210,7 @@ public class SocketControl {
         @Override
         public void run() {
             LogUtil.d(TAG, "Timeout!!!");
-            mControlListener.onResult(HTTPConstant.RECEIVE_CHECK_FAILED, mTempString);
+            mControlListener.onResult(SocketConstant.RECEIVE_CHECK_FAILED, mTempString);
         }
     };
 
@@ -212,10 +219,10 @@ public class SocketControl {
             mHasResponsed = true;
             sendMsg(data);
         } else {
-            if (HTTPConstant.RECEIVE_CHECK_FAILED == state) {
-                response(HTTPConstant.RECEIVE_CHECK_FAILED, data);
+            if (SocketConstant.RECEIVE_CHECK_FAILED == state) {
+                response(SocketConstant.RECEIVE_CHECK_FAILED, data);
             } else {
-                response(HTTPConstant.SEND_FAIL, data);
+                response(SocketConstant.SEND_FAIL, data);
             }
         }
     }

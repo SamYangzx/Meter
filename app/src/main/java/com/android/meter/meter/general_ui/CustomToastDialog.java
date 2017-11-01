@@ -19,6 +19,7 @@ import static android.content.ContentValues.TAG;
  */
 
 public class CustomToastDialog extends Dialog {
+    private Context mContext;
     private Button yes;//确定按钮
     private Button no;//取消按钮
     private TextView titleTv;//消息标题文本
@@ -37,19 +38,24 @@ public class CustomToastDialog extends Dialog {
      * @param str
      * @param onNoOnclickListener
      */
-    public void setNoOnclickListener(String str, onCancelclickListener onNoOnclickListener) {
+    public void setNegativeButton(String str, onCancelclickListener onNoOnclickListener) {
         if (str != null) {
             noStr = str;
         }
         this.noOnclickListener = onNoOnclickListener;
     }
 
-    public void setNoOnclickListener(onCancelclickListener onNoOnclickListener) {
-        this.setNoOnclickListener(null, onNoOnclickListener);
+    public void setNegativeButton(onCancelclickListener onNoOnclickListener) {
+        this.setNegativeButton(null, onNoOnclickListener);
     }
 
-    public void setYesOnclickListener(onEnterclickListener onYesOnclickListener) {
-        this.setYesOnclickListener(null, onYesOnclickListener);
+    public void setNegativeButton(int id, onCancelclickListener onNoOnclickListener) {
+        noStr = (String) mContext.getString(id);
+        this.noOnclickListener = onNoOnclickListener;
+    }
+
+    public void setPositiveButton(onEnterclickListener onYesOnclickListener) {
+        this.setPositiveButton(null, onYesOnclickListener);
     }
 
     /**
@@ -58,15 +64,22 @@ public class CustomToastDialog extends Dialog {
      * @param str
      * @param onYesOnclickListener
      */
-    public void setYesOnclickListener(String str, onEnterclickListener onYesOnclickListener) {
+    public void setPositiveButton(String str, onEnterclickListener onYesOnclickListener) {
         if (str != null) {
             yesStr = str;
         }
         this.yesOnclickListener = onYesOnclickListener;
     }
 
+    public void setPositiveButton(int id, onEnterclickListener onYesOnclickListener) {
+        yesStr = (String) mContext.getText(id);
+        this.yesOnclickListener = onYesOnclickListener;
+    }
+
     public CustomToastDialog(Context context) {
         super(context, R.style.MyDialog);
+        mContext = context;
+
     }
 
     @Override
@@ -78,11 +91,10 @@ public class CustomToastDialog extends Dialog {
 
         //初始化界面控件
         initView();
-        //初始化界面数据
+//        初始化界面数据
         initData();
         //初始化界面控件的事件
         initEvent();
-
     }
 
     /**
@@ -171,4 +183,5 @@ public class CustomToastDialog extends Dialog {
     public interface onCancelclickListener {
         public void onNoClick();
     }
+
 }

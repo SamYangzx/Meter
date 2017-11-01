@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -47,6 +48,8 @@ import android.widget.Toast;
 
 import com.android.meter.meter.camera.AspectRatioFragment;
 import com.android.meter.meter.util.FileUtil;
+import com.android.meter.meter.util.ImageUtils;
+import com.android.meter.meter.util.LogUtil;
 import com.android.meter.meter.util.PermissionsCheckUtil;
 import com.android.meter.meter.util.TimeUtil;
 import com.google.android.cameraview.AspectRatio;
@@ -97,6 +100,7 @@ public class CameraActivity extends AppCompatActivity implements
 
     private Handler mBackgroundHandler;
     private Context mContext;
+    private String mPhotoName;
 
     private View.OnClickListener mOnClickListener = new View.OnClickListener() {
         @Override
@@ -108,7 +112,10 @@ public class CameraActivity extends AppCompatActivity implements
                     }
                     break;
                 case R.id.take_picture_complete:
-                    startActivity(new Intent(mContext, MeasureSetActivity.class));
+                    Intent intent = new Intent();
+                    intent.setClass(mContext, MeasureSetActivity.class);
+                    intent.putExtra(MeasureSetActivity.EXTRA_PHOTO, mPhotoName);
+                    startActivity(intent);
                     break;
             }
         }
@@ -269,14 +276,15 @@ public class CameraActivity extends AppCompatActivity implements
             getBackgroundHandler().post(new Runnable() {
                 @Override
                 public void run() {
-                    File file = new File(FileUtil.getPicFolder(),
-                            FileUtil.getTimeFileName());
+                    mPhotoName = FileUtil.getTimeFileName();
+                    String filePath = FileUtil.getFilePath(FileUtil.getPicFolder(),
+                            mPhotoName);
+                    File file = new File(filePath);
                     OutputStream os = null;
                     try {
                         os = new FileOutputStream(file);
                         os.write(data);
                         os.close();
-
                     } catch (IOException e) {
                         Log.e(TAG, "Cannot write to " + file, e);
                     } finally {
@@ -287,6 +295,13 @@ public class CameraActivity extends AppCompatActivity implements
                                 // Ignore
                             }
                         }
+                    }
+
+                    Bitmap bitmap = ImageUtils.compressBySize(filePath, ImageUtils.DEFAULT_WIDTH, ImageUtils.DEFAULT_HEIGHT);
+                    try {
+                        ImageUtils.saveImage(bitmap, filePath);
+                    } catch (IOException e) {
+                        LogUtil.e(TAG, filePath + " cannot compress : " + e);
                     }
 
                     refreshGallery(file);

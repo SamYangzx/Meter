@@ -45,7 +45,7 @@ public class SocketReceiver extends Thread {
                 }
                 LogUtil.receiveCmdResult(TAG, input);
                 if (mIHttpListener != null) {
-                    mIHttpListener.onResult(HTTPConstant.RECEIVE_SUCCESS, StringUtil.bytes2HexString(input));
+                    mIHttpListener.onResult(SocketConstant.RECEIVE_SUCCESS, StringUtil.bytes2HexString(input));
                 }
 //                if (content.equals("bye")) {
 //                    System.out.println("对方请求关闭连接,无法继续进行聊天");
@@ -60,7 +60,7 @@ public class SocketReceiver extends Thread {
             e.printStackTrace();
             LogUtil.d(TAG, "e: " + e);
             if (mIHttpListener != null) {
-                mIHttpListener.onResult(HTTPConstant.RECEIVE_FAILED, StringUtil.bytes2HexString(input));
+                mIHttpListener.onResult(SocketConstant.RECEIVE_FAILED, StringUtil.bytes2HexString(input));
             }
         }
     }

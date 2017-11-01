@@ -8,5 +8,4 @@ public class Constant {
     public static final int DELAY_REFRESH_TIME = 15;
     public static final int LINES_COUNT = 21; //should be an odd number.
 
-
 }

@@ -1,16 +1,13 @@
 package com.android.meter.meter;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -22,8 +19,9 @@ import com.android.meter.meter.bluetooth.BluetoothHelper;
 import com.android.meter.meter.bluetooth.BtConstant;
 import com.android.meter.meter.excel.ExcelUtils;
 import com.android.meter.meter.excel.Record;
-import com.android.meter.meter.http.HTTPConstant;
+import com.android.meter.meter.general_ui.CustomToastDialog;
 import com.android.meter.meter.http.IHttpListener;
+import com.android.meter.meter.http.SocketConstant;
 import com.android.meter.meter.http.SocketControl;
 import com.android.meter.meter.numberpicker.LoadPickerView;
 import com.android.meter.meter.numberpicker.NumberPickerView;
@@ -143,17 +141,17 @@ public class MeasureActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), msg.getData().getString(TOAST),
                             Toast.LENGTH_SHORT).show();
                     break;
-                case HTTPConstant.SEND_FAIL:
+                case SocketConstant.SEND_FAIL:
                     ToastUtil.showToast(mContext, "Socket发送数据失败，请检查网络连接是否正常!");
                     break;
-                case HTTPConstant.RECEIVE_SUCCESS:
+                case SocketConstant.RECEIVE_SUCCESS:
                     data = (String) msg.obj;
                     handlerCmd(data);
                     break;
-                case HTTPConstant.RECEIVE_CHECK_FAILED:
+                case SocketConstant.RECEIVE_CHECK_FAILED:
                     ToastUtil.showToast(mContext, "电脑端未回复!");
                     break;
-                case HTTPConstant.HAS_NOT_RESPONSE:
+                case SocketConstant.HAS_NOT_RESPONSE:
                     ToastUtil.showToast(mContext, "上一条指令还未处理完，请等待！");
                     break;
                 default:
@@ -207,7 +205,7 @@ public class MeasureActivity extends AppCompatActivity {
     }
 
     private void initTitle() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.measure_toolbar);
+//        Toolbar toolbar = (Toolbar) findViewById(R.id.measure_toolbar);
         mTitleTv = (TextView) findViewById(R.id.measure_title_tv);
         mBtStateTv = (TextView) findViewById(R.id.bt_state_tv);
         ImageButton ib = (ImageButton) findViewById(R.id.measure_title_ib);
@@ -324,7 +322,7 @@ public class MeasureActivity extends AppCompatActivity {
                 case R.id.reset_btn:
 //                    ToastUtil.showToast(mContext, getStringById(R.string.reset));
                     VibratorHelper.vibrate(mContext);
-                    dialog();
+                    resetDialog();
                     break;
                 case R.id.center_btn:
                     VibratorHelper.vibrate(mContext);
@@ -442,68 +440,66 @@ public class MeasureActivity extends AppCompatActivity {
     }
 
 
-    protected void dialog() {
-        AlertDialog.Builder builder = new android.app.AlertDialog.Builder(mContext);
-        builder.setMessage(R.string.reset_confirm);
-        builder.setTitle(R.string.warn);
-        builder.setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
+    protected void resetDialog() {
+        final CustomToastDialog dialog = new CustomToastDialog(mContext);
+        dialog.setTitle(R.string.warn);
+        dialog.setMessage(R.string.reset_confirm);
+        dialog.setPositiveButton(R.string.confirm, new CustomToastDialog.onEnterclickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
+            public void onYesClick() {
                 dialog.dismiss();
                 ToastUtil.showToast(mContext, R.string.reset);
-//                MeasureActivity.this.finish();
-//                sendMsg(CommandUtil.RESET_CMD_CODE, true);
-//                SocketControl.getInstance().sendMsg(CommandUtil.RESET_CMD_CODE);
                 BluetoothHelper.getBluetoothHelper(mContext).sendHex(CommandUtil.getResetCmd());
             }
         });
-        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+        dialog.setNegativeButton(R.string.cancel, new CustomToastDialog.onCancelclickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
+            public void onNoClick() {
                 dialog.dismiss();
             }
         });
-        builder.create().show();
+        dialog.show();
+
     }
 
-    private void backDialog(){
-        AlertDialog.Builder builder = new android.app.AlertDialog.Builder(mContext);
-        builder.setMessage(R.string.back_confirm);
-        builder.setTitle(R.string.warn);
-        builder.setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
+    private void backDialog() {
+        final CustomToastDialog dialog = new CustomToastDialog(mContext);
+        dialog.setTitle(R.string.warn);
+        dialog.setMessage(R.string.back_confirm);
+        dialog.setPositiveButton(R.string.confirm, new CustomToastDialog.onEnterclickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
+            public void onYesClick() {
                 dialog.dismiss();
                 finish();
             }
         });
-        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+        dialog.setNegativeButton(R.string.cancel, new CustomToastDialog.onCancelclickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
+            public void onNoClick() {
                 dialog.dismiss();
             }
         });
-        builder.create().show();
+        dialog.show();
     }
 
     private void changeModeDialog() {
-        AlertDialog.Builder builder = new android.app.AlertDialog.Builder(mContext);
-        builder.setMessage(R.string.change_confirm);
-        builder.setTitle(R.string.warn);
-        builder.setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
+        final CustomToastDialog dialog = new CustomToastDialog(mContext);
+        dialog.setTitle(R.string.warn);
+        dialog.setMessage(R.string.change_confirm);
+        dialog.setPositiveButton(R.string.confirm, new CustomToastDialog.onEnterclickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
+            public void onYesClick() {
                 dialog.dismiss();
                 changeMode();
             }
         });
-        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+        dialog.setNegativeButton(R.string.cancel, new CustomToastDialog.onCancelclickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
+            public void onNoClick() {
                 dialog.dismiss();
             }
         });
-        builder.create().show();
+        dialog.show();
     }
 
 
@@ -583,12 +579,11 @@ public class MeasureActivity extends AppCompatActivity {
         LogUtil.d(TAG, "cmdLength: " + cmdLength + " ,cmdType: " + cmdType + " , content hex: " + content + " ,origin: " + StringUtil.hex2String(content));
         switch (cmdType) {
             case UPLOCD_CMD_CODE:
-                //TODO replease it after separation is OK.
                 String sampleValue = "";
                 if (content.length() >= (cmdLength - 2) * 2) {
                     sampleValue = content.substring(18);
                     int divideIndex = StringUtil.getValueUnitIndex(sampleValue);
-                    String s = Float.valueOf(StringUtil.hex2String(sampleValue.substring(0, divideIndex))).toString();
+                    String s = StringUtil.getStrWithoutFront0(StringUtil.hex2String(sampleValue.substring(0, divideIndex)));
                     LogUtil.d(TAG, "without more 0: " + s);
                     mSampleTv.setText(s);
 //                    mUnitTv.setText(getFormatUnit(StringUtil.hex2String(sampleValue.substring(divideIndex))));
@@ -601,10 +596,10 @@ public class MeasureActivity extends AppCompatActivity {
 
     private ArrayList<ArrayList<String>> mRecordList = new ArrayList<ArrayList<String>>();
 
-    private ArrayList<ArrayList<String>> addRecord(ArrayList<String> record) {
-        mRecordList.clear();
-        mRecordList.add(record);
-        return mRecordList;
-    }
+//    private ArrayList<ArrayList<String>> addRecord(ArrayList<String> record) {
+//        mRecordList.clear();
+//        mRecordList.add(record);
+//        return mRecordList;
+//    }
 
 }

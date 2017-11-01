@@ -4,7 +4,7 @@ package com.android.meter.meter.http;
  * Created by fenghe on 2017/6/28.
  */
 
-public class HTTPConstant {
+public class SocketConstant {
     public static final String DEFAULT_SERVER = "192.168.5.1";
     public static final int DEFAULT_PORT = 7001;
 
@@ -24,5 +24,8 @@ public class HTTPConstant {
 
     public static final String SAVE_IP = "save_ip";
     public static final String SAVE_PORT = "save_port";
+
+
+
 
 }

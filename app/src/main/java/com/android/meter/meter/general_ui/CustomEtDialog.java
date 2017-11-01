@@ -16,7 +16,7 @@ import com.android.meter.meter.util.CommandUtil;
  * Created by fenghe on 2017/6/17.
  */
 
-public class CustomDialog extends Dialog {
+public class CustomEtDialog extends Dialog {
     private Button yes;//确定按钮
     private Button no;//取消按钮
     private TextView titleTv;//消息标题文本
@@ -62,7 +62,7 @@ public class CustomDialog extends Dialog {
         this.yesOnclickListener = onYesOnclickListener;
     }
 
-    public CustomDialog(Context context) {
+    public CustomEtDialog(Context context) {
         super(context, R.style.MyDialog);
     }
 

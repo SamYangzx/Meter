@@ -10,7 +10,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.android.meter.meter.R;
-import com.android.meter.meter.http.HTTPConstant;
+import com.android.meter.meter.http.SocketConstant;
 import com.android.meter.meter.util.SharedPreferenceUtils;
 
 /**
@@ -134,14 +134,14 @@ public class NetworkDialog extends Dialog {
 
     public String getServer() {
         if (TextUtils.isEmpty(mServerEt.getText().toString())) {
-            return HTTPConstant.DEFAULT_SERVER;
+            return SocketConstant.DEFAULT_SERVER;
         }
         return mServerEt.getText().toString();
     }
 
     public int getIp() {
         if (TextUtils.isEmpty(mPortEt.getText().toString())) {
-            return HTTPConstant.DEFAULT_PORT;
+            return SocketConstant.DEFAULT_PORT;
         }
         return Integer.valueOf(mPortEt.getText().toString());
     }
@@ -155,12 +155,12 @@ public class NetworkDialog extends Dialog {
         no = (Button) findViewById(R.id.no);
         mServerTv = (TextView) findViewById(R.id.server_toast);
         mServerEt = (EditText) findViewById(R.id.server_et);
-//        mServerEt.setText(HTTPConstant.DEFAULT_SERVER);
-        mServerEt.setText((String) SharedPreferenceUtils.getParam(mContext, HTTPConstant.SAVE_IP, HTTPConstant.DEFAULT_SERVER));
+//        mServerEt.setText(SocketConstant.DEFAULT_SERVER);
+        mServerEt.setText((String) SharedPreferenceUtils.getParam(mContext, SocketConstant.SAVE_IP, SocketConstant.DEFAULT_SERVER));
         mPortTv = (TextView) findViewById(R.id.port_toast);
         mPortEt = (EditText) findViewById(R.id.port_et);
-//        mPortEt.setText(Integer.toString(HTTPConstant.DEFAULT_PORT));
-        mPortEt.setText(Integer.toString((int) SharedPreferenceUtils.getParam(mContext, HTTPConstant.SAVE_PORT, HTTPConstant.DEFAULT_PORT)));
+//        mPortEt.setText(Integer.toString(SocketConstant.DEFAULT_PORT));
+        mPortEt.setText(Integer.toString((int) SharedPreferenceUtils.getParam(mContext, SocketConstant.SAVE_PORT, SocketConstant.DEFAULT_PORT)));
     }
 
     /**
