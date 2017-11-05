@@ -10,6 +10,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
 
+import com.android.meter.meter.R;
 import com.android.meter.meter.util.CommandUtil;
 import com.android.meter.meter.util.LogUtil;
 import com.android.meter.meter.util.StringUtil;
@@ -36,11 +37,13 @@ public class BluetoothHelper {
     private ConnectThread mConnectThread;
     private ConnectedThread mConnectedThread;
     private int mState;
+    //蓝牙链接失败或蓝牙断开并未包含在下面。
     public static final int STATE_NONE = 0;
     public static final int STATE_LISTEN = 1;
     public static final int STATE_CONNECTING = 2;
     public static final int STATE_CONNECTED = 3;
 
+    private Context mContext;
 //    private IMsgListener mIMsgListener;
 //
 //    public void setIMsgListener(IMsgListener iMsgListener) {
@@ -61,6 +64,7 @@ public class BluetoothHelper {
     private BluetoothHelper(Context context, Handler handler) {
         mAdapter = BluetoothAdapter.getDefaultAdapter();
         mState = STATE_NONE;
+        mContext = context;
         setmHandler(handler);
     }
 
@@ -120,11 +124,15 @@ public class BluetoothHelper {
     public String getStateString() {
         switch (getState()) {
             case STATE_NONE:
-                return "no BT device";
+//                return "no BT device";
+            case STATE_LISTEN:
+                return mContext.getString(R.string.title_not_bt_connected);
             case STATE_CONNECTING:
-                return "BT connecting";
+//                return "BT connecting";
+                return mContext.getString(R.string.title_bt_connecting);
             case STATE_CONNECTED:
-                return "BT connected";
+//                return "BT connected";
+                return mContext.getString(R.string.title_bt_connected);
         }
         return "";
     }
@@ -177,6 +185,7 @@ public class BluetoothHelper {
         LogUtil.d(TAG, "connect to: " + device);
         if (device == null) {
             LogUtil.d(TAG, "device == null");
+            setState(STATE_NONE);
             return;
         }
 
@@ -309,7 +318,7 @@ public class BluetoothHelper {
         if (mHandler != null) {
             Message msg = mHandler.obtainMessage(BtConstant.MESSAGE_TOAST);
             Bundle bundle = new Bundle();
-            bundle.putString(BluetoothChatActivity.TOAST, "Unable to connect device");
+            bundle.putString(BluetoothChatActivity.TOAST, "BT connect failed");
             msg.setData(bundle);
             mHandler.sendMessage(msg);
         }
@@ -321,7 +330,7 @@ public class BluetoothHelper {
         if (mHandler != null) {
             Message msg = mHandler.obtainMessage(BtConstant.MESSAGE_TOAST);
             Bundle bundle = new Bundle();
-            bundle.putString(BluetoothChatActivity.TOAST, "蓝牙链接已经断开");
+            bundle.putString(BluetoothChatActivity.TOAST, "蓝牙已经断开");
             msg.setData(bundle);
             mHandler.sendMessage(msg);
         }

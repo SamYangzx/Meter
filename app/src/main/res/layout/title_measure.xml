@@ -19,7 +19,7 @@
         android:textSize="@dimen/general_title_textsize" />
 
     <TextView
-        android:id="@+id/bt_state_tv"
+        android:id="@+id/device_state_tv"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"

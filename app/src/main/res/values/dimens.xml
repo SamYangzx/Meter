@@ -5,6 +5,7 @@
 
     <!--General padding begin-->
     <dimen name="general_title_textsize">20sp</dimen>
+    <dimen name="general_title_small_size">14sp</dimen>
     <dimen name="general_tv_textsize">20sp</dimen>
     <dimen name="general_title_height">45dp</dimen>
 

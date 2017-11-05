@@ -17,6 +17,7 @@ public class SocketConstant {
     public static final int RECEIVE_CHECK_SUCCESS = 0x107;
     public static final int RECEIVE_CHECK_FAILED = 0x108;
     public static final int HAS_NOT_RESPONSE = 0x109;
+    public static final int CONNECTING = 0x10A;
     public static final String RECEIVED_SUCCESS = "BB03EF01EDCC";
 
     public static final boolean WRITE_HEX = true;
@@ -24,8 +25,5 @@ public class SocketConstant {
 
     public static final String SAVE_IP = "save_ip";
     public static final String SAVE_PORT = "save_port";
-
-
-
 
 }

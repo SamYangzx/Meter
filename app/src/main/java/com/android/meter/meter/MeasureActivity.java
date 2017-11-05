@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.RequiresApi;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -30,6 +29,7 @@ import com.android.meter.meter.util.CommandUtil;
 import com.android.meter.meter.util.Constant;
 import com.android.meter.meter.util.FileUtil;
 import com.android.meter.meter.util.LogUtil;
+import com.android.meter.meter.util.SharedPreferenceUtils;
 import com.android.meter.meter.util.StringUtil;
 import com.android.meter.meter.util.TimeUtil;
 import com.android.meter.meter.util.ToastUtil;
@@ -41,7 +41,7 @@ import static com.android.meter.meter.bluetooth.BluetoothChatActivity.TOAST;
 import static com.android.meter.meter.util.CommandUtil.UPLOCD_CMD_CODE;
 import static com.android.meter.meter.util.CommandUtil.getValueData;
 
-public class MeasureActivity extends AppCompatActivity {
+public class MeasureActivity extends BaseActivity {
     private static final String TAG = LogUtil.COMMON_TAG + MeasureActivity.class.getSimpleName();
 
     public static final String EXTRA_MEASURE_UNIT = "measure_unit";
@@ -84,7 +84,7 @@ public class MeasureActivity extends AppCompatActivity {
     private int mTotalTimes;
     private int mTimes;
 
-    private TextView mBtStateTv;
+    private TextView mDeviceStateTv;
     private TextView mSampleTv;
     private TextView mUnitTv;
     private TextView mLoadSpeedTv;
@@ -104,16 +104,19 @@ public class MeasureActivity extends AppCompatActivity {
                     switch (msg.arg1) {
                         case BluetoothHelper.STATE_CONNECTED:
 //                            ToastUtil.showToast(mContext, "bluetooth connected");
-                            mBtStateTv.setText("Connected");
+//                            mDeviceStateTv.setText("Connected");
+                            updateBtTitle(getString(R.string.title_bt_connected));
                             break;
                         case BluetoothHelper.STATE_CONNECTING:
-                            mBtStateTv.setText(R.string.title_bt_connecting);
-//                            ToastUtil.showToast(mContext, R.string.title_connecting);
+//                            mDeviceStateTv.setText(R.string.title_bt_connecting);
+//                            ToastUtil.showToast(mContext, R.string.title_bt_connecting);
+                            updateBtTitle(getString(R.string.title_bt_connecting));
                             break;
                         case BluetoothHelper.STATE_LISTEN:
                         case BluetoothHelper.STATE_NONE:
-                            mBtStateTv.setText(R.string.title_not_bt_connected);
+//                            mDeviceStateTv.setText(R.string.title_not_bt_connected);
 //                            ToastUtil.showToast(mContext, R.string.title_not_bt_connected);
+                            updateBtTitle(getString(R.string.title_not_bt_connected));
                             break;
                     }
                     break;
@@ -153,6 +156,15 @@ public class MeasureActivity extends AppCompatActivity {
                     break;
                 case SocketConstant.HAS_NOT_RESPONSE:
                     ToastUtil.showToast(mContext, "上一条指令还未处理完，请等待！");
+                    break;
+                case SocketConstant.CONNECT_SUCCESS:
+                    updateWifiTitle(getString(R.string.title_wifi_connected));
+                    break;
+                case SocketConstant.CONNECTING:
+                    updateWifiTitle(getString(R.string.title_wifi_connecting));
+                    break;
+                case SocketConstant.CONNECT_FAIL:
+                    updateWifiTitle(getString(R.string.title_wifi_not_connected));
                     break;
                 default:
                     break;
@@ -207,15 +219,20 @@ public class MeasureActivity extends AppCompatActivity {
     private void initTitle() {
 //        Toolbar toolbar = (Toolbar) findViewById(R.id.measure_toolbar);
         mTitleTv = (TextView) findViewById(R.id.measure_title_tv);
-        mBtStateTv = (TextView) findViewById(R.id.bt_state_tv);
-        ImageButton ib = (ImageButton) findViewById(R.id.measure_title_ib);
-        ib.setOnClickListener(mListener);
+        mDeviceStateTv = (TextView) findViewById(R.id.device_state_tv);
+        setTitleTv(mDeviceStateTv);
+        ImageButton changeIb = (ImageButton) findViewById(R.id.measure_title_ib);
+        changeIb.setOnClickListener(mListener);
+
+        ImageButton connectIb = (ImageButton) findViewById(R.id.connect_ib);
+        connectIb.setOnClickListener(mListener);
     }
 
 
     private void initData() {
         BluetoothHelper.getBluetoothHelper(mContext).setmHandler(mHandler);
         SocketControl.getInstance().setListener(mHttpListener);
+        updateWifiTitle(SocketControl.getInstance().isConneced());
 
 //        mMeasurePointArray = getResources().getStringArray(R.array.speed_array);
         //mTimesArray = getResources().getStringArray(R.array.check_array);
@@ -387,6 +404,15 @@ public class MeasureActivity extends AppCompatActivity {
                     break;
                 case R.id.measure_title_ib:
                     changeModeDialog();
+                    break;
+                case R.id.connect_ib:
+                    LogUtil.v(TAG, "start connect");
+                    String server = (String) SharedPreferenceUtils.getParam(mContext, SocketConstant.SAVE_IP, SocketConstant.DEFAULT_SERVER);
+                    int port = (int) SharedPreferenceUtils.getParam(mContext, SocketConstant.SAVE_PORT, SocketConstant.DEFAULT_PORT);
+                    SocketControl.getInstance().connect(server, port);
+
+                    String btAddress = (String) SharedPreferenceUtils.getParam(mContext, BtConstant.SAVE_BT_ADDRESS, "");
+                    BluetoothHelper.getBluetoothHelper(mContext).connect(btAddress);
                     break;
                 default:
                     break;
@@ -595,11 +621,5 @@ public class MeasureActivity extends AppCompatActivity {
     }
 
     private ArrayList<ArrayList<String>> mRecordList = new ArrayList<ArrayList<String>>();
-
-//    private ArrayList<ArrayList<String>> addRecord(ArrayList<String> record) {
-//        mRecordList.clear();
-//        mRecordList.add(record);
-//        return mRecordList;
-//    }
 
 }

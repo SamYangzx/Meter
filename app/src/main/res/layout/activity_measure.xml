@@ -22,33 +22,39 @@
             android:paddingLeft="@dimen/general_padding_horizontal"
             android:paddingRight="@dimen/general_padding_horizontal">
 
+            <ImageButton
+                android:id="@+id/connect_ib"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/connect"/>
+
+
             <TextView
                 android:id="@+id/measure_title_tv"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:layout_weight="1"
-                android:gravity="center_vertical"
+                android:gravity="center"
                 android:text="@string/measure_title_measure"
                 android:textSize="@dimen/general_title_textsize" />
 
             <TextView
-                android:id="@+id/bt_state_tv"
+                android:id="@+id/device_state_tv"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_weight="1"
-                android:gravity="center_vertical"
-                android:textSize="@dimen/general_title_textsize"
-                android:visibility="gone" />
+                android:gravity="center"
+                android:textSize="@dimen/general_title_small_size"
+                android:visibility="visible" />
 
             <ImageButton
                 android:id="@+id/measure_title_ib"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_gravity="center_vertical"
-                android:background="@drawable/setting"
-                android:onClick="onUISettingPressed" />
+                android:background="@drawable/setting"/>
         </LinearLayout>
     </android.support.v7.widget.Toolbar>
 
@@ -92,10 +98,10 @@
             android:id="@+id/load_speed_tv"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_weight="1"
             android:gravity="bottom|center_horizontal"
             android:paddingBottom="20dp"
             android:text="0"
-            android:layout_weight="1"
             android:visibility="visible" />
 
 

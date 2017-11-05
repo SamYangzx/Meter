@@ -41,7 +41,8 @@
     <string name="bt_not_enabled_leaving">蓝牙没有打开</string>
     <string name="title_bt_connecting">蓝牙连接中...</string>
     <string name="title_connected_to">连接到: </string>
-    <string name="title_not_bt_connected">无蓝牙连接</string>
+    <string name="title_bt_connected">蓝牙OK</string>
+    <string name="title_not_bt_connected">蓝牙断开</string>
     <string name="debug">调试</string>
     <string name="about">关于</string>
     <string name="about_msg">1.蓝牙处可以连接想要连接的蓝牙设备；
@@ -65,6 +66,11 @@
     <string name="discoverable">打开可见</string>
     <string name="cancel_discovery">停止扫描</string>
     <!--bluetooth end-->
+
+    <string name="title_wifi_connected">WifiOk</string>
+    <string name="title_wifi_connecting">Wifi连接中...</string>
+    <string name="title_wifi_not_connected">Wifi断开</string>
+
 
     <string-array name="measure_unit_array">
         <item>N</item>

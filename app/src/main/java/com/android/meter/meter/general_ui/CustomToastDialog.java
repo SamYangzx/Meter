@@ -177,11 +177,11 @@ public class CustomToastDialog extends Dialog {
      * 设置确定按钮和取消被点击的接口
      */
     public interface onEnterclickListener {
-        public void onYesClick();
+        void onYesClick();
     }
 
     public interface onCancelclickListener {
-        public void onNoClick();
+        void onNoClick();
     }
 
 }

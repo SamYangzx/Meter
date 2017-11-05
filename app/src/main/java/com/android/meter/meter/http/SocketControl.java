@@ -43,6 +43,7 @@ public class SocketControl {
             if (mIHttpListener != null) {
                 switch (state) {
                     case SocketConstant.CONNECT_SUCCESS:
+                    case SocketConstant.CONNECTING:
                     case SocketConstant.CONNECT_FAIL:
                         mIHttpListener.onResult(state, data);
                         break;
@@ -125,6 +126,7 @@ public class SocketControl {
                 try {
                     mSocket = new Socket();
 //                    mSocket.setSoTimeout(READ_TIMEOUT);
+                    mControlListener.onResult(SocketConstant.CONNECTING, null);
                     mSocket.connect(new InetSocketAddress(server, port),
                             CONNECT_TIMEOUT);
                     LogUtil.d(TAG, "connect success");
@@ -189,6 +191,7 @@ public class SocketControl {
 
         if (mSendThread == null) {
             mHasResponsed = false;
+            mControlListener.onResult(SocketConstant.CONNECT_FAIL, null);
             response(SocketConstant.SEND_FAIL, hex);
         } else {
             if (mHasResponsed) {
@@ -238,6 +241,13 @@ public class SocketControl {
             mSendTimes = 0;
             mHanlder.removeCallbacksAndMessages(null);
         }
+    }
+
+    public boolean isConneced(){
+        if(mSocket != null && mSocket.isConnected()){
+            return true;
+        }
+        return false;
     }
 
 }

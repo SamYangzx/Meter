@@ -22,7 +22,7 @@ public class LogUtil {
             .getAbsolutePath() + File.separator + LOG_FOLDER;
     private static final String LOG_FILE = android.os.Environment.getExternalStorageDirectory()
             .getAbsolutePath() + File.separator + LOG_FOLDER + File.separator + "log.txt";
-    private static boolean LOG_TO_FILE = false;
+    private static boolean LOG_TO_FILE = true;
 
     private static final int LOG_VERBOSE = 0;
     private static final int LOG_DEBUG = 1;
