@@ -216,7 +216,7 @@ public class MeasureSetActivity extends BaseActivity {
         if (firstStart) {
             firstStart = false;
             if (!TextUtils.isEmpty(mPhotoName)) {
-                SocketControl.getInstance().sendFile(FileUtil.getPicDateFolder() + File.separator + mPhotoName);
+                SocketControl.getInstance().sendFile(FileUtil.getPicNumberFolder(true) + File.separator + mPhotoName);
             }
         }
         updateBtTitle(BluetoothHelper.getBluetoothHelper(mContext).getStateString());
@@ -581,7 +581,9 @@ public class MeasureSetActivity extends BaseActivity {
     private IHttpListener mHttpListener = new IHttpListener() {
         @Override
         public void onResult(int state, String data) {
-            mHandler.sendEmptyMessage(state);
+            if(mHandler != null){
+                 mHandler.sendEmptyMessage(state);
+            }
         }
     };
 

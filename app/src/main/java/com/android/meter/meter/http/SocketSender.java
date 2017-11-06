@@ -98,16 +98,16 @@ public class SocketSender extends Thread {
     /**
      * Use string if the msg is file path.
      *
-     * @param hex
+     * @param hexOrFile
      */
-    public synchronized void sendMsg(String hex) {
+    public synchronized void sendMsg(String hexOrFile) {
         if (mSocket != null) {
-            LogUtil.d(TAG, "sendMsg.add: " + hex);
-            mMsgQueue.offer(hex);
+            LogUtil.d(TAG, "sendMsg.add: " + hexOrFile);
+            mMsgQueue.offer(hexOrFile);
         } else {
-            LogUtil.d(TAG, "sendMsg.add hex failed.");
-            mIHttpListener.onResult(SocketConstant.SEND_FAIL, hex);
-            LogUtil.sendCmdResult(TAG, hex, false);
+            LogUtil.d(TAG, "sendMsg.add hexOrFile failed.");
+            mIHttpListener.onResult(SocketConstant.SEND_FAIL, hexOrFile);
+            LogUtil.sendCmdResult(TAG, hexOrFile, false);
         }
     }
 
@@ -129,6 +129,7 @@ public class SocketSender extends Thread {
         LogUtil.d(TAG, "sendFile: " + file);
         File f = new File(file);
         if (f == null || !f.exists()) {
+            LogUtil.e(TAG, "sendFile. not exist: " + file);
             return;
         }
         try {

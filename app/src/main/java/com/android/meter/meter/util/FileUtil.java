@@ -25,17 +25,33 @@ public class FileUtil {
         return FOLDER_PATH + File.separator + TimeUtil.getDateYearMonthDay();
     }
 
-//    public static String getPicNumberFolder(boolean ) {
-//
-//        return folderPath;
-//    }
-
-    public static String getPicDateFolder() {
-        String folderPath = getDefaultDateFolder() + File.separator + PIC_FOLDER;
-        File file = new File(folderPath);
+    /**
+     * 每天拍照的照片按照拍照存储的次数存放。
+     *
+     * @param existFolder true if you want to use exist folder.
+     * @return
+     */
+    public static String getPicNumberFolder(boolean existFolder) {
+        String dateFolder = getPicDateFolder();
+        String numberFolder;
+        if (existFolder) {
+            numberFolder = dateFolder + File.separator + getFileCount(dateFolder);
+        } else {
+            numberFolder = dateFolder + File.separator + (getFileCount(dateFolder) + 1);
+        }
+        File file = new File(numberFolder);
         if (!file.exists()) {
             file.mkdirs();
         }
+        return numberFolder;
+    }
+
+    public static String getPicDateFolder() {
+        String folderPath = getDefaultDateFolder() + File.separator + PIC_FOLDER;
+//        File file = new File(folderPath); //因为调用此函数的地方会新建文件夹，故此处不再判断。
+//        if (!file.exists()) {
+//            file.mkdirs();
+//        }
         return folderPath;
     }
 

@@ -107,6 +107,7 @@ public class CameraActivity extends AppCompatActivity implements
     private Handler mBackgroundHandler;
     private Context mContext;
     private String mPhotoName;
+    private boolean mSameFolder = false;
 
     private View.OnClickListener mOnClickListener = new View.OnClickListener() {
         @Override
@@ -162,8 +163,9 @@ public class CameraActivity extends AppCompatActivity implements
         String server = (String) SharedPreferenceUtils.getParam(mContext, SocketConstant.SAVE_IP, SocketConstant.DEFAULT_SERVER);
         int port = (int) SharedPreferenceUtils.getParam(mContext, SocketConstant.SAVE_PORT, SocketConstant.DEFAULT_PORT);
         SocketControl.getInstance().connect(server, port);
-        String bt = (String) SharedPreferenceUtils.getParam(mContext, BtConstant.SAVE_BT_ADDRESS,"");
+        String bt = (String) SharedPreferenceUtils.getParam(mContext, BtConstant.SAVE_BT_ADDRESS, "");
         BluetoothHelper.getBluetoothHelper(mContext).connect(bt);
+        mSameFolder = false;
         super.onStart();
     }
 
@@ -295,7 +297,7 @@ public class CameraActivity extends AppCompatActivity implements
                 @Override
                 public void run() {
                     mPhotoName = FileUtil.getTimeFileName();
-                    String filePath = FileUtil.getFilePath(FileUtil.getPicDateFolder(),
+                    String filePath = FileUtil.getFilePath(FileUtil.getPicNumberFolder(mSameFolder),
                             mPhotoName);
                     File file = new File(filePath);
                     OutputStream os = null;
@@ -314,6 +316,7 @@ public class CameraActivity extends AppCompatActivity implements
                             }
                         }
                     }
+                    mSameFolder = true;
 
                     Bitmap bitmap = ImageUtils.compressBySize(filePath, ImageUtils.DEFAULT_WIDTH, ImageUtils.DEFAULT_HEIGHT);
                     try {

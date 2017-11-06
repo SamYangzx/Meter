@@ -170,10 +170,11 @@ public class SocketControl {
     private long mCmdSendTime = 0;
     private String mTempString;
 
-    public void sendFile(String fileName) {
-        LogUtil.saveCmd(fileName); //文件名是以"20"开头。
+    public void sendFile(String file) {
+        LogUtil.saveCmd(file);
+        LogUtil.d(TAG, "sendFile: " + file);
         if (mSendThread != null) {
-            mSendThread.sendMsg(fileName);
+            mSendThread.sendMsg(file);
         }
     }
 
