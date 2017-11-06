@@ -68,8 +68,10 @@ public class SocketControl {
                     case SocketConstant.RECEIVE_CHECK_FAILED:
                         retry(SocketConstant.RECEIVE_CHECK_FAILED, data);
                         break;
-                    case SocketConstant.SEND_FAIL:
-                        retry(SocketConstant.SEND_FAIL, data);
+                    case SocketConstant.SEND_FAIL: //发送线程遇到异常后，socket会断开。
+                        disconnect();
+                        response(SocketConstant.CONNECT_FAIL, data);
+//                        retry(SocketConstant.SEND_FAIL, data);
                         break;
                     case SocketConstant.HAS_NOT_RESPONSE:
                         response(SocketConstant.HAS_NOT_RESPONSE, data);
@@ -77,6 +79,8 @@ public class SocketControl {
                     default:
                         break;
                 }
+            } else {
+                LogUtil.e(TAG, "mIHttpListener is null");
             }
         }
     };
@@ -155,6 +159,8 @@ public class SocketControl {
                 LogUtil.e(TAG, "socket close exception: " + e);
             }
         }
+        mSendThread = null;
+        mReceiverThread = null;
         if (mHanlder != null) {
             mHanlder.removeCallbacksAndMessages(null);
         }
@@ -165,6 +171,7 @@ public class SocketControl {
     private String mTempString;
 
     public void sendFile(String fileName) {
+        LogUtil.saveCmd(fileName); //文件名是以"20"开头。
         if (mSendThread != null) {
             mSendThread.sendMsg(fileName);
         }
@@ -187,7 +194,9 @@ public class SocketControl {
 //                mControlListener.onResult(SocketConstant.SEND_FAIL, hex);
 //            }
 //        }
-
+        if (mSendTimes == 1) {
+            LogUtil.saveCmd(hex);
+        }
 
         if (mSendThread == null) {
             mHasResponsed = false;
@@ -243,8 +252,8 @@ public class SocketControl {
         }
     }
 
-    public boolean isConneced(){
-        if(mSocket != null && mSocket.isConnected()){
+    public boolean isConneced() {
+        if (mSocket != null && mSocket.isConnected()) {
             return true;
         }
         return false;

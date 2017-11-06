@@ -57,7 +57,7 @@ public class SocketSender extends Thread {
                 }
 //                    mOutStream.write(msg);
 //                    mOutStream.newLine();
-                if (isFile(msg)) {
+                if (FileUtil.isFile(msg)) {
                     sendFile(msg);
                 } else {
                     writeMsg(msg);
@@ -157,17 +157,5 @@ public class SocketSender extends Thread {
         }
     }
 
-    /**
-     * 根据字符串是否包含文件路径来判断是否是传输文件。
-     *
-     * @param hexOrFile
-     * @return
-     */
-    private boolean isFile(String hexOrFile) {
-        if (hexOrFile.startsWith(FileUtil.FOLDER_PATH)) {
-            return true;
-        }
-        return false;
-    }
 
 }

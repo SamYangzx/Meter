@@ -24,6 +24,8 @@ public class LogUtil {
             .getAbsolutePath() + File.separator + LOG_FOLDER + File.separator + "log.txt";
     private static boolean LOG_TO_FILE = true;
 
+    private static final String NEWLINE = "\r\n";
+
     private static final int LOG_VERBOSE = 0;
     private static final int LOG_DEBUG = 1;
     private static final int LOG_INFO = 2;
@@ -101,6 +103,35 @@ public class LogUtil {
         e(tag, msg, null);
     }
 
+    public static void saveCmd(String text) {
+        StringBuilder logText = new StringBuilder();
+        logText.append(text).append(NEWLINE);
+
+        String s = TimeUtil.getDateYearMonthDay();  //name the folder and file by date.
+        String path = LOG_PATH + File.separator + s;
+        File logFolder = new File(path);
+        if (!logFolder.exists()) {
+            Log.d(TAG, "Create log folder " + logFolder.mkdirs());
+        }
+        File logFile = new File(path, s + ".txt");
+        if (!logFile.exists()) {
+            try {
+                Log.d(TAG, "Create log file " + logFile.createNewFile());
+            } catch (IOException e) {
+                Log.d(TAG, "", e);
+            }
+        }
+
+        try {
+            OutputStreamWriter writer = null;
+            writer = new OutputStreamWriter(new FileOutputStream(logFile, true), "UTF-8");
+            writer.write(logText.toString());
+            writer.close();
+        } catch (IOException e1) {
+            Log.e(TAG, "", e1);
+        }
+    }
+
     public static void printStack(String tag) {
         String s = track();
         d(tag, s);
@@ -156,7 +187,7 @@ public class LogUtil {
         logText.append(myLogSdf.format(nowtime)).append("\t");
         logText.append(mylogtype).append("\t");
         logText.append(tag).append("\t");
-        logText.append(text).append("\n");
+        logText.append(text).append(NEWLINE);
         logText.append(Log.getStackTraceString(tr));
 
         File logFolder = new File(LOG_PATH);

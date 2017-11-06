@@ -10,6 +10,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -167,10 +168,17 @@ public class MeasureSetActivity extends BaseActivity {
 //                    ToastUtil.showToast(mContext, "Socket connect fail");
                     updateWifiTitle(getString(R.string.title_wifi_not_connected));
                     break;
+                case SocketConstant.RECEIVE_CHECK_FAILED:
+                    ToastUtil.showToast(mContext, "电脑端未回复!");
+                    break;
+                case SocketConstant.HAS_NOT_RESPONSE:
+                    ToastUtil.showToast(mContext, "上一条指令还未处理完，请等待！");
+                    break;
                 case SocketConstant.SEND_FAIL:
                     ToastUtil.showToast(mContext, "Socket send msg fail!!");
                     break;
                 default:
+                    ToastUtil.showToast(mContext, "接收到反馈：" + msg.what);
                     break;
 
             }
@@ -207,7 +215,9 @@ public class MeasureSetActivity extends BaseActivity {
         initDevice();
         if (firstStart) {
             firstStart = false;
-            SocketControl.getInstance().sendFile(FileUtil.getPicFolder() + File.separator + mPhotoName);
+            if (!TextUtils.isEmpty(mPhotoName)) {
+                SocketControl.getInstance().sendFile(FileUtil.getPicDateFolder() + File.separator + mPhotoName);
+            }
         }
         updateBtTitle(BluetoothHelper.getBluetoothHelper(mContext).getStateString());
         updateWifiTitle(SocketControl.getInstance().isConneced());
@@ -316,16 +326,16 @@ public class MeasureSetActivity extends BaseActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        BluetoothHelper.getBluetoothHelper(mContext).disconnect();
-        SocketControl.getInstance().disconnect();
+//        BluetoothHelper.getBluetoothHelper(mContext).disconnect();
+//        SocketControl.getInstance().disconnect();
     }
 
     @Override
     protected void onDestroy() {
         LogUtil.d(TAG, "onDestroy is invoked...");
-        BluetoothHelper.getBluetoothHelper(mContext).setmHandler(null);
+//        BluetoothHelper.getBluetoothHelper(mContext).setmHandler(null);
 //        BluetoothHelper.getBluetoothHelper(mContext).setIMsgListener(null);
-        SocketControl.getInstance().setListener(null);
+//        SocketControl.getInstance().setListener(null);
         mHandler.removeCallbacksAndMessages(null);
         mHandler = null;
         super.onDestroy();
@@ -352,7 +362,7 @@ public class MeasureSetActivity extends BaseActivity {
 //        String server = (String) SharedPreferenceUtils.getParam(mContext, SocketConstant.SAVE_IP, SocketConstant.DEFAULT_SERVER);
 //        int port = (int) SharedPreferenceUtils.getParam(mContext, SocketConstant.SAVE_PORT, SocketConstant.DEFAULT_PORT);
 //        SocketControl.getInstance().connect(server, port);
-//        SocketControl.getInstance().sendFile(FileUtil.getPicFolder() + File.separator + mPhotoName);
+//        SocketControl.getInstance().sendFile(FileUtil.getPicDateFolder() + File.separator + mPhotoName);
 
 //        String btAddress = (String) SharedPreferenceUtils.getParam(mContext, BtConstant.SAVE_BT_ADDRESS, "");
 //        BluetoothHelper.getBluetoothHelper(mContext).connect(btAddress);

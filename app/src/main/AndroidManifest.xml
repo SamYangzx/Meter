@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.android.meter.meter"
     android:versionCode="112"
-    android:versionName="1.12.05_ui">
+    android:versionName="1.12.06">
 
     <uses-sdk android:minSdkVersion="14" />
 

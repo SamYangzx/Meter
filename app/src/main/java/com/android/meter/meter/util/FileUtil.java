@@ -19,12 +19,18 @@ public class FileUtil {
     public static final String FILE_END = "end";
     public static final String FOLDER_PATH = Environment.getExternalStorageDirectory() + File.separator + PACKAGE_FOLDER;
 
+    public static int FILE_INDEX = 1;
 
     public static String getDefaultDateFolder() {
         return FOLDER_PATH + File.separator + TimeUtil.getDateYearMonthDay();
     }
 
-    public static String getPicFolder() {
+//    public static String getPicNumberFolder(boolean ) {
+//
+//        return folderPath;
+//    }
+
+    public static String getPicDateFolder() {
         String folderPath = getDefaultDateFolder() + File.separator + PIC_FOLDER;
         File file = new File(folderPath);
         if (!file.exists()) {
@@ -68,5 +74,26 @@ public class FileUtil {
      */
     public static String getFilePath(String foler, String name) {
         return foler + File.separator + name;
+    }
+
+    /**
+     * 根据字符串是否包含文件路径来判断是否是传输文件。
+     *
+     * @param hexOrFile
+     * @return
+     */
+    public static boolean isFile(String hexOrFile) {
+        if (hexOrFile.startsWith(FileUtil.FOLDER_PATH)) {
+            return true;
+        }
+        return false;
+    }
+
+    public static int getFileCount(String folder) {
+        File file = new File(folder);
+        if (file.exists() && file.isDirectory()) {
+            return file.list().length;
+        }
+        return 0;
     }
 }

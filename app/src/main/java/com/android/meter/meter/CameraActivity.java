@@ -39,6 +39,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -46,11 +47,16 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.android.meter.meter.bluetooth.BluetoothHelper;
+import com.android.meter.meter.bluetooth.BtConstant;
 import com.android.meter.meter.camera.AspectRatioFragment;
+import com.android.meter.meter.http.SocketConstant;
+import com.android.meter.meter.http.SocketControl;
 import com.android.meter.meter.util.FileUtil;
 import com.android.meter.meter.util.ImageUtils;
 import com.android.meter.meter.util.LogUtil;
 import com.android.meter.meter.util.PermissionsCheckUtil;
+import com.android.meter.meter.util.SharedPreferenceUtils;
 import com.android.meter.meter.util.TimeUtil;
 import com.google.android.cameraview.AspectRatio;
 import com.google.android.cameraview.CameraView;
@@ -114,7 +120,9 @@ public class CameraActivity extends AppCompatActivity implements
                 case R.id.take_picture_complete:
                     Intent intent = new Intent();
                     intent.setClass(mContext, MeasureSetActivity.class);
-                    intent.putExtra(MeasureSetActivity.EXTRA_PHOTO, mPhotoName);
+                    if (!TextUtils.isEmpty(mPhotoName)) {
+                        intent.putExtra(MeasureSetActivity.EXTRA_PHOTO, mPhotoName);
+                    }
                     startActivity(intent);
                     break;
             }
@@ -147,6 +155,16 @@ public class CameraActivity extends AppCompatActivity implements
         if (actionBar != null) {
             actionBar.setDisplayShowTitleEnabled(false);
         }
+    }
+
+    @Override
+    protected void onStart() {
+        String server = (String) SharedPreferenceUtils.getParam(mContext, SocketConstant.SAVE_IP, SocketConstant.DEFAULT_SERVER);
+        int port = (int) SharedPreferenceUtils.getParam(mContext, SocketConstant.SAVE_PORT, SocketConstant.DEFAULT_PORT);
+        SocketControl.getInstance().connect(server, port);
+        String bt = (String) SharedPreferenceUtils.getParam(mContext, BtConstant.SAVE_BT_ADDRESS,"");
+        BluetoothHelper.getBluetoothHelper(mContext).connect(bt);
+        super.onStart();
     }
 
     @Override
@@ -277,7 +295,7 @@ public class CameraActivity extends AppCompatActivity implements
                 @Override
                 public void run() {
                     mPhotoName = FileUtil.getTimeFileName();
-                    String filePath = FileUtil.getFilePath(FileUtil.getPicFolder(),
+                    String filePath = FileUtil.getFilePath(FileUtil.getPicDateFolder(),
                             mPhotoName);
                     File file = new File(filePath);
                     OutputStream os = null;
