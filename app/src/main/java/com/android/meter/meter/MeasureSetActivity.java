@@ -35,7 +35,6 @@ import com.android.meter.meter.numberpicker.NumberPickerView;
 import com.android.meter.meter.util.CommandUtil;
 import com.android.meter.meter.util.Constant;
 import com.android.meter.meter.util.FileUtil;
-import com.android.meter.meter.util.IMsgListener;
 import com.android.meter.meter.util.LogUtil;
 import com.android.meter.meter.util.SharedPreferenceUtils;
 import com.android.meter.meter.util.StringUtil;
@@ -71,6 +70,7 @@ public class MeasureSetActivity extends BaseActivity {
             {"m3/h", "m3/min", "m3/s", "L/h", "L/min", "L/s", "mL/h", "mL/min", "mL/s", "ft3/h", "ft3/min", "ft3/s", "UKgal/s", "U.Sgal/s", "USbbl/s"},
             {"℃", "K", "οF", "οRa", "οR"},
             {"J"},
+            {" "},
     };
 
     private Context mContext;
@@ -98,6 +98,7 @@ public class MeasureSetActivity extends BaseActivity {
     private NetworkDialog mNetworkDialog;
     private boolean firstStart = true;
 
+    private int mTotalUnitIndex = 0;
     private int mUnitIndex = 0;
     private String mMeasurePointUnit;
     private String mSampleUnit;
@@ -200,10 +201,27 @@ public class MeasureSetActivity extends BaseActivity {
         mStepPicker.postDelayed(new Runnable() {
             @Override
             public void run() {
-                Log.d(TAG, "mStepArray.length / 2: " + mStepArray.length / 2);
-                mStepPicker.setPickedIndexRelativeToRaw(mStepArray.length / 2);
-                mStep = Integer.valueOf(mStepArray[mStepArray.length / 2]);
+//                Log.d(TAG, "mStepArray.length / 2: " + mStepArray.length / 2);
+                int step = (int) SharedPreferenceUtils.getParam(mContext, Constant.STEP, mStepArray.length / 2);
+                mStepPicker.setPickedIndexRelativeToRaw(step);
+                mStep = Float.valueOf(mStepArray[step]);
 
+            }
+        }, Constant.DELAY_REFRESH_TIME);
+        mTapPicker.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                int tap = (int) SharedPreferenceUtils.getParam(mContext, Constant.TAP, mTapArray.length / 2);
+                mTapPicker.setPickedIndexRelativeToRaw(tap);
+                mTap = mTapArray[tap];
+            }
+        }, Constant.DELAY_REFRESH_TIME);
+        mCountPicker.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                int count = (int) SharedPreferenceUtils.getParam(mContext, Constant.COUNT, mCountArray.length / 2);
+                mCountPicker.setPickedIndexRelativeToRaw(count);
+                mCount = Integer.valueOf(mCountArray[count]);
             }
         }, Constant.DELAY_REFRESH_TIME);
 
@@ -222,6 +240,7 @@ public class MeasureSetActivity extends BaseActivity {
         updateBtTitle(BluetoothHelper.getBluetoothHelper(mContext).getStateString());
         updateWifiTitle(SocketControl.getInstance().isConneced());
 //        setTitles(BluetoothHelper.getBluetoothHelper(mContext).getStateString());
+        initViewData();
         super.onStart();
     }
 
@@ -237,7 +256,7 @@ public class MeasureSetActivity extends BaseActivity {
 //        setTitles(BluetoothHelper.getBluetoothHelper(mContext).getStateString());
 //    }
 
-    private boolean isNeedResetHandler = false;
+//    private boolean isNeedResetHandler = false;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -347,11 +366,6 @@ public class MeasureSetActivity extends BaseActivity {
         mTapArray = getResources().getStringArray(R.array.tap_array);
         mCountArray = getResources().getStringArray(R.array.jinhui_array);
 
-        mMeasurePointUnit = mUnitArrays[0][0];
-        mSampleUnit = mUnitArrays[0][0];
-        mStep = Float.parseFloat(mStepArray[0]);
-        mTap = mTapArray[0];
-        mCount = Integer.valueOf(mCountArray[0]);
     }
 
     private void initDevice() {
@@ -368,6 +382,27 @@ public class MeasureSetActivity extends BaseActivity {
 //        BluetoothHelper.getBluetoothHelper(mContext).connect(btAddress);
     }
 
+    private void initViewData() {
+//        mStep = Float.parseFloat(mStepArray[0]);
+//        mTap = mTapArray[0];
+//        mCount = Integer.valueOf(mCountArray[0]);
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mTotalUnitIndex = (int) SharedPreferenceUtils.getParam(mContext, Constant.TOTAL_UNIT, 0);
+                LogUtil.d(TAG, "mTotalUnitIndex: " + mTotalUnitIndex);
+                final int measureIndex = (int) SharedPreferenceUtils.getParam(mContext, Constant.MEASURE_UNIT, 0);
+                final int sampleIndex = (int) SharedPreferenceUtils.getParam(mContext, Constant.SAMPLE_UNIT, 0);
+
+                updateSpinnerArray(mTotalUnitIndex);
+                mMeasurePointUnit = mUnitArrays[mTotalUnitIndex][measureIndex];
+                mSampleUnit = mUnitArrays[mTotalUnitIndex][sampleIndex];
+                mMeasureUnitSp.setSelection(measureIndex, true);
+                mSampleUnitSp.setSelection(sampleIndex);
+            }
+        }, Constant.DELAY_REFRESH_TIME);
+    }
+
     private void initView() {
         mToolbar = (Toolbar) findViewById(R.id.measure_set_toolbar);
         mCustomerTitle = (TextView) findViewById(R.id.customer_title);
@@ -382,6 +417,7 @@ public class MeasureSetActivity extends BaseActivity {
                 mMeasurePointUnit = mUnitArrays[mUnitIndex][position];
 //                BluetoothHelper.getBluetoothHelper(mContext).sendHex(StringUtil.string2HexString(mUnitArrays[mUnitIndex][position]));
 //                BluetoothHelper.getBluetoothHelper(mContext).sendHex(CommandUtil.TEST_HEX_CMD);
+                SharedPreferenceUtils.setParam(mContext, Constant.MEASURE_UNIT, position);
             }
 
             @Override
@@ -395,6 +431,7 @@ public class MeasureSetActivity extends BaseActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 mSampleUnit = mUnitArrays[mUnitIndex][position];
 //                BluetoothHelper.getBluetoothHelper(mContext).sendHex(StringUtil.string2HexString(mUnitArrays[mUnitIndex][position]));
+                SharedPreferenceUtils.setParam(mContext, Constant.SAMPLE_UNIT, position);
             }
 
             @Override
@@ -416,6 +453,7 @@ public class MeasureSetActivity extends BaseActivity {
             public void onValueChange(NumberPickerView picker, int oldVal, int newVal) {
                 Log.d(TAG, "oldVal: " + oldVal + ", newVal: " + newVal + ", Value: " + mStepArray[newVal]);
                 mStep = Float.parseFloat(mStepArray[newVal]);
+                SharedPreferenceUtils.setParam(mContext, Constant.STEP, newVal);
 //                BluetoothHelper.getBluetoothHelper(mContext).sendString(mStepArray[newVal] + " unit");
 
             }
@@ -425,6 +463,7 @@ public class MeasureSetActivity extends BaseActivity {
             @Override
             public void onValueChange(NumberPickerView picker, int oldVal, int newVal) {
                 mTap = mTapArray[newVal];
+                SharedPreferenceUtils.setParam(mContext, Constant.TAP, newVal);
             }
         });
 
@@ -434,6 +473,7 @@ public class MeasureSetActivity extends BaseActivity {
             public void onValueChange(NumberPickerView picker, int oldVal, int newVal) {
                 Log.d(TAG, "oldVal: " + oldVal + ", newVal: " + newVal + ", Value: " + mCountArray[newVal]);
                 mCount = Integer.valueOf(mCountArray[newVal]);
+                SharedPreferenceUtils.setParam(mContext, Constant.TAP, newVal);
             }
         });
 
@@ -499,7 +539,7 @@ public class MeasureSetActivity extends BaseActivity {
                     intent.putExtra(MeasureActivity.EXTRA_TAP, mTap);
                     intent.putExtra(MeasureActivity.EXTRA_COUNT, mCount);
                     intent.setClass(mContext, MeasureActivity.class);
-                    isNeedResetHandler = true;
+//                    isNeedResetHandler = true;
                     startActivity(intent);
                     break;
                 case R.id.end_btn:
@@ -524,6 +564,8 @@ public class MeasureSetActivity extends BaseActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             updateSpinnerArray(which);
+
+                            SharedPreferenceUtils.setParam(mContext, Constant.TOTAL_UNIT, which);
                         }
                     }).create();
         }
@@ -545,8 +587,7 @@ public class MeasureSetActivity extends BaseActivity {
         mSampleUnitSp.setAdapter(mSampleAdapter);
     }
 
-    private boolean isContinue = true;
-//    SocketControl mClient;
+//    private boolean isContinue = true;
 
     private void test() {
 //        mClient = new SocketControl(SocketConstant.DEFAULT_SERVER, SocketConstant.DEFAULT_PORT, mHttpListener);
@@ -570,19 +611,19 @@ public class MeasureSetActivity extends BaseActivity {
 
 
     /*****This is for test**/
-    private IMsgListener mIBtMsgListener = new IMsgListener() {
-        @Override
-        public void received(int state, final String msg) {
-            sendTest(msg);
-        }
-    };
+//    private IMsgListener mIBtMsgListener = new IMsgListener() {
+//        @Override
+//        public void received(int state, final String msg) {
+//            sendTest(msg);
+//        }
+//    };
 
 
     private IHttpListener mHttpListener = new IHttpListener() {
         @Override
         public void onResult(int state, String data) {
-            if(mHandler != null){
-                 mHandler.sendEmptyMessage(state);
+            if (mHandler != null) {
+                mHandler.sendEmptyMessage(state);
             }
         }
     };

@@ -109,6 +109,7 @@
         <item>流量</item>
         <item>温度</item>
         <item>能量</item>
+        <item>空</item>
     </string-array>
 
     <!--<string-array name="n_unit_array">-->

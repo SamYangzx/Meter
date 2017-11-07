@@ -33,11 +33,12 @@ public class FileUtil {
      */
     public static String getPicNumberFolder(boolean existFolder) {
         String dateFolder = getPicDateFolder();
+        String date = TimeUtil.getDateYearMonthDay();
         String numberFolder;
         if (existFolder) {
-            numberFolder = dateFolder + File.separator + getFileCount(dateFolder);
+            numberFolder = dateFolder + File.separator + date + "_" + getFileCount(dateFolder);
         } else {
-            numberFolder = dateFolder + File.separator + (getFileCount(dateFolder) + 1);
+            numberFolder = dateFolder + File.separator + date + "_" + (getFileCount(dateFolder) + 1);
         }
         File file = new File(numberFolder);
         if (!file.exists()) {
@@ -45,6 +46,7 @@ public class FileUtil {
         }
         return numberFolder;
     }
+
 
     public static String getPicDateFolder() {
         String folderPath = getDefaultDateFolder() + File.separator + PIC_FOLDER;
