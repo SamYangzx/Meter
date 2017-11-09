@@ -28,6 +28,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/measure_title"
         android:supportsRtl="true"
+        android:largeHeap="true"
         android:theme="@style/AppTheme">
         <activity
             android:name=".CameraActivity"
@@ -47,7 +48,8 @@
         <activity
             android:name=".bluetooth.DeviceListActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".BaseActivity"></activity>
+        <activity android:name=".BaseActivity" />
+        <activity android:name=".ChoosePhotoActivity"></activity>
     </application>
 
 </manifest>

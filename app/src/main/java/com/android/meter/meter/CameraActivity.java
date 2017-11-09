@@ -120,7 +120,8 @@ public class CameraActivity extends AppCompatActivity implements
                     break;
                 case R.id.take_picture_complete:
                     Intent intent = new Intent();
-                    intent.setClass(mContext, MeasureSetActivity.class);
+//                    intent.setClass(mContext, MeasureSetActivity.class);
+                    intent.setClass(mContext, ChoosePhotoActivity.class);
                     if (!TextUtils.isEmpty(mPhotoName)) {
                         intent.putExtra(MeasureSetActivity.EXTRA_PHOTO, mPhotoName);
                     }

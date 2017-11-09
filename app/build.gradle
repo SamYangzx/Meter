@@ -28,6 +28,7 @@ dependencies {
     })
     compile project(':library')
     compile files('libs/jxl-2.6.12.jar')
+    compile project(':imagepicker')
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'cn.carbswang.android:NumberPickerView:1.1.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'

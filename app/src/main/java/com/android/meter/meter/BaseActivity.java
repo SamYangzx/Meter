@@ -1,7 +1,10 @@
 package com.android.meter.meter;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.widget.TextView;
@@ -42,12 +45,16 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     void updateWifiTitle(boolean connect) {
-        if(connect){
-        mWifiStr = mContext.getString(R.string.title_wifi_connected);
-        }else{
+        if (connect) {
+            mWifiStr = mContext.getString(R.string.title_wifi_connected);
+        } else {
             mWifiStr = mContext.getString(R.string.title_wifi_not_connected);
         }
         mTitle.setText(mBtStr + "/" + mWifiStr);
+    }
+
+    public boolean checkPermission(@NonNull String permission) {
+        return ActivityCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED;
     }
 
 }
