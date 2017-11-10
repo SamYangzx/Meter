@@ -28,7 +28,6 @@ import com.android.meter.meter.bluetooth.DeviceListActivity;
 import com.android.meter.meter.general_ui.CustomEtDialog;
 import com.android.meter.meter.general_ui.CustomToastDialog;
 import com.android.meter.meter.general_ui.NetworkDialog;
-import com.android.meter.meter.http.IHttpListener;
 import com.android.meter.meter.http.SocketConstant;
 import com.android.meter.meter.http.SocketControl;
 import com.android.meter.meter.numberpicker.NumberPickerView;
@@ -372,7 +371,7 @@ public class MeasureSetActivity extends BaseActivity {
         BluetoothHelper.getBluetoothHelper(mContext).enableBT();
         BluetoothHelper.getBluetoothHelper(mContext).setmHandler(mHandler);
 
-        SocketControl.getInstance().setListener(mHttpListener);
+        SocketControl.getInstance().setListener(this);
 //        String server = (String) SharedPreferenceUtils.getParam(mContext, SocketConstant.SAVE_IP, SocketConstant.DEFAULT_SERVER);
 //        int port = (int) SharedPreferenceUtils.getParam(mContext, SocketConstant.SAVE_PORT, SocketConstant.DEFAULT_PORT);
 //        SocketControl.getInstance().connect(server, port);
@@ -618,14 +617,11 @@ public class MeasureSetActivity extends BaseActivity {
 //        }
 //    };
 
-
-    private IHttpListener mHttpListener = new IHttpListener() {
-        @Override
-        public void onResult(int state, String data) {
-            if (mHandler != null) {
-                mHandler.sendEmptyMessage(state);
-            }
+    @Override
+    public void onResult(int state, String data) {
+        super.onResult(state, data);
+        if (mHandler != null) {
+            mHandler.sendEmptyMessage(state);
         }
-    };
-
+    }
 }

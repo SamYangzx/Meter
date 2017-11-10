@@ -10,7 +10,7 @@ import java.util.Date;
 public class TimeUtil {
     private static final String yyyyMMdd = "yyyyMMdd";
     private static final String yyyyMMdd_HHmmss = "yyyyMMdd_HHmmss";
-
+    private static String TODAY_DATE = null;
 
     public static String getDateByFormat(String format) {
         SimpleDateFormat formatter = new SimpleDateFormat(format);
@@ -20,7 +20,12 @@ public class TimeUtil {
     }
 
     public static String getDateYearMonthDay() {
-        return getDateByFormat(yyyyMMdd);
+        if (TODAY_DATE != null) {
+            return TODAY_DATE;
+        } else {
+            TODAY_DATE = getDateByFormat(yyyyMMdd);
+        }
+        return TODAY_DATE;
     }
 
     public static String getDateYearMonthDayHourMinute() {

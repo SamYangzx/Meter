@@ -59,7 +59,7 @@ public class ImagePicker {
     private boolean multiMode = true;    //图片选择模式
     private int selectLimit = 9;         //最大选择图片数量
     private boolean crop = true;         //裁剪
-    private boolean showCamera = true;   //显示相机
+    private boolean showCamera = false;   //显示相机
     private boolean isSaveRectangle = false;  //裁剪后的图片是否是矩形，否者跟随裁剪框的形状
     private int outPutX = 800;           //裁剪保存宽度
     private int outPutY = 800;           //裁剪保存高度
@@ -211,7 +211,7 @@ public class ImagePicker {
         mCurrentImageFolderPosition = mCurrentSelectedImageSetPosition;
     }
 
-    public ArrayList<ImageItem> getCurrentImageFolderItems() {
+    public List<ImageItem> getCurrentImageFolderItems() {
         return mImageFolders.get(mCurrentImageFolderPosition).images;
     }
 

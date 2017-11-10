@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
+import static com.android.meter.meter.http.SocketConstant.HAS_NOT_RESPONSE;
+
 
 /*******
  * 说明：此控制是校验发送命令后是否有接收到正确的反馈，带有连续三次发送功能。当服务器端和控制端同时发送和接收数据时，错误率会
@@ -22,6 +24,7 @@ public class SocketControl {
     private static final int MAX_RESPONSE_MILL_TIME = 1500;
     private static final int MAX_SEND_TIMES = 3;
     private boolean mHasResponsed = true;
+    private boolean mIsFile = false;
 
     private Handler mHanlder = new Handler() {
 
@@ -52,14 +55,16 @@ public class SocketControl {
                             mIHttpListener.onResult(SocketConstant.RECEIVE_SUCCESS, data);
                             break;
                         } else {
-                            if (System.currentTimeMillis() - mCmdSendTime <= MAX_RESPONSE_MILL_TIME && data != null && data.startsWith(SocketConstant.RECEIVED_SUCCESS)) {
+                            if (!mIsFile) {
+                                if (System.currentTimeMillis() - mCmdSendTime <= MAX_RESPONSE_MILL_TIME && data != null && data.startsWith(SocketConstant.RECEIVED_SUCCESS)) {
 //                            mIHttpListener.onResult(SocketConstant.RECEIVE_SUCCESS, data);
-                                response(SocketConstant.SEND_SUCCESS, data);
-                                mSendTimes = 0;
-                                mHasResponsed = true;
-                                mHanlder.removeCallbacksAndMessages(null);
-                            } else {
-                                retry(SocketConstant.RECEIVE_CHECK_FAILED, data);
+                                    response(SocketConstant.SEND_SUCCESS, data);
+                                    mSendTimes = 0;
+                                    mHasResponsed = true;
+                                    mHanlder.removeCallbacksAndMessages(null);
+                                } else {
+                                    retry(SocketConstant.RECEIVE_CHECK_FAILED, data);
+                                }
                             }
                         }
                         break;
@@ -68,13 +73,18 @@ public class SocketControl {
                     case SocketConstant.RECEIVE_CHECK_FAILED:
                         retry(SocketConstant.RECEIVE_CHECK_FAILED, data);
                         break;
+                    case SocketConstant.SEND_SUCCESS:
+                        if (mIsFile) {
+                            response(SocketConstant.SEND_SUCCESS, data);
+                        }
+                        break;
                     case SocketConstant.SEND_FAIL: //发送线程遇到异常后，socket会断开。
                         disconnect();
                         response(SocketConstant.CONNECT_FAIL, data);
 //                        retry(SocketConstant.SEND_FAIL, data);
                         break;
-                    case SocketConstant.HAS_NOT_RESPONSE:
-                        response(SocketConstant.HAS_NOT_RESPONSE, data);
+                    case HAS_NOT_RESPONSE:
+                        response(HAS_NOT_RESPONSE, data);
                         break;
                     default:
                         break;
@@ -173,17 +183,30 @@ public class SocketControl {
     public void sendFile(String file) {
         LogUtil.saveCmd(file);
         LogUtil.d(TAG, "sendFile: " + file);
-        if (mSendThread != null) {
+        if (!mHasResponsed) {
+            response(HAS_NOT_RESPONSE, file);
+            return;
+        }
+        mIsFile = true;
+        mHasResponsed = false;
+        if (isConneced()) {
             mSendThread.sendMsg(file);
+        } else {
+            response(SocketConstant.CONNECT_FAIL, file);
         }
     }
 
 
     public void sendMsg(String hex) {
+        if (!mHasResponsed) {
+            response(HAS_NOT_RESPONSE, hex);
+            return;
+        }
         mCmdSendTime = System.currentTimeMillis();
         LogUtil.d(TAG, "sendMsg.hex: " + hex + " ,time: " + mCmdSendTime + ", mSendTimes: " + mSendTimes);
         mSendTimes++;
         mTempString = hex;
+        mIsFile = false;
 //        if (mSendThread != null && mHasResponsed) {
 //            mHasResponsed = false;
 //            mHanlder.postDelayed(mRunnable, MAX_RESPONSE_MILL_TIME);
@@ -212,7 +235,7 @@ public class SocketControl {
                 LogUtil.sendCmdResult(TAG, hex, false);
                 mHasResponsed = false;
                 if (mControlListener != null) {
-                    mControlListener.onResult(SocketConstant.HAS_NOT_RESPONSE, hex);
+                    mControlListener.onResult(HAS_NOT_RESPONSE, hex);
                 }
             }
         }
@@ -244,17 +267,17 @@ public class SocketControl {
     private void response(int state, String data) {
         LogUtil.d(TAG, "state: " + state + " ,data: " + data + ", mHasResponsed: " + mHasResponsed);
         if (!mHasResponsed) {
-            if (mIHttpListener != null) {
-                mIHttpListener.onResult(state, data);
-            }
             mHasResponsed = true;
             mSendTimes = 0;
             mHanlder.removeCallbacksAndMessages(null);
+            if (mIHttpListener != null) {
+                mIHttpListener.onResult(state, data);
+            }
         }
     }
 
     public boolean isConneced() {
-        if (mSocket != null && mSocket.isConnected()) {
+        if (mSocket != null && mSocket.isConnected() && mSendThread != null) {
             return true;
         }
         return false;

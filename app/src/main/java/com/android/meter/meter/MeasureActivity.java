@@ -19,7 +19,6 @@ import com.android.meter.meter.bluetooth.BtConstant;
 import com.android.meter.meter.excel.ExcelUtils;
 import com.android.meter.meter.excel.Record;
 import com.android.meter.meter.general_ui.CustomToastDialog;
-import com.android.meter.meter.http.IHttpListener;
 import com.android.meter.meter.http.SocketConstant;
 import com.android.meter.meter.http.SocketControl;
 import com.android.meter.meter.numberpicker.LoadPickerView;
@@ -231,7 +230,7 @@ public class MeasureActivity extends BaseActivity {
 
     private void initData() {
         BluetoothHelper.getBluetoothHelper(mContext).setmHandler(mHandler);
-        SocketControl.getInstance().setListener(mHttpListener);
+        SocketControl.getInstance().setListener(this);
         updateWifiTitle(SocketControl.getInstance().isConneced());
 
 //        mMeasurePointArray = getResources().getStringArray(R.array.speed_array);
@@ -533,17 +532,6 @@ public class MeasureActivity extends BaseActivity {
         return "(" + unit + ")";
     }
 
-
-    private IHttpListener mHttpListener = new IHttpListener() {
-        @Override
-        public void onResult(int state, String data) {
-            Message msg = new Message();
-            msg.what = state;
-            msg.obj = data;
-            mHandler.sendMessage(msg);
-        }
-    };
-
     /**
      * msg origin string data.
      * changeMode if need change send method BT or http, this will be true.
@@ -622,4 +610,13 @@ public class MeasureActivity extends BaseActivity {
 
     private ArrayList<ArrayList<String>> mRecordList = new ArrayList<ArrayList<String>>();
 
+
+    @Override
+    public void onResult(int state, String data) {
+        super.onResult(state, data);
+        Message msg = new Message();
+        msg.what = state;
+        msg.obj = data;
+        mHandler.sendMessage(msg);
+    }
 }

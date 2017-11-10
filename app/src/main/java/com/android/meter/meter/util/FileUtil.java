@@ -34,22 +34,33 @@ public class FileUtil {
     public static String getPicNumberFolder(boolean existFolder) {
         String dateFolder = getPicDateFolder();
         String date = TimeUtil.getDateYearMonthDay();
-        String numberFolder;
+//        String numberFolder;
+        StringBuilder sb = new StringBuilder();
         if (existFolder) {
-            numberFolder = dateFolder + File.separator + date + "_" + getFileCount(dateFolder);
+            sb.append(dateFolder).append(File.separator).append(date).append("_").append(getFileCount(dateFolder)).append(File.separator).append(PIC_FOLDER);
+//            numberFolder = dateFolder + File.separator + date + "_" + getFileCount(dateFolder) + File.separator + PIC_FOLDER;
         } else {
-            numberFolder = dateFolder + File.separator + date + "_" + (getFileCount(dateFolder) + 1);
+            sb.append(dateFolder).append(File.separator).append(date).append("_").append((getFileCount(dateFolder) + 1)).append(File.separator).append(PIC_FOLDER);
+//            numberFolder = dateFolder + File.separator + date + "_" + (getFileCount(dateFolder) + 1) + File.separator + PIC_FOLDER;
         }
-        File file = new File(numberFolder);
+        File file = new File(sb.toString());
         if (!file.exists()) {
             file.mkdirs();
         }
-        return numberFolder;
+        return sb.toString();
     }
 
+    public static String getLogFolder() {
+        String dateFolder = getPicDateFolder();
+        String date = TimeUtil.getDateYearMonthDay();
+        StringBuilder sb = new StringBuilder();
+        sb.append(dateFolder).append(File.separator).append(date).append("_").append(getFileCount(dateFolder));
+        return sb.toString();
+    }
 
     public static String getPicDateFolder() {
-        String folderPath = getDefaultDateFolder() + File.separator + PIC_FOLDER;
+        String folderPath = getDefaultDateFolder();
+//        String folderPath = getDefaultDateFolder() + File.separator + PIC_FOLDER;
 //        File file = new File(folderPath); //因为调用此函数的地方会新建文件夹，故此处不再判断。
 //        if (!file.exists()) {
 //            file.mkdirs();

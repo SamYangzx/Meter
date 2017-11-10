@@ -16,8 +16,13 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.android.meter.meter.http.SocketConstant;
+import com.android.meter.meter.http.SocketControl;
+import com.android.meter.meter.util.FileUtil;
+import com.android.meter.meter.util.LogUtil;
 import com.android.meter.meter.util.ToastUtil;
 import com.lzy.imagepicker.DataHolder;
 import com.lzy.imagepicker.ImageDataSource;
@@ -25,39 +30,26 @@ import com.lzy.imagepicker.ImagePicker;
 import com.lzy.imagepicker.adapter.ImageFolderAdapter;
 import com.lzy.imagepicker.adapter.ImageRecyclerAdapter;
 import com.lzy.imagepicker.adapter.ImageRecyclerAdapter.OnImageItemClickListener;
+import com.lzy.imagepicker.adapter.ImageRecyclerAdapter.OnImageCheckListener;
 import com.lzy.imagepicker.bean.ImageFolder;
 import com.lzy.imagepicker.bean.ImageItem;
+import com.lzy.imagepicker.imageloader.GlideImageLoader;
 import com.lzy.imagepicker.ui.ImageCropActivity;
 import com.lzy.imagepicker.ui.ImageGridActivity;
 import com.lzy.imagepicker.ui.ImagePreviewActivity;
 import com.lzy.imagepicker.util.Utils;
 import com.lzy.imagepicker.view.FolderPopUpWindow;
 import com.lzy.imagepicker.view.GridSpacingItemDecoration;
-import com.lzy.imagepicker.ImagePicker;
-import com.lzy.imagepicker.loader.ImageLoader;
-import com.lzy.imagepicker.imageloader.*;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-//
-//public class ChoosePhotoActivity extends ImageGridActivity {
-//    private static final String TAG = ChoosePhotoActivity.class.getSimpleName();
-//
-//    private ImagePicker imagePicker;
-//
-//    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_choose_photo);
-//        imagePicker = ImagePicker.getInstance();
-//        imagePicker.setImageLoader(new GlideImageLoader());
-//
-//    }
-//}
 
+public class ChoosePhotoActivity extends BaseActivity implements ImageDataSource.OnImagesLoadedListener,
+        OnImageItemClickListener, OnImageCheckListener, ImagePicker.OnImageSelectedListener,
+        View.OnClickListener {
 
-public class ChoosePhotoActivity extends BaseActivity implements ImageDataSource.OnImagesLoadedListener, OnImageItemClickListener, ImagePicker.OnImageSelectedListener, View.OnClickListener {
-
+    private static final String TAG = LogUtil.COMMON_TAG + ChoosePhotoActivity.class.getSimpleName();
     public static final int REQUEST_PERMISSION_STORAGE = 0x01;
     public static final int REQUEST_PERMISSION_CAMERA = 0x02;
     public static final String EXTRAS_TAKE_PICKERS = "TAKE";
@@ -68,6 +60,7 @@ public class ChoosePhotoActivity extends BaseActivity implements ImageDataSource
     private boolean isOrigin = false;  //是否选中原图
     private View mFooterBar;     //底部栏
     private Button mBtnOk;       //确定按钮
+    private Button mDeleteBtn, mSendBtn;
     private View mllDir; //文件夹切换按钮
     private TextView mtvDir; //显示当前文件夹
     private TextView mBtnPre;      //预览按钮
@@ -78,6 +71,11 @@ public class ChoosePhotoActivity extends BaseActivity implements ImageDataSource
     private boolean directPhoto = false; // 默认不是直接调取相机
     private RecyclerView mRecyclerView;
     private ImageRecyclerAdapter mRecyclerAdapter;
+    private ImageFolder mImageFolder;
+    private List<ImageItem> mSendImages;
+    private int mSendIndex = 0;
+    private boolean needToast = false;
+    private ProgressBar mSendBar;
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
@@ -94,10 +92,12 @@ public class ChoosePhotoActivity extends BaseActivity implements ImageDataSource
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_image_grid);
+        setContentView(R.layout.activity_choose_photo);
+        LogUtil.d(TAG, "onCreate");
 
         imagePicker = ImagePicker.getInstance();
         imagePicker.clear();
+
 //        ImagePicker imagePicker = ImagePicker.getInstance();
         imagePicker.setImageLoader(new GlideImageLoader());
         imagePicker.addOnImageSelectedListener(this);
@@ -119,6 +119,35 @@ public class ChoosePhotoActivity extends BaseActivity implements ImageDataSource
 
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler);
 
+//        mImageGridAdapter = new ImageGridAdapter(this, null);
+        mImageFolderAdapter = new ImageFolderAdapter(this, null);
+        mRecyclerAdapter = new ImageRecyclerAdapter(this, null);
+        initView();
+
+        onImageSelected(0, null, false);
+
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN) {
+            if (checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                new ImageDataSource(this, null, this);
+            } else {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_PERMISSION_STORAGE);
+            }
+        } else {
+//            new ImageDataSource(this, null, this);
+            new ImageDataSource(this, FileUtil.getPicNumberFolder(true), this);
+        }
+    }
+
+    private void initView() {
+        mDeleteBtn = (Button) findViewById(R.id.delete_btn);
+        mDeleteBtn.setOnClickListener(this);
+        mSendBtn = (Button) findViewById(R.id.send_btn);
+        mSendBtn.setOnClickListener(this);
+        updateBtn(false);
+        Button skipBtn = (Button) findViewById(R.id.skip_btn);
+        skipBtn.setOnClickListener(this);
+        mSendBar = (ProgressBar)findViewById(R.id.send_bar);
+
         findViewById(R.id.btn_back).setOnClickListener(this);
         mBtnOk = (Button) findViewById(R.id.btn_ok);
         mBtnOk.setOnClickListener(this);
@@ -135,23 +164,9 @@ public class ChoosePhotoActivity extends BaseActivity implements ImageDataSource
             mBtnOk.setVisibility(View.GONE);
             mBtnPre.setVisibility(View.GONE);
         }
-
-//        mImageGridAdapter = new ImageGridAdapter(this, null);
-        mImageFolderAdapter = new ImageFolderAdapter(this, null);
-        mRecyclerAdapter = new ImageRecyclerAdapter(this, null);
-
-        onImageSelected(0, null, false);
-
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN) {
-            if (checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                new ImageDataSource(this, null, this);
-            } else {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_PERMISSION_STORAGE);
-            }
-        } else {
-            new ImageDataSource(this, null, this);
-        }
+        mRecyclerView.setVisibility(View.INVISIBLE);
     }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -160,15 +175,27 @@ public class ChoosePhotoActivity extends BaseActivity implements ImageDataSource
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 new ImageDataSource(this, null, this);
             } else {
-                ToastUtil.showToast(mContext,"权限被禁止，无法选择本地图片");
+                ToastUtil.showToast(mContext, "权限被禁止，无法选择本地图片");
             }
         } else if (requestCode == REQUEST_PERMISSION_CAMERA) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 imagePicker.takePicture(this, ImagePicker.REQUEST_CODE_TAKE);
             } else {
-                ToastUtil.showToast(mContext,"权限被禁止，无法打开相机");
+                ToastUtil.showToast(mContext, "权限被禁止，无法打开相机");
             }
         }
+    }
+
+    @Override
+    protected void onStart() {
+        SocketControl.getInstance().setListener(this);
+        super.onStart();
+    }
+
+    @Override
+    public void onBackPressed() {
+        SocketControl.getInstance().setListener(null);
+        super.onBackPressed();
     }
 
     @Override
@@ -212,6 +239,39 @@ public class ChoosePhotoActivity extends BaseActivity implements ImageDataSource
         } else if (id == R.id.btn_back) {
             //点击返回按钮
             finish();
+        } else if (id == R.id.delete_btn) {
+            ArrayList<ImageItem> imageItems = imagePicker.getSelectedImages();
+            if (imageItems != null && imageItems.size() != 0) {
+                for (ImageItem item : imageItems) {
+                    LogUtil.v(TAG, "delete: " + item.path);
+                    File file = new File(item.path);
+                    if (file.exists()) {
+                        LogUtil.v(TAG, "delete: " + file.delete());
+                        File parent = file.getParentFile();
+                        if (parent != null && parent.list().length == 0) {
+                            LogUtil.d(TAG, "delete empty folder: " + parent.getAbsolutePath() + parent.delete());
+                        }
+                    } else {
+                        LogUtil.v(TAG, item.path + "is not exist");
+                    }
+                    mImageFolder.remove(item);
+                    imagePicker.getSelectedImages().remove(item);
+                }
+                LogUtil.d(TAG, "start to print imagePicker.getSelectedImages");
+                printImage(imagePicker.getSelectedImages());
+                mRecyclerAdapter.refreshData(mImageFolder.images);
+                if(imagePicker.getSelectedImages().size() ==0){
+                    updateBtn(false);
+                }
+            }
+        } else if (id == R.id.send_btn) {
+            mSendImages = imagePicker.getSelectedImages();
+            sendChoosePhotos();
+            mSendBar.setVisibility(View.VISIBLE);
+        } else if (id == R.id.skip_btn) {
+            Intent intent = new Intent(mContext, MeasureSetActivity.class);
+            startActivity(intent);
+            finish();
         }
     }
 
@@ -241,19 +301,23 @@ public class ChoosePhotoActivity extends BaseActivity implements ImageDataSource
     public void onImagesLoaded(List<ImageFolder> imageFolders) {
         this.mImageFolders = imageFolders;
         imagePicker.setImageFolders(imageFolders);
+//        printImageFolders(imageFolders);
         if (imageFolders.size() == 0) {
 //            mImageGridAdapter.refreshData(null);
             mRecyclerAdapter.refreshData(null);
         } else {
+            setLatestFolder();
 //            mImageGridAdapter.refreshData(imageFolders.get(0).images);
-            mRecyclerAdapter.refreshData(imageFolders.get(0).images);
+            mRecyclerAdapter.refreshData(mImageFolder.images);
         }
 //        mImageGridAdapter.setOnImageItemClickListener(this);
         mRecyclerAdapter.setOnImageItemClickListener(this);
+        mRecyclerAdapter.setOnImageCheckListener(this);
         mRecyclerView.setLayoutManager(new GridLayoutManager(this, 3));
         mRecyclerView.addItemDecoration(new GridSpacingItemDecoration(3, Utils.dp2px(this, 2), false));
         mRecyclerView.setAdapter(mRecyclerAdapter);
         mImageFolderAdapter.refreshData(imageFolders);
+        mRecyclerView.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -380,6 +444,111 @@ public class ChoosePhotoActivity extends BaseActivity implements ImageDataSource
             } else if (directPhoto) {
                 finish();
             }
+        }
+    }
+
+    /**
+     * get latest floder by folder's path.
+     */
+    private void setLatestFolder() {
+        if (mImageFolders != null) {
+            String latestFolder = FileUtil.getPicNumberFolder(true);
+            for (ImageFolder folder : mImageFolders) {
+//                LogUtil.d(TAG, "folder.path: " + folder.path);
+                if (latestFolder.equals(folder.path)) {
+                    mImageFolder = folder;
+                    return;
+                }
+            }
+        }
+        if (mImageFolder == null) {
+            mImageFolder = new ImageFolder();
+        }
+
+    }
+
+    private void printImageFolders(List<ImageFolder> imageFolders) {
+        if (imageFolders != null) {
+            for (ImageFolder folder : imageFolders) {
+                LogUtil.d(TAG, "folder.path: " + folder.path);
+            }
+        } else {
+            LogUtil.d(TAG, "imageFolders is null");
+
+        }
+    }
+
+    private void printImage(List<ImageItem> imageItems) {
+        if (imageItems != null) {
+            for (ImageItem item : imageItems) {
+                LogUtil.d(TAG, "printImage.item.path: " + item.path);
+            }
+        } else {
+            LogUtil.d(TAG, "items is null");
+
+        }
+    }
+
+
+    private void sendChoosePhotos() {
+        LogUtil.v(TAG, "sendChoosePhotos.send clickable: " + mSendBtn.isClickable());
+        if (mSendImages != null && mSendImages.size() != 0 && mSendImages.size() > mSendIndex) {
+            int index = mSendIndex;
+            needToast = true;
+            SocketControl.getInstance().sendFile(mSendImages.get(index).path);
+        }
+        updateBtn(false);
+        printImage(mSendImages);
+        printImage(imagePicker.getSelectedImages());
+    }
+
+
+    @Override
+    public void onResult(int state, String data) {
+        super.onResult(state, data);
+        LogUtil.d(TAG, "state: " + state + " ,needToast: " + needToast);
+        if (needToast) {
+            if (SocketConstant.SEND_SUCCESS == state) {
+                mSendIndex++;
+                if (mSendIndex >= mSendImages.size()) { //send files completed.
+                    Intent intent = new Intent(mContext, MeasureSetActivity.class);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    sendChoosePhotos();
+                }
+            } else {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        ToastUtil.showToast(mContext, "发送失败，请检查连接是否正常！");
+                        mSendBar.setVisibility(View.GONE);
+                    }
+                });
+            }
+        }
+    }
+
+
+    private void updateBtn(boolean clickable) {
+//        if(clickable){
+        mSendBtn.setEnabled(clickable);
+        if (clickable) {
+            mSendBtn.setTextColor(getColor(R.color.general_textview_black_color));
+        } else {
+            mSendBtn.setTextColor(getColor(R.color.general_textview_grey_color));
+        }
+//        }
+
+    }
+
+    @Override
+    public void onImageCheck(View view, ImageItem imageItem, int position) {
+        LogUtil.v(TAG, "imagePicker.getSelectImageCount: " + imagePicker.getSelectImageCount());
+        if (imagePicker.getSelectImageCount() == 0) {
+            updateBtn(false);
+        } else {
+            updateBtn(true);
         }
     }
 }

@@ -107,13 +107,13 @@ public class LogUtil {
         StringBuilder logText = new StringBuilder();
         logText.append(text).append(NEWLINE);
 
-        String s = TimeUtil.getDateYearMonthDay();  //name the folder and file by date.
-        String path = FileUtil.getPicNumberFolder(true);
+//        String s = TimeUtil.getDateYearMonthDay();  //name the folder and file by date.
+        String path = FileUtil.getLogFolder();
         File logFolder = new File(path);
         if (!logFolder.exists()) {
             Log.d(TAG, "Create log folder " + logFolder.mkdirs());
         }
-        File logFile = new File(path, s + "·.txt");
+        File logFile = new File(path, "cmd.txt");
         if (!logFile.exists()) {
             try {
                 Log.d(TAG, "Create log file " + logFile.createNewFile());

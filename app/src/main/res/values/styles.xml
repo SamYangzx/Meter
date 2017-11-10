@@ -19,7 +19,6 @@
     </style>
 
 
-
     <style name="PickerStyle">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
@@ -69,6 +68,10 @@
 
     <!-- toolbar弹出菜单样式 -->
     <style name="ToolbarPopupTheme" parent="@style/ThemeOverlay.AppCompat.Dark">
+        <item name="android:colorBackground">@color/toolbar_popup_background_color</item>
+    </style>
+
+    <style name="ChoosePhotoButtonStyle" parent="@style/android:Theme.Holo.Light">
         <item name="android:colorBackground">@color/toolbar_popup_background_color</item>
     </style>
 </resources>

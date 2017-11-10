@@ -121,9 +121,12 @@ public class CameraActivity extends AppCompatActivity implements
                 case R.id.take_picture_complete:
                     Intent intent = new Intent();
 //                    intent.setClass(mContext, MeasureSetActivity.class);
-                    intent.setClass(mContext, ChoosePhotoActivity.class);
-                    if (!TextUtils.isEmpty(mPhotoName)) {
-                        intent.putExtra(MeasureSetActivity.EXTRA_PHOTO, mPhotoName);
+                    if (TextUtils.isEmpty(mPhotoName)) {
+                        intent.setClass(mContext, MeasureSetActivity.class);
+                    }else{
+                        intent.setClass(mContext, ChoosePhotoActivity.class);
+//                        intent.putExtra(MeasureSetActivity.EXTRA_PHOTO, mPhotoName);
+                        mPhotoName = "";
                     }
                     startActivity(intent);
                     break;

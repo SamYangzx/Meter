@@ -14,6 +14,7 @@ import com.lzy.imagepicker.bean.ImageItem;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * ================================================
@@ -112,7 +113,8 @@ public class ImageDataSource implements LoaderManager.LoaderCallbacks<Cursor> {
                 imageFolder.path = imageParentFile.getAbsolutePath();
 
                 if (!imageFolders.contains(imageFolder)) {
-                    ArrayList<ImageItem> images = new ArrayList<>();
+//                    ArrayList<ImageItem> images = new ArrayList<>();
+                    List<ImageItem> images = new CopyOnWriteArrayList<ImageItem>();
                     images.add(imageItem);
                     imageFolder.cover = imageItem;
                     imageFolder.images = images;

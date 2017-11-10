@@ -9,7 +9,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.widget.TextView;
 
-public class BaseActivity extends AppCompatActivity {
+import com.android.meter.meter.http.IHttpListener;
+
+public class BaseActivity extends AppCompatActivity implements IHttpListener {
 
     String mBtStr = "", mWifiStr = "";
     TextView mTitle;
@@ -57,4 +59,8 @@ public class BaseActivity extends AppCompatActivity {
         return ActivityCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED;
     }
 
+    @Override
+    public void onResult(int state, String data) {
+
+    }
 }

@@ -21,16 +21,17 @@ import com.lzy.imagepicker.util.Utils;
 import com.lzy.imagepicker.view.SuperCheckBox;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 加载相册图片的RecyclerView适配器
- *
+ * <p>
  * 用于替换原项目的GridView，使用局部刷新解决选中照片出现闪动问题
- *
+ * <p>
  * 替换为RecyclerView后只是不再会导致全局刷新，
- *
+ * <p>
  * 但还是会出现明显的重新加载图片，可能是picasso图片加载框架的问题
- *
+ * <p>
  * Author: nanchen
  * Email: liushilin520@foxmail.com
  * Date: 2017-04-05  10:04
@@ -38,27 +39,35 @@ import java.util.ArrayList;
 
 public class ImageRecyclerAdapter extends RecyclerView.Adapter<ViewHolder> {
 
-
     private static final int ITEM_TYPE_CAMERA = 0;  //第一个条目是相机
     private static final int ITEM_TYPE_NORMAL = 1;  //第一个条目不是相机
     private ImagePicker imagePicker;
     private Activity mActivity;
-    private ArrayList<ImageItem> images;       //当前需要显示的所有的图片数据
-    private ArrayList<ImageItem> mSelectedImages; //全局保存的已经选中的图片数据
+    private List<ImageItem> images;       //当前需要显示的所有的图片数据
+    private List<ImageItem> mSelectedImages; //全局保存的已经选中的图片数据
     private boolean isShowCamera;         //是否显示拍照按钮
     private int mImageSize;               //每个条目的大小
     private LayoutInflater mInflater;
     private OnImageItemClickListener listener;   //图片被点击的监听
+    private OnImageCheckListener mCheckListener;
 
     public void setOnImageItemClickListener(OnImageItemClickListener listener) {
         this.listener = listener;
+    }
+
+    public void setOnImageCheckListener(OnImageCheckListener listener) {
+        this.mCheckListener = listener;
     }
 
     public interface OnImageItemClickListener {
         void onImageItemClick(View view, ImageItem imageItem, int position);
     }
 
-    public void refreshData(ArrayList<ImageItem> images) {
+    public interface OnImageCheckListener {
+        void onImageCheck(View view, ImageItem imageItem, int position);
+    }
+
+    public void refreshData(List<ImageItem> images) {
         if (images == null || images.size() == 0) this.images = new ArrayList<>();
         else this.images = images;
         notifyDataSetChanged();
@@ -81,18 +90,18 @@ public class ImageRecyclerAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        if (viewType == ITEM_TYPE_CAMERA){
-            return new CameraViewHolder(mInflater.inflate(R.layout.adapter_camera_item,parent,false));
+        if (isShowCamera && viewType == ITEM_TYPE_CAMERA) {
+            return new CameraViewHolder(mInflater.inflate(R.layout.adapter_camera_item, parent, false));
         }
-        return new ImageViewHolder(mInflater.inflate(R.layout.adapter_image_list_item,parent,false));
+        return new ImageViewHolder(mInflater.inflate(R.layout.adapter_image_list_item, parent, false));
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        if (holder instanceof CameraViewHolder){
-            ((CameraViewHolder)holder).bindCamera();
-        }else if (holder instanceof ImageViewHolder){
-            ((ImageViewHolder)holder).bind(position);
+        if (holder instanceof CameraViewHolder) {
+            ((CameraViewHolder) holder).bindCamera();
+        } else if (holder instanceof ImageViewHolder) {
+            ((ImageViewHolder) holder).bind(position);
         }
     }
 
@@ -121,7 +130,7 @@ public class ImageRecyclerAdapter extends RecyclerView.Adapter<ViewHolder> {
         }
     }
 
-    private class ImageViewHolder extends ViewHolder{
+    private class ImageViewHolder extends ViewHolder {
 
         View rootView;
         ImageView ivThumb;
@@ -135,17 +144,18 @@ public class ImageRecyclerAdapter extends RecyclerView.Adapter<ViewHolder> {
             rootView = itemView;
             ivThumb = (ImageView) itemView.findViewById(R.id.iv_thumb);
             mask = itemView.findViewById(R.id.mask);
-            checkView=itemView.findViewById(R.id.checkView);
+            checkView = itemView.findViewById(R.id.checkView);
             cbCheck = (SuperCheckBox) itemView.findViewById(R.id.cb_check);
             itemView.setLayoutParams(new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, mImageSize)); //让图片是个正方形
         }
 
-        void bind(final int position){
+        void bind(final int position) {
             final ImageItem imageItem = getItem(position);
             ivThumb.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (listener != null) listener.onImageItemClick(rootView, imageItem, position);
+                    //delete preview function
+//                    if (listener != null) listener.onImageItemClick(rootView, imageItem, position);
                 }
             });
             checkView.setOnClickListener(new View.OnClickListener() {
@@ -160,6 +170,10 @@ public class ImageRecyclerAdapter extends RecyclerView.Adapter<ViewHolder> {
                     } else {
                         imagePicker.addSelectedImageItem(position, imageItem, cbCheck.isChecked());
                         mask.setVisibility(View.VISIBLE);
+                    }
+
+                    if(mCheckListener != null){
+                        mCheckListener.onImageCheck(checkView, imageItem,position);
                     }
                 }
             });
@@ -182,7 +196,7 @@ public class ImageRecyclerAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     }
 
-    private class CameraViewHolder extends ViewHolder{
+    private class CameraViewHolder extends ViewHolder {
 
         View mItemView;
 
@@ -191,7 +205,7 @@ public class ImageRecyclerAdapter extends RecyclerView.Adapter<ViewHolder> {
             mItemView = itemView;
         }
 
-        void bindCamera(){
+        void bindCamera() {
             mItemView.setLayoutParams(new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, mImageSize)); //让图片是个正方形
             mItemView.setTag(null);
             mItemView.setOnClickListener(new View.OnClickListener() {

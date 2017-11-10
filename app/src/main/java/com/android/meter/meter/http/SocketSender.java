@@ -22,6 +22,7 @@ public class SocketSender extends Thread {
 
     private Socket mSocket;
     private boolean mContinue = true;
+    private boolean mIsLatestFile = false;
     private Queue<String> mMsgQueue = new LinkedList<String>();
     private IHttpListener mIHttpListener;
     //    private DataOutputStream mOutStream;
@@ -111,7 +112,13 @@ public class SocketSender extends Thread {
         }
     }
 
+    /**
+     *  send string.
+     * @param data
+     * @throws IOException
+     */
     private void writeMsg(String data) throws IOException {
+        mIsLatestFile = false;
         if (SocketConstant.WRITE_HEX) {
             mOutStream.write(StringUtil.hexString2Bytes(data));
         } else {
@@ -124,7 +131,10 @@ public class SocketSender extends Thread {
     }
 
 
-    //开始符，文件格式，文件大小，文件名，文件，结束符号
+    /**
+     *  Send file. 开始符_文件格式_文件大小_文件名_文件_结束符号
+     * @param file
+     */
     private void sendFile(String file) {
         LogUtil.d(TAG, "sendFile: " + file);
         File f = new File(file);
@@ -139,6 +149,10 @@ public class SocketSender extends Thread {
 
             long fileLength = f.length();
             StringBuilder sb = new StringBuilder();
+            if(mIsLatestFile){
+                sb.append(SEPERATOR);
+            }
+            mIsLatestFile = true;
             sb.append(FILE_START).append(SEPERATOR)
                     .append(ext).append(SEPERATOR)
                     .append(Long.toString(fileLength)).append(SEPERATOR)
