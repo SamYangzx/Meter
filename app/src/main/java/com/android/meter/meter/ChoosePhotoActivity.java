@@ -54,6 +54,7 @@ public class ChoosePhotoActivity extends BaseActivity implements ImageDataSource
     public static final int REQUEST_PERMISSION_CAMERA = 0x02;
     public static final String EXTRAS_TAKE_PICKERS = "TAKE";
     public static final String EXTRAS_IMAGES = "IMAGES";
+    private static final String SCAN_FOLDER =  FileUtil.getPicNumberFolder(true); //null mean all folder.
 
     private ImagePicker imagePicker;
 
@@ -76,6 +77,7 @@ public class ChoosePhotoActivity extends BaseActivity implements ImageDataSource
     private int mSendIndex = 0;
     private boolean needToast = false;
     private ProgressBar mSendBar;
+    private boolean mCompletedLoad = false;
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
@@ -125,16 +127,14 @@ public class ChoosePhotoActivity extends BaseActivity implements ImageDataSource
         initView();
 
         onImageSelected(0, null, false);
-
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN) {
             if (checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                new ImageDataSource(this, null, this);
+                new ImageDataSource(this, SCAN_FOLDER, this);
             } else {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_PERMISSION_STORAGE);
             }
         } else {
-//            new ImageDataSource(this, null, this);
-            new ImageDataSource(this, FileUtil.getPicNumberFolder(true), this);
+            new ImageDataSource(this, SCAN_FOLDER, this);
         }
     }
 
@@ -147,6 +147,9 @@ public class ChoosePhotoActivity extends BaseActivity implements ImageDataSource
         Button skipBtn = (Button) findViewById(R.id.skip_btn);
         skipBtn.setOnClickListener(this);
         mSendBar = (ProgressBar)findViewById(R.id.send_bar);
+        if(!mCompletedLoad){
+            mSendBar.setVisibility(View.VISIBLE);
+        }
 
         findViewById(R.id.btn_back).setOnClickListener(this);
         mBtnOk = (Button) findViewById(R.id.btn_ok);
@@ -173,7 +176,7 @@ public class ChoosePhotoActivity extends BaseActivity implements ImageDataSource
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_PERMISSION_STORAGE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                new ImageDataSource(this, null, this);
+                new ImageDataSource(this, SCAN_FOLDER, this);
             } else {
                 ToastUtil.showToast(mContext, "权限被禁止，无法选择本地图片");
             }
@@ -265,9 +268,9 @@ public class ChoosePhotoActivity extends BaseActivity implements ImageDataSource
                 }
             }
         } else if (id == R.id.send_btn) {
+            mSendBar.setVisibility(View.VISIBLE);
             mSendImages = imagePicker.getSelectedImages();
             sendChoosePhotos();
-            mSendBar.setVisibility(View.VISIBLE);
         } else if (id == R.id.skip_btn) {
             Intent intent = new Intent(mContext, MeasureSetActivity.class);
             startActivity(intent);
@@ -299,6 +302,13 @@ public class ChoosePhotoActivity extends BaseActivity implements ImageDataSource
 
     @Override
     public void onImagesLoaded(List<ImageFolder> imageFolders) {
+        mCompletedLoad = true;
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mSendBar.setVisibility(View.GONE);
+            }
+        });
         this.mImageFolders = imageFolders;
         imagePicker.setImageFolders(imageFolders);
 //        printImageFolders(imageFolders);
@@ -536,9 +546,9 @@ public class ChoosePhotoActivity extends BaseActivity implements ImageDataSource
 //        if(clickable){
         mSendBtn.setEnabled(clickable);
         if (clickable) {
-            mSendBtn.setTextColor(getColor(R.color.general_textview_color));
+            mSendBtn.setTextColor(getResources().getColor(R.color.general_textview_color));
         } else {
-            mSendBtn.setTextColor(getColor(R.color.general_textview_grey_color));
+            mSendBtn.setTextColor(getResources().getColor(R.color.general_textview_grey_color));
         }
 //        }
 

@@ -29,7 +29,6 @@ import android.support.v4.os.ParcelableCompat;
 import android.support.v4.os.ParcelableCompatCreatorCallbacks;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.widget.FrameLayout;
 
 import java.lang.annotation.Retention;
@@ -123,7 +122,7 @@ public class CameraView extends FrameLayout {
         mDisplayOrientationDetector = new DisplayOrientationDetector(context) {
             @Override
             public void onDisplayOrientationChanged(int displayOrientation) {
-                Log.d("sam", "CameraView.onDisplayOrientationChanged.displayOrientation: " +displayOrientation );
+//                Log.w("sam", "CameraView.onDisplayOrientationChanged.displayOrientation: " +displayOrientation );
                 mImpl.setDisplayOrientation(displayOrientation);
             }
         };

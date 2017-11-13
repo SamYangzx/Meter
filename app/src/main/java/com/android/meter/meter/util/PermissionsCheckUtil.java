@@ -18,7 +18,7 @@ public class PermissionsCheckUtil {
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.BLUETOOTH_ADMIN,
-            Manifest.permission.INTERNET
+            Manifest.permission.INTERNET,
     };
 
     public static void verifyStoragePermissions(Context context) {

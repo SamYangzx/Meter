@@ -57,10 +57,13 @@ abstract class DisplayOrientationDetector {
                     return;
                 }
                 final int rotation = mDisplay.getRotation();
+//                Log.w("sam", "DisplayOrientationDetector.onOrientationChanged.rotation: " + rotation);
                 if (mLastKnownRotation != rotation) {
                     mLastKnownRotation = rotation;
                     dispatchOnDisplayOrientationChanged(DISPLAY_ORIENTATIONS.get(rotation));
                 }
+
+                //Log.w("sam", "DisplayOrientationDetector.onOrientationChanged.orientation: " + orientation);
             }
         };
     }

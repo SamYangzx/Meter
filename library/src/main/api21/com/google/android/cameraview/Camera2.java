@@ -634,7 +634,6 @@ class Camera2 extends CameraViewImpl {
                     (sensorOrientation +
                             mDisplayOrientation * (mFacing == Constants.FACING_FRONT ? 1 : -1) +
                             360) % 360);
-            Log.d("sam", "Camera2.captureStillPicture.sensorOrientation: " + sensorOrientation);
             // Stop preview and capture a still picture.
             mCaptureSession.stopRepeating();
             mCaptureSession.capture(captureRequestBuilder.build(),

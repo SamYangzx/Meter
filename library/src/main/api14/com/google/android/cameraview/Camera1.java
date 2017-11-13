@@ -21,6 +21,7 @@ import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.os.Build;
 import android.support.v4.util.SparseArrayCompat;
+import android.util.Log;
 import android.view.SurfaceHolder;
 
 import java.io.IOException;
@@ -253,11 +254,13 @@ class Camera1 extends CameraViewImpl {
     @Override
     void setDisplayOrientation(int displayOrientation) {
         if (mDisplayOrientation == displayOrientation) {
+//        Log.w("sam", "mDisplayOrientation == displayOrientation.");
             return;
         }
         mDisplayOrientation = displayOrientation;
         if (isCameraOpened()) {
             int cameraRotation = calcCameraRotation(displayOrientation);
+//            Log.w("sam", "setDisplayOrientation.displayOrientation: " + cameraRotation);
             mCameraParameters.setRotation(cameraRotation);
             mCamera.setParameters(mCameraParameters);
             final boolean needsToStopPreview = mShowingPreview && Build.VERSION.SDK_INT < 14;
@@ -337,6 +340,7 @@ class Camera1 extends CameraViewImpl {
             }
             mCameraParameters.setPreviewSize(size.getWidth(), size.getHeight());
             mCameraParameters.setPictureSize(pictureSize.getWidth(), pictureSize.getHeight());
+//            Log.w("sam", "Camera1.adjustCameraParameters.calcCameraRotation: " + calcCameraRotation(mDisplayOrientation));
             mCameraParameters.setRotation(calcCameraRotation(mDisplayOrientation));
             setAutoFocusInternal(mAutoFocus);
             setFlashInternal(mFlash);
