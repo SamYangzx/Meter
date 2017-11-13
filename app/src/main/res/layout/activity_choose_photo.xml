@@ -83,42 +83,37 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_toEndOf="@+id/footer_bar"
             android:layout_toRightOf="@+id/footer_bar"
             android:background="@color/ip_color_primary"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:padding="8dp">
 
             <Button
                 android:id="@+id/delete_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="48dp"
+                style="@style/MeasureButtonBottomStyle"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
-                android:text="删除"
-                android:textColor="@color/general_textview_black_color" />
+                android:text="删除" />
 
             <Button
                 android:id="@+id/skip_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="48dp"
+                style="@style/MeasureButtonBottomStyle"
                 android:layout_alignParentTop="true"
                 android:layout_centerHorizontal="true"
-                android:text="跳过"
-                android:textColor="@color/general_textview_black_color" />
+                android:text="跳过" />
 
             <Button
                 android:id="@+id/send_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="48dp"
+                style="@style/MeasureButtonBottomStyle"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
                 android:layout_gravity="right"
-                android:layout_marginEnd="11dp"
-                android:layout_marginRight="11dp"
-                android:text="发送"
-                android:textColor="@color/general_textview_black_color" />
+                android:text="发送" />
 
         </RelativeLayout>
 

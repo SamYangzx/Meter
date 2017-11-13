@@ -69,7 +69,7 @@ public class MeasureSetActivity extends BaseActivity {
             {"m3/h", "m3/min", "m3/s", "L/h", "L/min", "L/s", "mL/h", "mL/min", "mL/s", "ft3/h", "ft3/min", "ft3/s", "UKgal/s", "U.Sgal/s", "USbbl/s"},
             {"℃", "K", "οF", "οRa", "οR"},
             {"J"},
-            {" "},
+            {""},
     };
 
     private Context mContext;
@@ -343,7 +343,8 @@ public class MeasureSetActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        exitDialog();
+//        super.onBackPressed();
 //        BluetoothHelper.getBluetoothHelper(mContext).disconnect();
 //        SocketControl.getInstance().disconnect();
     }
@@ -571,6 +572,26 @@ public class MeasureSetActivity extends BaseActivity {
         return mUnitDialog;
     }
 
+    private void exitDialog() {
+        final CustomToastDialog dialog = new CustomToastDialog(mContext);
+        dialog.setTitle(R.string.warn);
+        dialog.setMessage(R.string.exit_confirm);
+        dialog.setPositiveButton(R.string.confirm, new CustomToastDialog.onEnterclickListener() {
+            @Override
+            public void onYesClick() {
+                dialog.dismiss();
+                AtyContainer.getInstance().finishAllActivity();
+            }
+        });
+        dialog.setNegativeButton(R.string.cancel, new CustomToastDialog.onCancelclickListener() {
+            @Override
+            public void onNoClick() {
+                dialog.dismiss();
+                MeasureSetActivity.this.finish();
+            }
+        });
+        dialog.show();
+    }
 
     private void updateSpinnerArray(int position) {
         mUnitIndex = position;

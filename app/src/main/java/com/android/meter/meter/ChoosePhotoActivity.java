@@ -521,8 +521,10 @@ public class ChoosePhotoActivity extends BaseActivity implements ImageDataSource
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        ToastUtil.showToast(mContext, "发送失败，请检查连接是否正常！");
                         mSendBar.setVisibility(View.GONE);
+                        ToastUtil.showToast(mContext, "发送失败，请检查连接是否正常！");
+                        updateBtn(true);
+
                     }
                 });
             }
@@ -534,7 +536,7 @@ public class ChoosePhotoActivity extends BaseActivity implements ImageDataSource
 //        if(clickable){
         mSendBtn.setEnabled(clickable);
         if (clickable) {
-            mSendBtn.setTextColor(getColor(R.color.general_textview_black_color));
+            mSendBtn.setTextColor(getColor(R.color.general_textview_color));
         } else {
             mSendBtn.setTextColor(getColor(R.color.general_textview_grey_color));
         }

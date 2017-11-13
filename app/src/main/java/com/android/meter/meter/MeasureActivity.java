@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.RequiresApi;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -185,6 +186,7 @@ public class MeasureActivity extends BaseActivity {
 
         mMeasurePointUnit = getIntent().getStringExtra(EXTRA_MEASURE_UNIT);
         mSampleUnit = getIntent().getStringExtra(EXTRA_SAMPLE_UNIT);
+        LogUtil.v(TAG, "mSampleUnit: " + mSampleUnit);
         mTap = getIntent().getStringExtra(EXTRA_TAP);
         mStep = getIntent().getFloatExtra(EXTRA_STEP, 1);
         mTotalTimes = getIntent().getIntExtra(EXTRA_COUNT, 1);
@@ -527,8 +529,15 @@ public class MeasureActivity extends BaseActivity {
         dialog.show();
     }
 
-
+    /**
+     * Don't show empty unit.
+     * @param unit
+     * @return
+     */
     private String getFormatUnit(String unit) {
+        if(TextUtils.isEmpty(unit)){
+            return "";
+        }
         return "(" + unit + ")";
     }
 

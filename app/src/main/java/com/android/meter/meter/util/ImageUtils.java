@@ -13,8 +13,8 @@ import java.io.IOException;
  */
 
 public class ImageUtils {
-    public static final int DEFAULT_WIDTH = 300;
-    public static final int DEFAULT_HEIGHT = 400;
+    public static final int DEFAULT_WIDTH = 150;
+    public static final int DEFAULT_HEIGHT = 200;
 
     //压缩图片尺寸
     public static Bitmap compressBySize(String pathName, int targetWidth,

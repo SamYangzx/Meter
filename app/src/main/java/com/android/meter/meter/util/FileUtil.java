@@ -37,7 +37,11 @@ public class FileUtil {
 //        String numberFolder;
         StringBuilder sb = new StringBuilder();
         if (existFolder) {
-            sb.append(dateFolder).append(File.separator).append(date).append("_").append(getFileCount(dateFolder)).append(File.separator).append(PIC_FOLDER);
+            int count = getFileCount(dateFolder);
+            if(count == 0){
+                count =1;
+            }
+            sb.append(dateFolder).append(File.separator).append(date).append("_").append(count).append(File.separator).append(PIC_FOLDER);
 //            numberFolder = dateFolder + File.separator + date + "_" + getFileCount(dateFolder) + File.separator + PIC_FOLDER;
         } else {
             sb.append(dateFolder).append(File.separator).append(date).append("_").append((getFileCount(dateFolder) + 1)).append(File.separator).append(PIC_FOLDER);
@@ -54,7 +58,11 @@ public class FileUtil {
         String dateFolder = getPicDateFolder();
         String date = TimeUtil.getDateYearMonthDay();
         StringBuilder sb = new StringBuilder();
-        sb.append(dateFolder).append(File.separator).append(date).append("_").append(getFileCount(dateFolder));
+        int count = getFileCount(dateFolder);
+        if(count == 0){
+            count =1;
+        }
+        sb.append(dateFolder).append(File.separator).append(date).append("_").append(count);
         return sb.toString();
     }
 

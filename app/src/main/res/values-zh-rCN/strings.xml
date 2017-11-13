@@ -26,6 +26,7 @@
     <string name="reset_confirm">确认清零吗？</string>
     <string name="back_confirm">确认返回上一界面吗？</string>
     <string name="change_confirm">确认切换模式吗？</string>
+    <string name="exit_confirm">是否退出应用？</string>
     <string name="save_calibrate">保存</string>
 
 

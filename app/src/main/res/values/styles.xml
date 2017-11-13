@@ -10,6 +10,7 @@
         <item name="android:windowBackground">@color/default_background_color</item>
         <item name="android:textColor">@color/general_textview_color</item>
         <item name="android:textSize">@dimen/general_tv_textsize</item>
+        <item name="android:fitsSystemWindows">true</item>
     </style>
 
     <style name="MeasureActivityStyle" parent="@style/android:Theme.Holo.Light">

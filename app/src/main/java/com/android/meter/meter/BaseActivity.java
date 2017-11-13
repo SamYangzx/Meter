@@ -1,5 +1,6 @@
 package com.android.meter.meter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -10,6 +11,9 @@ import android.text.TextUtils;
 import android.widget.TextView;
 
 import com.android.meter.meter.http.IHttpListener;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class BaseActivity extends AppCompatActivity implements IHttpListener {
 
@@ -22,6 +26,8 @@ public class BaseActivity extends AppCompatActivity implements IHttpListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_base);
         mContext = this;
+        // 添加Activity到堆栈
+        AtyContainer.getInstance().addActivity(this);
     }
 
     void setTitleTv(TextView textView) {
@@ -63,4 +69,46 @@ public class BaseActivity extends AppCompatActivity implements IHttpListener {
     public void onResult(int state, String data) {
 
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // 结束Activity&从栈中移除该Activity
+        AtyContainer.getInstance().removeActivity(this);
+    }
+
+}
+
+class AtyContainer {
+
+    private AtyContainer() {
+    }
+
+    private static AtyContainer instance = new AtyContainer();
+    private static List<Activity> activityStack = new ArrayList<Activity>();
+
+    public static AtyContainer getInstance() {
+        return instance;
+    }
+
+    public void addActivity(Activity aty) {
+        activityStack.add(aty);
+    }
+
+    public void removeActivity(Activity aty) {
+        activityStack.remove(aty);
+    }
+
+    /**
+     * 结束所有Activity
+     */
+    public void finishAllActivity() {
+        for (int i = 0, size = activityStack.size(); i < size; i++) {
+            if (null != activityStack.get(i)) {
+                activityStack.get(i).finish();
+            }
+        }
+        activityStack.clear();
+    }
+
 }
