@@ -180,7 +180,7 @@ public class SocketControl {
     private long mCmdSendTime = 0;
     private String mTempString;
 
-    public void sendFile(String file) {
+    public void sendFile(String file, int count) {
         LogUtil.saveCmd(file);
         LogUtil.d(TAG, "sendFile: " + file);
         if (!mHasResponsed) {
@@ -190,6 +190,7 @@ public class SocketControl {
         mIsFile = true;
         mHasResponsed = false;
         if (isConneced()) {
+            mSendThread.setFileCount(count);
             mSendThread.sendMsg(file);
         } else {
             response(SocketConstant.CONNECT_FAIL, file);

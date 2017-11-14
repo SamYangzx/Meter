@@ -17,6 +17,7 @@ public class FileUtil {
 
     public static final String FILE_START = "start";
     public static final String FILE_END = "end";
+    public static final String TOTAL_FILE_END = "sendend";
     public static final String FOLDER_PATH = Environment.getExternalStorageDirectory() + File.separator + PACKAGE_FOLDER;
 
     public static int FILE_INDEX = 1;

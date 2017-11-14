@@ -503,11 +503,17 @@ public class ChoosePhotoActivity extends BaseActivity implements ImageDataSource
     private void sendChoosePhotos() {
         LogUtil.v(TAG, "sendChoosePhotos.send clickable: " + mSendBtn.isClickable());
         if (mSendImages != null && mSendImages.size() != 0 && mSendImages.size() > mSendIndex) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                updateBtn(false);
+
+                }
+            });
             int index = mSendIndex;
             needToast = true;
-            SocketControl.getInstance().sendFile(mSendImages.get(index).path);
+            SocketControl.getInstance().sendFile(mSendImages.get(index).path, mSendImages.size());
         }
-        updateBtn(false);
         printImage(mSendImages);
         printImage(imagePicker.getSelectedImages());
     }

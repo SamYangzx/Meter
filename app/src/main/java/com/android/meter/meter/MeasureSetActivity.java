@@ -232,9 +232,9 @@ public class MeasureSetActivity extends BaseActivity {
         initDevice();
         if (firstStart) {
             firstStart = false;
-            if (!TextUtils.isEmpty(mPhotoName)) {
-                SocketControl.getInstance().sendFile(FileUtil.getPicNumberFolder(true) + File.separator + mPhotoName);
-            }
+//            if (!TextUtils.isEmpty(mPhotoName)) {
+//                SocketControl.getInstance().sendFile(FileUtil.getPicNumberFolder(true) + File.separator + mPhotoName);
+//            }
         }
         updateBtTitle(BluetoothHelper.getBluetoothHelper(mContext).getStateString());
         updateWifiTitle(SocketControl.getInstance().isConneced());

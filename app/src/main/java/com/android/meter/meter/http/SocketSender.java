@@ -16,6 +16,7 @@ import java.util.Queue;
 import static com.android.meter.meter.util.CommandUtil.SEPERATOR;
 import static com.android.meter.meter.util.FileUtil.FILE_END;
 import static com.android.meter.meter.util.FileUtil.FILE_START;
+import static com.android.meter.meter.util.FileUtil.TOTAL_FILE_END;
 
 public class SocketSender extends Thread {
     private static final String TAG = LogUtil.COMMON_TAG + SocketSender.class.getSimpleName();
@@ -28,6 +29,8 @@ public class SocketSender extends Thread {
     //    private DataOutputStream mOutStream;
 //    private BufferedWriter mOutStream;
     private OutputStream mOutStream;   //优先使用此输出流
+    private int mFileCount = 0;
+    private int mFileIndex = 0;
 
     public SocketSender(Socket socket, IHttpListener listener) {
         mSocket = socket;
@@ -77,6 +80,7 @@ public class SocketSender extends Thread {
             if (mIHttpListener != null) {
                 mIHttpListener.onResult(SocketConstant.SEND_FAIL, msg);
             }
+            resetData();
             e.printStackTrace();
         } finally {
             if (mOutStream != null) {
@@ -112,8 +116,13 @@ public class SocketSender extends Thread {
         }
     }
 
+    public void setFileCount(int count) {
+        mFileCount = count;
+    }
+
     /**
-     *  send string.
+     * send string.
+     *
      * @param data
      * @throws IOException
      */
@@ -132,7 +141,8 @@ public class SocketSender extends Thread {
 
 
     /**
-     *  Send file. 开始符_文件格式_文件大小_文件名_文件_结束符号
+     * Send file. 开始符_文件格式_文件大小_文件名_文件_结束符号
+     *
      * @param file
      */
     private void sendFile(String file) {
@@ -149,7 +159,7 @@ public class SocketSender extends Thread {
 
             long fileLength = f.length();
             StringBuilder sb = new StringBuilder();
-            if(mIsLatestFile){
+            if (mIsLatestFile) {
                 sb.append(SEPERATOR);
             }
             mIsLatestFile = true;
@@ -166,11 +176,20 @@ public class SocketSender extends Thread {
             while ((length = is.read(b)) > 0) {
                 mOutStream.write(b, 0, length);
             }
-            mOutStream.write((SEPERATOR + FILE_END).getBytes());
+            mFileIndex++;
+            if (mFileIndex >= mFileCount) {
+                mOutStream.write((SEPERATOR + TOTAL_FILE_END).getBytes());
+            } else {
+                mOutStream.write((SEPERATOR + FILE_END).getBytes());
+            }
         } catch (IOException e) {
             LogUtil.e(TAG, "send: " + file + " failed");
         }
     }
 
+    private void resetData() {
+        mFileCount = 0;
+        mFileIndex = 0;
+    }
 
 }
