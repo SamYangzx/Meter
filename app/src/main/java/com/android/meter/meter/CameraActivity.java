@@ -194,6 +194,12 @@ public class CameraActivity extends BaseActivity implements
     }
 
     @Override
+    public void onBackPressed() {
+//        super.onBackPressed();
+        AtyContainer.getInstance().finishAllActivity();
+    }
+
+    @Override
     protected void onPause() {
         mCameraView.stop();
         super.onPause();

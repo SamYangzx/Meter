@@ -109,6 +109,7 @@ class AtyContainer {
             }
         }
         activityStack.clear();
+        System.exit(0);
     }
 
 }

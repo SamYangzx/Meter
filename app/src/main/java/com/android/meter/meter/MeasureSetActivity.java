@@ -10,7 +10,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -33,13 +32,10 @@ import com.android.meter.meter.http.SocketControl;
 import com.android.meter.meter.numberpicker.NumberPickerView;
 import com.android.meter.meter.util.CommandUtil;
 import com.android.meter.meter.util.Constant;
-import com.android.meter.meter.util.FileUtil;
 import com.android.meter.meter.util.LogUtil;
 import com.android.meter.meter.util.SharedPreferenceUtils;
 import com.android.meter.meter.util.StringUtil;
 import com.android.meter.meter.util.ToastUtil;
-
-import java.io.File;
 
 import static com.android.meter.meter.bluetooth.BluetoothChatActivity.TOAST;
 import static com.android.meter.meter.http.SocketConstant.SAVE_IP;
@@ -343,8 +339,8 @@ public class MeasureSetActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-        exitDialog();
-//        super.onBackPressed();
+//        exitDialog();
+        super.onBackPressed();
 //        BluetoothHelper.getBluetoothHelper(mContext).disconnect();
 //        SocketControl.getInstance().disconnect();
     }
