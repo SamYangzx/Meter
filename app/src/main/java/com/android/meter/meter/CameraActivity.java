@@ -107,6 +107,7 @@ public class CameraActivity extends BaseActivity implements
     private Context mContext;
     private String mPhotoName;
     private boolean mSameFolder = false;
+    private boolean mIsTakingPhoto = false;
 
     private View.OnClickListener mOnClickListener = new View.OnClickListener() {
         @Override
@@ -114,20 +115,26 @@ public class CameraActivity extends BaseActivity implements
             switch (v.getId()) {
                 case R.id.take_picture:
                     if (mCameraView != null) {
+                        mIsTakingPhoto = true;
                         mCameraView.takePicture();
+                    } else {
+                        LogUtil.e(TAG, "mCameraView is null");
                     }
                     break;
                 case R.id.take_picture_complete:
-                    Intent intent = new Intent();
+                    if (!mIsTakingPhoto) {
+                        Intent intent = new Intent();
 //                    intent.setClass(mContext, MeasureSetActivity.class);
-                    if (TextUtils.isEmpty(mPhotoName)) {
-                        intent.setClass(mContext, MeasureSetActivity.class);
-                    }else{
-                        intent.setClass(mContext, ChoosePhotoActivity.class);
+                        LogUtil.d(TAG, "startActivity.mPhotoName: " + mPhotoName);
+                        if (TextUtils.isEmpty(mPhotoName)) {
+                            intent.setClass(mContext, MeasureSetActivity.class);
+                        } else {
+                            intent.setClass(mContext, ChoosePhotoActivity.class);
 //                        intent.putExtra(MeasureSetActivity.EXTRA_PHOTO, mPhotoName);
-                        mPhotoName = "";
+                            mPhotoName = "";
+                        }
+                        startActivity(intent);
                     }
-                    startActivity(intent);
                     break;
             }
         }
@@ -292,10 +299,10 @@ public class CameraActivity extends BaseActivity implements
 
         @Override
         public void onPictureTaken(CameraView cameraView, final byte[] data) {
-            Log.d(TAG, "onPictureTaken " + data.length);
+            LogUtil.d(TAG, "onPictureTaken " + data.length);
             Toast.makeText(cameraView.getContext(), TimeUtil.getDateYearMonthDayHourMinute(), Toast.LENGTH_SHORT)
                     .show();
-            Log.d(TAG, "Pictures Directory: " + Environment.getExternalStorageDirectory());
+            LogUtil.d(TAG, "Pictures Directory: " + Environment.getExternalStorageDirectory());
             getBackgroundHandler().post(new Runnable() {
                 @Override
                 public void run() {
@@ -309,7 +316,7 @@ public class CameraActivity extends BaseActivity implements
                         os.write(data);
                         os.close();
                     } catch (IOException e) {
-                        Log.e(TAG, "Cannot write to " + file, e);
+                        LogUtil.e(TAG, "Cannot write to " + file, e);
                     } finally {
                         if (os != null) {
                             try {
@@ -331,6 +338,8 @@ public class CameraActivity extends BaseActivity implements
                     refreshGallery(file);
                 }
             });
+
+            mIsTakingPhoto = false;
         }
 
     };

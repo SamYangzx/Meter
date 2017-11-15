@@ -54,7 +54,7 @@ public class ChoosePhotoActivity extends BaseActivity implements ImageDataSource
     public static final int REQUEST_PERMISSION_CAMERA = 0x02;
     public static final String EXTRAS_TAKE_PICKERS = "TAKE";
     public static final String EXTRAS_IMAGES = "IMAGES";
-    private static final String SCAN_FOLDER =  FileUtil.getPicNumberFolder(true); //null mean all folder.
+    private String SCAN_FOLDER; //null mean all folder.
 
     private ImagePicker imagePicker;
 
@@ -127,6 +127,7 @@ public class ChoosePhotoActivity extends BaseActivity implements ImageDataSource
         initView();
 
         onImageSelected(0, null, false);
+        SCAN_FOLDER = FileUtil.getPicNumberFolder(true);
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN) {
             if (checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                 new ImageDataSource(this, SCAN_FOLDER, this);
