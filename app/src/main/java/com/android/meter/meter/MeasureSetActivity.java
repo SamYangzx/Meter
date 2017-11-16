@@ -469,7 +469,7 @@ public class MeasureSetActivity extends BaseActivity {
             public void onValueChange(NumberPickerView picker, int oldVal, int newVal) {
                 Log.d(TAG, "oldVal: " + oldVal + ", newVal: " + newVal + ", Value: " + mCountArray[newVal]);
                 mCount = Integer.valueOf(mCountArray[newVal]);
-                SharedPreferenceUtils.setParam(mContext, Constant.TAP, newVal);
+                SharedPreferenceUtils.setParam(mContext, Constant.COUNT, newVal);
             }
         });
 
