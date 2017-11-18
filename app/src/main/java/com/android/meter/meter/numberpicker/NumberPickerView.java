@@ -299,6 +299,7 @@ public class NumberPickerView extends View {
                 mRespondChangeInMainThread = a.getBoolean(attr, DEFAULT_RESPOND_CHANGE_IN_MAIN_THREAD);
             } else if (attr == cn.carbswang.android.numberpickerview.library.R.styleable.NumberPickerView_npv_TextEllipsize) {
                 mTextEllipsize = a.getString(attr);
+//                mTextEllipsize = TEXT_ELLIPSIZE_START;
             }
         }
         a.recycle();

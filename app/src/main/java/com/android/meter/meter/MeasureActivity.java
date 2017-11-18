@@ -88,6 +88,7 @@ public class MeasureActivity extends BaseActivity {
     private TextView mSampleTv;
     private TextView mUnitTv;
     private TextView mLoadSpeedTv;
+    private TextView mMeasurePointUnitTv;
     private int mMode = MEASURE_MODE;
     private boolean mFirstTime = true;
     private boolean mNeedOffset = true;
@@ -266,9 +267,11 @@ public class MeasureActivity extends BaseActivity {
 
     private void initView() {
         mMeasurePointPicker = (NumberPickerView) findViewById(R.id.measure_point_picker);
-        mMeasurePointPicker.setHintText(mMeasurePointUnit);
+//        mMeasurePointPicker.setHintText(mMeasurePointUnit);
         mMeasurePointPicker.refreshByNewDisplayedValues(getMeasurePointArray(mStep));
         mMeasurePointValue = "0"; //init mMeasurePointValue.
+        mMeasurePointUnitTv = (TextView)findViewById(R.id.measure_point_unit);
+        mMeasurePointUnitTv.setText(mMeasurePointUnit);
         updateMeasurePointPicker();
 
         mTimesPicker = (NumberPickerView) findViewById(R.id.times_picker);

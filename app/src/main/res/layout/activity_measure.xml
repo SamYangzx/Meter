@@ -27,7 +27,7 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_gravity="center_vertical"
-                android:background="@drawable/connect"/>
+                android:background="@drawable/connect" />
 
 
             <TextView
@@ -54,7 +54,7 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_gravity="center_vertical"
-                android:background="@drawable/setting"/>
+                android:background="@drawable/setting" />
         </LinearLayout>
     </android.support.v7.widget.Toolbar>
 
@@ -114,14 +114,31 @@
 
             <LinearLayout style="@style/GeneralVerticalLayoutStyle">
 
-                <com.android.meter.meter.numberpicker.NumberPickerView
-                    android:id="@+id/measure_point_picker"
+                <LinearLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="@dimen/measure_load_picker_height"
-                    app:npv_ItemPaddingVertical="5dp"
-                    app:npv_TextSizeNormal="16sp"
-                    app:npv_TextSizeSelected="20sp"
-                    app:npv_WrapSelectorWheel="false" />
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_gravity="center_vertical">
+
+                    <com.android.meter.meter.numberpicker.NumberPickerView
+                        android:id="@+id/measure_point_picker"
+                        android:layout_width="wrap_content"
+                        android:layout_height="@dimen/measure_load_picker_height"
+                        app:npv_ItemPaddingHorizontal="5dp"
+                        app:npv_ItemPaddingVertical="5dp"
+                        app:npv_TextSizeNormal="16sp"
+                        app:npv_TextSizeSelected="20sp"
+                        app:npv_WrapSelectorWheel="false" />
+
+                    <TextView
+                        android:id="@+id/measure_point_unit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:textColor="@color/general_textview_grey_color"
+                        android:textSize="16sp" />
+
+                </LinearLayout>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -134,7 +151,7 @@
 
                 <com.android.meter.meter.numberpicker.LoadPickerView
                     android:id="@+id/load_picker"
-                    android:layout_width="70dp"
+                    android:layout_width="90dp"
                     android:layout_height="@dimen/measure_load_picker_height"
                     app:npv_ItemPaddingVertical="5dp"
                     app:npv_TextSizeNormal="8sp"
