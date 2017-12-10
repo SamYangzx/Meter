@@ -22,6 +22,8 @@ import jxl.write.WriteException;
 
 public class ExcelUtils {
     private static final String TAG = ExcelUtils.class.getSimpleName();
+
+    public static final boolean WRITE_DATA = false;
     private static final int ROW_OFFSET_EVERYTIME = 5;
 
     public static WritableFont arial14font = null;
@@ -63,6 +65,9 @@ public class ExcelUtils {
     }
 
     public static void initExcel(String fileName, String[] colName) {
+        if (!WRITE_DATA) {
+            return;
+        }
         format();
         WritableWorkbook workbook = null;
         WritableSheet sheet;
@@ -103,6 +108,9 @@ public class ExcelUtils {
     @SuppressWarnings("unchecked")
     public static <T> void writeObjListToExcel(List<T> objList,
                                                String fileName, boolean needOffset) {
+        if (!WRITE_DATA) {
+            return;
+        }
         LogUtil.d(TAG, "writeObjListToExcel.invoke");
         if (objList != null && objList.size() > 0) {
             WritableWorkbook writebook = null;
@@ -154,6 +162,9 @@ public class ExcelUtils {
 
 
     public static int getRows(String fileName) {
+        if(!WRITE_DATA){
+            return 0;
+        }
         WritableWorkbook writebook = null;
         InputStream in = null;
         Workbook workbook = null;
@@ -204,6 +215,9 @@ public class ExcelUtils {
      */
     public static void writeObjToRow(List<String> objList,
                                      String fileName, int writeRow) {
+        if(!WRITE_DATA){
+            return;
+        }
         LogUtil.d(TAG, "writeObjToRow.writeRow: " + writeRow);
         if (objList != null && objList.size() > 0) {
             WritableWorkbook writebook = null;

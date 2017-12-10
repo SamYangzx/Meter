@@ -2,10 +2,7 @@ package com.android.meter.meter;
 
 import android.app.Application;
 
-import com.android.meter.meter.bluetooth.BluetoothHelper;
-import com.android.meter.meter.bluetooth.BtConstant;
-import com.android.meter.meter.http.SocketConstant;
-import com.android.meter.meter.http.SocketControl;
+import com.android.meter.meter.util.Constant;
 import com.android.meter.meter.util.LogUtil;
 import com.android.meter.meter.util.SharedPreferenceUtils;
 
@@ -25,7 +22,7 @@ public class MainApplication extends Application {
         LogUtil.v(TAG, "MainApplication.onCreate");
         super.onCreate();
         sApp = this;
-//        initData();
+        initData();
     }
 
     public static MainApplication getContext() {
@@ -33,12 +30,15 @@ public class MainApplication extends Application {
     }
 
     private void initData() {
-//        FileUtil.FILE_INDEX = 1;
-        String server = (String) SharedPreferenceUtils.getParam(sApp, SocketConstant.SAVE_IP, SocketConstant.DEFAULT_SERVER);
-        int port = (int) SharedPreferenceUtils.getParam(sApp, SocketConstant.SAVE_PORT, SocketConstant.DEFAULT_PORT);
-        SocketControl.getInstance().connect(server, port);
-        String bt = (String) SharedPreferenceUtils.getParam(sApp, BtConstant.SAVE_BT_ADDRESS,"");
-        BluetoothHelper.getBluetoothHelper(sApp).connect(bt);
+        //Donot need to init bt and wifi @{.
+//        String server = (String) SharedPreferenceUtils.getParam(sApp, SocketConstant.SAVE_IP, SocketConstant.DEFAULT_SERVER);
+//        int port = (int) SharedPreferenceUtils.getParam(sApp, SocketConstant.SAVE_PORT, SocketConstant.DEFAULT_PORT);
+//        SocketControl.getInstance().connect(server, port);
+//        String bt = (String) SharedPreferenceUtils.getParam(sApp, BtConstant.SAVE_BT_ADDRESS,"");
+//        BluetoothHelper.getBluetoothHelper(sApp).connect(bt);
+        //Donot need to init bt and wifi @}.
+        SharedPreferenceUtils.setParam(this, Constant.SAME_PHOTO_FOLDER, false);
+
     }
 
 }

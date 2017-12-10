@@ -4,6 +4,8 @@ import android.os.Environment;
 
 import java.io.File;
 
+import static java.io.File.separatorChar;
+
 /**
  * Created by fenghe on 2017/6/5.
  */
@@ -18,6 +20,7 @@ public class FileUtil {
     public static final String FILE_START = "start";
     public static final String FILE_END = "end";
     public static final String TOTAL_FILE_END = "sendend";
+    //修改下面的值时要修改ImageDataSource中的FOLDER_PATH 值。
     public static final String FOLDER_PATH = Environment.getExternalStorageDirectory() + File.separator + PACKAGE_FOLDER;
 
     public static int FILE_INDEX = 1;
@@ -39,8 +42,8 @@ public class FileUtil {
         StringBuilder sb = new StringBuilder();
         if (existFolder) {
             int count = getFileCount(dateFolder);
-            if(count == 0){
-                count =1;
+            if (count == 0) {
+                count = 1;
             }
             sb.append(dateFolder).append(File.separator).append(date).append("_").append(count).append(File.separator).append(PIC_FOLDER);
 //            numberFolder = dateFolder + File.separator + date + "_" + getFileCount(dateFolder) + File.separator + PIC_FOLDER;
@@ -60,8 +63,8 @@ public class FileUtil {
         String date = TimeUtil.getDateYearMonthDay();
         StringBuilder sb = new StringBuilder();
         int count = getFileCount(dateFolder);
-        if(count == 0){
-            count =1;
+        if (count == 0) {
+            count = 1;
         }
         sb.append(dateFolder).append(File.separator).append(date).append("_").append(count);
         return sb.toString();
@@ -100,6 +103,22 @@ public class FileUtil {
             int dot = filename.lastIndexOf('.');
             if ((dot > -1) && (dot < (filename.length() - 1))) {
                 return filename.substring(dot + 1);
+            }
+        }
+        return "";
+    }
+
+    /**
+     * 获取文件路径的父文件夹路径
+     *
+     * @param path
+     * @return 文件路径的父文件夹路径
+     */
+    public static String getParentFolderPath(String path) {
+        if ((path != null) && (path.length() > 0)) {
+            int index = path.lastIndexOf(separatorChar);
+            if ((index > 0) && (path.length() > index)) {
+                return path.substring(0, index);
             }
         }
         return "";

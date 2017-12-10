@@ -49,6 +49,7 @@
         android:paddingRight="16.0dp"
         android:paddingLeft="16.0dp"
         android:text="完成(0/3)"
+        android:visibility="gone"
         android:textColor="#ffffff"
         android:textSize="14sp" />
 

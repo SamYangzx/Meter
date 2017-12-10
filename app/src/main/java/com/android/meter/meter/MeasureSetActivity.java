@@ -203,22 +203,22 @@ public class MeasureSetActivity extends BaseActivity {
 
             }
         }, Constant.DELAY_REFRESH_TIME);
-        mTapPicker.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                int tap = (int) SharedPreferenceUtils.getParam(mContext, Constant.TAP, mTapArray.length / 2);
-                mTapPicker.setPickedIndexRelativeToRaw(tap);
-                mTap = mTapArray[tap];
-            }
-        }, Constant.DELAY_REFRESH_TIME);
-        mCountPicker.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                int count = (int) SharedPreferenceUtils.getParam(mContext, Constant.COUNT, mCountArray.length / 2);
-                mCountPicker.setPickedIndexRelativeToRaw(count);
-                mCount = Integer.valueOf(mCountArray[count]);
-            }
-        }, Constant.DELAY_REFRESH_TIME);
+//        mTapPicker.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                int tap = (int) SharedPreferenceUtils.getParam(mContext, Constant.TAP, mTapArray.length / 2);
+//                mTapPicker.setPickedIndexRelativeToRaw(tap);
+//                mTap = mTapArray[tap];
+//            }
+//        }, Constant.DELAY_REFRESH_TIME);
+//        mCountPicker.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                int count = (int) SharedPreferenceUtils.getParam(mContext, Constant.COUNT, mCountArray.length / 2);
+//                mCountPicker.setPickedIndexRelativeToRaw(count);
+//                mCount = Integer.valueOf(mCountArray[count]);
+//            }
+//        }, Constant.DELAY_REFRESH_TIME);
 
     }
 

@@ -2,6 +2,7 @@ package com.android.meter.meter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -226,6 +227,8 @@ public class MeasureActivity extends BaseActivity {
         ImageButton changeIb = (ImageButton) findViewById(R.id.measure_title_ib);
         changeIb.setOnClickListener(mListener);
 
+        ImageButton stopIb = (ImageButton)findViewById(R.id.stop_ib);
+        stopIb.setOnClickListener(mListener);
         ImageButton connectIb = (ImageButton) findViewById(R.id.connect_ib);
         connectIb.setOnClickListener(mListener);
     }
@@ -256,7 +259,7 @@ public class MeasureActivity extends BaseActivity {
         mMeasurePointIndex = MEASURE_POINT_INDEX_OFF;
         mNeedOffset = true;
 
-
+        //若立刻发送指令，蓝牙端有时数据会接收不到。
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -270,7 +273,7 @@ public class MeasureActivity extends BaseActivity {
 //        mMeasurePointPicker.setHintText(mMeasurePointUnit);
         mMeasurePointPicker.refreshByNewDisplayedValues(getMeasurePointArray(mStep));
         mMeasurePointValue = "0"; //init mMeasurePointValue.
-        mMeasurePointUnitTv = (TextView)findViewById(R.id.measure_point_unit);
+        mMeasurePointUnitTv = (TextView) findViewById(R.id.measure_point_unit);
         mMeasurePointUnitTv.setText(mMeasurePointUnit);
         updateMeasurePointPicker();
 
@@ -339,6 +342,7 @@ public class MeasureActivity extends BaseActivity {
     private View.OnClickListener mListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            Log.d(TAG, "click----");
             switch (v.getId()) {
                 case R.id.reset_btn:
 //                    ToastUtil.showToast(mContext, getStringById(R.string.reset));
@@ -347,10 +351,10 @@ public class MeasureActivity extends BaseActivity {
                     break;
                 case R.id.center_btn:
                     VibratorHelper.vibrate(mContext);
-                    if (CALIBRATE_MODE == mMode && mMeasurePointIndex > 20) { //切换数据时短时间内未及时更新。
+                    if (CALIBRATE_MODE == mMode && mMeasurePointIndex > 20) { //切换到测量模式时短时间内未及时更新。@{
                         LogUtil.d(TAG, "force calibrate!!");
                         mMeasurePointIndex = mMeasurePointIndex - 990;
-                    }
+                    }//@}
                     String hexStr;
 //                    hexStr = Float.toHexString(Float.valueOf(mMeasurePointValue));
 //                    hexStr = StringUtil.bytes2HexString(StringUtil.int2byte(mMeasurePointIndex));
@@ -407,7 +411,12 @@ public class MeasureActivity extends BaseActivity {
                     }
                     break;
                 case R.id.measure_title_ib:
-                    changeModeDialog();
+//                    changeModeDialog();
+                    startSendCmdActivity();
+                    break;
+                case R.id.stop_ib:
+                    SharedPreferenceUtils.setParam(mContext, Constant.SAME_PHOTO_FOLDER, false);
+                    ToastUtil.showToast(mContext, R.string.measure_end);
                     break;
                 case R.id.connect_ib:
                     LogUtil.v(TAG, "start connect");
@@ -425,7 +434,14 @@ public class MeasureActivity extends BaseActivity {
 
     };
 
-    private void changeMode() {
+    private void startSendCmdActivity() {
+        Intent intent = new Intent();
+        intent.setClass(MeasureActivity.this, SendCmdActivity.class);
+        startActivity(intent);
+    }
+
+    //change measure and calculate mode.
+   /* private void changeMode() {
         if (MEASURE_MODE == mMode) {
             LogUtil.d(TAG, "changeMode CALIBRATE_MODE");
             mMode = CALIBRATE_MODE;
@@ -440,7 +456,7 @@ public class MeasureActivity extends BaseActivity {
         mMeasurePointPicker.refreshByNewDisplayedValues(getMeasurePointArray(mStep));
         mMeasurePointPicker.setPickedIndexRelativeToRaw(mMeasurePointArray.length / 2);
         updateMeasurePointPicker();
-    }
+    }*/
 
     private String getStringById(int str) {
         return mContext.getResources().getString(str);
@@ -512,33 +528,34 @@ public class MeasureActivity extends BaseActivity {
         dialog.show();
     }
 
-    private void changeModeDialog() {
-        final CustomToastDialog dialog = new CustomToastDialog(mContext);
-        dialog.setTitle(R.string.warn);
-        dialog.setMessage(R.string.change_confirm);
-        dialog.setPositiveButton(R.string.confirm, new CustomToastDialog.onEnterclickListener() {
-            @Override
-            public void onYesClick() {
-                dialog.dismiss();
-                changeMode();
-            }
-        });
-        dialog.setNegativeButton(R.string.cancel, new CustomToastDialog.onCancelclickListener() {
-            @Override
-            public void onNoClick() {
-                dialog.dismiss();
-            }
-        });
-        dialog.show();
-    }
+//    private void changeModeDialog() {
+//        final CustomToastDialog dialog = new CustomToastDialog(mContext);
+//        dialog.setTitle(R.string.warn);
+//        dialog.setMessage(R.string.change_confirm);
+//        dialog.setPositiveButton(R.string.confirm, new CustomToastDialog.onEnterclickListener() {
+//            @Override
+//            public void onYesClick() {
+//                dialog.dismiss();
+//                changeMode();
+//            }
+//        });
+//        dialog.setNegativeButton(R.string.cancel, new CustomToastDialog.onCancelclickListener() {
+//            @Override
+//            public void onNoClick() {
+//                dialog.dismiss();
+//            }
+//        });
+//        dialog.show();
+//    }
 
     /**
      * Don't show empty unit.
+     *
      * @param unit
      * @return
      */
     private String getFormatUnit(String unit) {
-        if(TextUtils.isEmpty(unit)){
+        if (TextUtils.isEmpty(unit)) {
             return "";
         }
         return "(" + unit + ")";

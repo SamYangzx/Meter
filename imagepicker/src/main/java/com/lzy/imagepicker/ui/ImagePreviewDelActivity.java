@@ -39,7 +39,7 @@ public class ImagePreviewDelActivity extends ImagePreviewBaseActivity implements
         mViewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
-                mCurrentPosition = position;
+//                mCurrentPosition = position;
                 mTitleCount.setText(getString(R.string.ip_preview_image_count, mCurrentPosition + 1, mImageItems.size()));
             }
         });

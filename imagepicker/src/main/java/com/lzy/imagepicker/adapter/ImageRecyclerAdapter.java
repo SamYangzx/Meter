@@ -21,7 +21,6 @@ import com.lzy.imagepicker.util.Utils;
 import com.lzy.imagepicker.view.SuperCheckBox;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 加载相册图片的RecyclerView适配器
@@ -43,13 +42,18 @@ public class ImageRecyclerAdapter extends RecyclerView.Adapter<ViewHolder> {
     private static final int ITEM_TYPE_NORMAL = 1;  //第一个条目不是相机
     private ImagePicker imagePicker;
     private Activity mActivity;
-    private List<ImageItem> images;       //当前需要显示的所有的图片数据
-    private List<ImageItem> mSelectedImages; //全局保存的已经选中的图片数据
+    private ArrayList<ImageItem> images;       //当前需要显示的所有的图片数据
+    private ArrayList<ImageItem> mSelectedImages; //全局保存的已经选中的图片数据
     private boolean isShowCamera;         //是否显示拍照按钮
     private int mImageSize;               //每个条目的大小
     private LayoutInflater mInflater;
     private OnImageItemClickListener listener;   //图片被点击的监听
     private OnImageCheckListener mCheckListener;
+    private boolean mCanPreview = false;
+
+    public void setCanPreview(boolean preview) {
+        mCanPreview = preview;
+    }
 
     public void setOnImageItemClickListener(OnImageItemClickListener listener) {
         this.listener = listener;
@@ -67,7 +71,7 @@ public class ImageRecyclerAdapter extends RecyclerView.Adapter<ViewHolder> {
         void onImageCheck(View view, ImageItem imageItem, int position);
     }
 
-    public void refreshData(List<ImageItem> images) {
+    public void refreshData(ArrayList<ImageItem> images) {
         if (images == null || images.size() == 0) this.images = new ArrayList<>();
         else this.images = images;
         notifyDataSetChanged();
@@ -154,8 +158,8 @@ public class ImageRecyclerAdapter extends RecyclerView.Adapter<ViewHolder> {
             ivThumb.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //delete preview function
-//                    if (listener != null) listener.onImageItemClick(rootView, imageItem, position);
+                    //control preview function
+                    if (listener != null && mCanPreview) listener.onImageItemClick(rootView, imageItem, position);
                 }
             });
             checkView.setOnClickListener(new View.OnClickListener() {
@@ -172,8 +176,8 @@ public class ImageRecyclerAdapter extends RecyclerView.Adapter<ViewHolder> {
                         mask.setVisibility(View.VISIBLE);
                     }
 
-                    if(mCheckListener != null){
-                        mCheckListener.onImageCheck(checkView, imageItem,position);
+                    if (mCheckListener != null) {
+                        mCheckListener.onImageCheck(checkView, imageItem, position);
                     }
                 }
             });

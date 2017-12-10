@@ -17,6 +17,7 @@
     <string name="count">次数</string>
     <!--measureSetActivity end-->
 
+    <!--measureActivity begin-->
     <string name="cancel">取消</string>
     <string name="center">确定</string>
     <string name="times">第n次</string>
@@ -28,10 +29,16 @@
     <string name="change_confirm">确认切换模式吗？</string>
     <string name="exit_confirm">是否退出应用？</string>
     <string name="save_calibrate">保存</string>
+    <string name="measure_end">本次测量结束</string>
+    <!--measureActivity end-->
 
 
     <string name="sample_value">采样值</string>
     <string name="measure_point">测量点</string>
     <string name="warn">提示</string>
+    <string name="debug">调试</string>
+    <string name="discoverable">打开可见</string>
+    <string name="about">关于</string>
+
 
 </resources>

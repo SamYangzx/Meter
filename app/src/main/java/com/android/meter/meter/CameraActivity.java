@@ -51,6 +51,7 @@ import com.android.meter.meter.bluetooth.BtConstant;
 import com.android.meter.meter.camera.AspectRatioFragment;
 import com.android.meter.meter.http.SocketConstant;
 import com.android.meter.meter.http.SocketControl;
+import com.android.meter.meter.util.Constant;
 import com.android.meter.meter.util.FileUtil;
 import com.android.meter.meter.util.ImageUtils;
 import com.android.meter.meter.util.LogUtil;
@@ -106,7 +107,7 @@ public class CameraActivity extends BaseActivity implements
     private Handler mBackgroundHandler;
     private Context mContext;
     private String mPhotoName;
-    private boolean mSameFolder = false;
+    private boolean mSameFolder = true;
     private boolean mIsTakingPhoto = false;
 
     private View.OnClickListener mOnClickListener = new View.OnClickListener() {
@@ -133,6 +134,7 @@ public class CameraActivity extends BaseActivity implements
 //                        intent.putExtra(MeasureSetActivity.EXTRA_PHOTO, mPhotoName);
                             mPhotoName = "";
                         }
+                        SharedPreferenceUtils.setParam(mContext, Constant.SAME_PHOTO_FOLDER, true);
                         startActivity(intent);
                     }
                     break;
@@ -175,8 +177,9 @@ public class CameraActivity extends BaseActivity implements
         SocketControl.getInstance().connect(server, port);
         String bt = (String) SharedPreferenceUtils.getParam(mContext, BtConstant.SAVE_BT_ADDRESS, "");
         BluetoothHelper.getBluetoothHelper(mContext).connect(bt);
-        mSameFolder = false;
         super.onStart();
+        mSameFolder = (boolean) SharedPreferenceUtils.getParam(this, Constant.SAME_PHOTO_FOLDER, false);
+        LogUtil.d(TAG, "onStart.mSameFolder: " + mSameFolder);
     }
 
     @Override

@@ -34,7 +34,7 @@ public abstract class ImagePreviewBaseActivity extends ImageBaseActivity {
     protected ArrayList<ImageItem> selectedImages;   //所有已经选中的图片
     protected View content;
     protected View topBar;
-    protected ViewPagerFixed mViewPager;
+    protected ViewPagerFixed mViewPager; //预览Adapter.
     protected ImagePageAdapter mAdapter;
     protected boolean isFromItems = false;
 
@@ -43,7 +43,9 @@ public abstract class ImagePreviewBaseActivity extends ImageBaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image_preview);
 
-        mCurrentPosition = getIntent().getIntExtra(ImagePicker.EXTRA_SELECTED_IMAGE_POSITION, 0);
+        //此值在文件夹预览模式下显示的是第几个文件夹 @{
+//        mCurrentPosition = getIntent().getIntExtra(ImagePicker.EXTRA_SELECTED_IMAGE_POSITION, 0);
+        //@}
         isFromItems = getIntent().getBooleanExtra(ImagePicker.EXTRA_FROM_ITEMS, false);
 
         if (isFromItems) {

@@ -1,7 +1,7 @@
 package com.lzy.imagepicker.bean;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.ArrayList;
 
 /**
  * ================================================
@@ -17,7 +17,10 @@ public class ImageFolder implements Serializable {
     public String name;  //当前文件夹的名字
     public String path;  //当前文件夹的路径
     public ImageItem cover;   //当前文件夹需要要显示的缩略图，默认为最近的一次图片
-    public List<ImageItem> images;  //当前文件夹下所有图片的集合
+    public ArrayList<ImageItem> images;  //当前文件夹下所有图片的集合
+    //标志当前文件夹是否被勾选中 @{
+    public boolean checked = false; //
+    //@}
 
     /**
      * 只要文件夹的路径和名字相同，就认为是相同的文件夹

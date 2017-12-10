@@ -15,4 +15,8 @@ public class Constant {
     public static final String TAP = "tap";
     public static final String COUNT = "count";
 
+    //for taking photo name begin.
+    public static final String SAME_PHOTO_FOLDER = "same_photo_folder";
+    //for taking photo name end.
+
 }

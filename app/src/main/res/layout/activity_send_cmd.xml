@@ -95,25 +95,14 @@
                 style="@style/MeasureButtonBottomStyle"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
+                android:visibility="gone"
                 android:text="删除" />
 
             <Button
-                android:id="@+id/skip_btn"
+                android:id="@+id/send_btn"
                 style="@style/MeasureButtonBottomStyle"
-                android:layout_alignParentTop="true"
-                android:layout_centerHorizontal="true"
-                android:visibility="gone"
-                android:text="跳过" />
-
-            <Button
-                android:id="@+id/next_btn"
-                style="@style/MeasureButtonBottomStyle"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentTop="true"
-                android:layout_gravity="right"
-                android:text="下一步" />
+                android:layout_centerInParent="true"
+                android:text="发送" />
 
         </RelativeLayout>
 

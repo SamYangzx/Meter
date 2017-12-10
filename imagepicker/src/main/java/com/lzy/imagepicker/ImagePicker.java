@@ -211,7 +211,7 @@ public class ImagePicker {
         mCurrentImageFolderPosition = mCurrentSelectedImageSetPosition;
     }
 
-    public List<ImageItem> getCurrentImageFolderItems() {
+    public ArrayList<ImageItem> getCurrentImageFolderItems() {
         return mImageFolders.get(mCurrentImageFolderPosition).images;
     }
 

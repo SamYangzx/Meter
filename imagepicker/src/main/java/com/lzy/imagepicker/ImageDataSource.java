@@ -2,6 +2,7 @@ package com.lzy.imagepicker;
 
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
@@ -14,7 +15,6 @@ import com.lzy.imagepicker.bean.ImageItem;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * ================================================
@@ -26,6 +26,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * ================================================
  */
 public class ImageDataSource implements LoaderManager.LoaderCallbacks<Cursor> {
+
+    private static final String FOLDER_PATH = Environment.getExternalStorageDirectory() + File.separator + "Meter";
 
     public static final int LOADER_ALL = 0;         //加载所有图片
     public static final int LOADER_CATEGORY = 1;    //分类加载图片
@@ -79,7 +81,7 @@ public class ImageDataSource implements LoaderManager.LoaderCallbacks<Cursor> {
         imageFolders.clear();
         if (data != null) {
             ArrayList<ImageItem> allImages = new ArrayList<>();   //所有图片的集合,不分文件夹
-            while (data.moveToNext()) {
+            while (data.moveToNext())  {
                 //查询数据
                 String imageName = data.getString(data.getColumnIndexOrThrow(IMAGE_PROJECTION[0]));
                 String imagePath = data.getString(data.getColumnIndexOrThrow(IMAGE_PROJECTION[1]));
@@ -110,28 +112,31 @@ public class ImageDataSource implements LoaderManager.LoaderCallbacks<Cursor> {
                 ImageFolder imageFolder = new ImageFolder();
                 imageFolder.name = imageParentFile.getName();
                 imageFolder.path = imageParentFile.getAbsolutePath();
-
-                if (!imageFolders.contains(imageFolder)) {
-//                    ArrayList<ImageItem> images = new ArrayList<>();
-                    List<ImageItem> images = new CopyOnWriteArrayList<ImageItem>();
-                    images.add(imageItem);
-                    imageFolder.cover = imageItem;
-                    imageFolder.images = images;
-                    imageFolders.add(imageFolder);
-                } else {
-                    imageFolders.get(imageFolders.indexOf(imageFolder)).images.add(imageItem);
+                //只有Meter目录下的文件夹才需要被显示出来 @{
+                if (imageFolder.path.startsWith(FOLDER_PATH)) {
+                    if (!imageFolders.contains(imageFolder)) {
+                        ArrayList<ImageItem> images = new ArrayList<>();
+                        images.add(imageItem);
+                        imageFolder.cover = imageItem;
+                        imageFolder.images = images;
+                        imageFolders.add(imageFolder);
+                    } else {
+                        imageFolders.get(imageFolders.indexOf(imageFolder)).images.add(imageItem);
+                    }
                 }
+                //@}
             }
-            //防止没有图片报异常
-            if (data.getCount() > 0 && allImages.size()>0) {
-                //构造所有图片的集合
-                ImageFolder allImagesFolder = new ImageFolder();
-                allImagesFolder.name = activity.getResources().getString(R.string.ip_all_images);
-                allImagesFolder.path = "/";
-                allImagesFolder.cover = allImages.get(0);
-                allImagesFolder.images = allImages;
-                imageFolders.add(0, allImagesFolder);  //确保第一条是所有图片
-            }
+            //下面的代码用于添加包含所有图片的文件夹。@｛
+//            if (data.getCount() > 0 && allImages.size()>0) {
+//                //构造所有图片的集合
+//                ImageFolder allImagesFolder = new ImageFolder();
+//                allImagesFolder.name = activity.getResources().getString(R.string.ip_all_images);
+//                allImagesFolder.path = "/";
+//                allImagesFolder.cover = allImages.get(0);
+//                allImagesFolder.images = allImages;
+//                imageFolders.add(0, allImagesFolder);  //确保第一条是所有图片
+//            }
+            //@}
         }
 
         //回调接口，通知图片数据准备完成

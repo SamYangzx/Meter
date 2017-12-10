@@ -16,12 +16,14 @@ import java.util.Date;
 public class LogUtil {
 
     public static final String TAG = LogUtil.class.getSimpleName();
-    public static final String COMMON_TAG = "sam/";
+    public static final String COMMON_TAG = "fenghe/";
     private static final String LOG_FOLDER = "Meter";
-    private static final String LOG_PATH = android.os.Environment.getExternalStorageDirectory()
+    public static final String LOG_PATH = android.os.Environment.getExternalStorageDirectory()
             .getAbsolutePath() + File.separator + LOG_FOLDER;
     private static final String LOG_FILE = android.os.Environment.getExternalStorageDirectory()
             .getAbsolutePath() + File.separator + LOG_FOLDER + File.separator + "log.txt";
+    public static final String CMD_FILE_NAME = "cmd.txt";
+
     private static boolean LOG_TO_FILE = false;
 
     private static final String NEWLINE = "\r\n";
@@ -113,7 +115,7 @@ public class LogUtil {
         if (!logFolder.exists()) {
             Log.d(TAG, "Create log folder " + logFolder.mkdirs());
         }
-        File logFile = new File(path, "cmd.txt");
+        File logFile = new File(path, CMD_FILE_NAME);
         if (!logFile.exists()) {
             try {
                 Log.d(TAG, "Create log file " + logFile.createNewFile());

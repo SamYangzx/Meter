@@ -19,8 +19,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:paddingLeft="@dimen/general_padding_horizontal"
             android:paddingRight="@dimen/general_padding_horizontal">
+
+            <ImageButton
+                android:id="@+id/stop_ib"
+                android:layout_width="@dimen/general_title_height"
+                android:layout_height="@dimen/general_title_height"
+                android:layout_marginRight="@dimen/general_padding_horizontal"
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/stop" />
 
             <ImageButton
                 android:id="@+id/connect_ib"
@@ -37,6 +44,7 @@
                 android:layout_gravity="center_vertical"
                 android:gravity="center"
                 android:text="@string/measure_title_measure"
+                android:visibility="gone"
                 android:textSize="@dimen/general_title_textsize" />
 
             <TextView
@@ -117,8 +125,8 @@
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_gravity="center_vertical">
+                    android:layout_gravity="center_vertical"
+                    android:orientation="horizontal">
 
                     <com.android.meter.meter.numberpicker.NumberPickerView
                         android:id="@+id/measure_point_picker"

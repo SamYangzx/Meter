@@ -22,7 +22,7 @@ public class SocketControl {
     private static final int CONNECT_TIMEOUT = 3 * 1000;
     private static final int READ_TIMEOUT = 1 * 1000;
     private static final int MAX_RESPONSE_MILL_TIME = 1500;
-    private static final int MAX_SEND_TIMES = 3;
+    private static final int MAX_SEND_TIMES = 1;
     private boolean mHasResponsed = true;
     private boolean mIsFile = false;
 
@@ -180,67 +180,75 @@ public class SocketControl {
     private long mCmdSendTime = 0;
     private String mTempString;
 
-    public void sendFile(String file, int count) {
-        LogUtil.saveCmd(file);
-        LogUtil.d(TAG, "sendFile: " + file);
-        if (!mHasResponsed) {
-            response(HAS_NOT_RESPONSE, file);
-            return;
-        }
-        mIsFile = true;
-        mHasResponsed = false;
-        if (isConneced()) {
-            mSendThread.setFileCount(count);
-            mSendThread.sendMsg(file);
+    public void sendFile(String file, int count, boolean realSend) {
+        LogUtil.d(TAG, "sendFile: " + file + " ,count: " + count);
+        if (realSend) {
+            if (!mHasResponsed) {
+                response(HAS_NOT_RESPONSE, file);
+                return;
+            }
+            mIsFile = true;
+            mHasResponsed = false;
+            if (isConneced()) {
+                mSendThread.setFileCount(count);
+                mSendThread.sendMsg(file);
+            } else {
+                response(SocketConstant.CONNECT_FAIL, file);
+            }
         } else {
-            response(SocketConstant.CONNECT_FAIL, file);
+            LogUtil.saveCmd(file);
+        }
+    }
+
+    /**
+     * default will save cmd, but not send cmd.
+     *
+     * @param file  file path which want to be sent
+     * @param count how many files will be sent.
+     */
+    private void sendFile(String file, int count) {
+        sendFile(file, count, false);
+    }
+
+
+    public void sendMsg(String hex, boolean realSend) {
+        LogUtil.d(TAG, "sendMsg: " + hex);
+        if (realSend) {
+            if (!mHasResponsed) {
+                response(HAS_NOT_RESPONSE, hex);
+                return;
+            }
+            mCmdSendTime = System.currentTimeMillis();
+            LogUtil.d(TAG, "sendMsg.hex: " + hex + " ,time: " + mCmdSendTime + ", mSendTimes: " + mSendTimes);
+            mSendTimes++;
+            mTempString = hex;
+            mIsFile = false;
+            if (mSendThread == null) {
+                mHasResponsed = false;
+                mControlListener.onResult(SocketConstant.CONNECT_FAIL, null);
+                response(SocketConstant.SEND_FAIL, hex);
+            } else {
+                if (mHasResponsed) {
+                    mHasResponsed = false;
+                    mHanlder.postDelayed(mRunnable, MAX_RESPONSE_MILL_TIME);
+                    mSendThread.sendMsg(hex);
+                } else {
+                    LogUtil.sendCmdResult(TAG, hex, false);
+                    mHasResponsed = false;
+                    if (mControlListener != null) {
+                        mControlListener.onResult(HAS_NOT_RESPONSE, hex);
+                    }
+                }
+            }
+
+        } else {
+            LogUtil.saveCmd(hex);
         }
     }
 
 
     public void sendMsg(String hex) {
-        if (!mHasResponsed) {
-            response(HAS_NOT_RESPONSE, hex);
-            return;
-        }
-        mCmdSendTime = System.currentTimeMillis();
-        LogUtil.d(TAG, "sendMsg.hex: " + hex + " ,time: " + mCmdSendTime + ", mSendTimes: " + mSendTimes);
-        mSendTimes++;
-        mTempString = hex;
-        mIsFile = false;
-//        if (mSendThread != null && mHasResponsed) {
-//            mHasResponsed = false;
-//            mHanlder.postDelayed(mRunnable, MAX_RESPONSE_MILL_TIME);
-//            mSendThread.sendMsg(hex);
-//        } else {
-//            LogUtil.sendCmdResult(TAG, hex, false);
-//            mHasResponsed = false;
-//            if (mControlListener != null) {
-//                mControlListener.onResult(SocketConstant.SEND_FAIL, hex);
-//            }
-//        }
-        if (mSendTimes == 1) {
-            LogUtil.saveCmd(hex);
-        }
-
-        if (mSendThread == null) {
-            mHasResponsed = false;
-            mControlListener.onResult(SocketConstant.CONNECT_FAIL, null);
-            response(SocketConstant.SEND_FAIL, hex);
-        } else {
-            if (mHasResponsed) {
-                mHasResponsed = false;
-                mHanlder.postDelayed(mRunnable, MAX_RESPONSE_MILL_TIME);
-                mSendThread.sendMsg(hex);
-            } else {
-                LogUtil.sendCmdResult(TAG, hex, false);
-                mHasResponsed = false;
-                if (mControlListener != null) {
-                    mControlListener.onResult(HAS_NOT_RESPONSE, hex);
-                }
-            }
-        }
-
+        sendMsg(hex, false);
     }
 
     private Runnable mRunnable = new Runnable() {

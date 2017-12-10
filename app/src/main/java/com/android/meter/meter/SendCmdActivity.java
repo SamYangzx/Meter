@@ -41,18 +41,18 @@ import com.lzy.imagepicker.util.Utils;
 import com.lzy.imagepicker.view.FolderPopUpWindow;
 import com.lzy.imagepicker.view.GridSpacingItemDecoration;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChoosePhotoActivity extends BaseActivity implements ImageDataSource.OnImagesLoadedListener,
+public class SendCmdActivity extends BaseActivity implements ImageDataSource.OnImagesLoadedListener,
         OnImageItemClickListener, OnImageCheckListener, ImagePicker.OnImageSelectedListener,
         View.OnClickListener {
 
-    private static final String TAG = LogUtil.COMMON_TAG + ChoosePhotoActivity.class.getSimpleName();
-    public static final int FIRST_VERSION = 1;// version1 需要选择照片发送；version2不需要。
-    public static final int SECOND_VERSION = 2;// version1 需要选择照片发送；version2不需要。
-    public static final int CURRENT_VERSION = SECOND_VERSION;// version1 需要选择照片发送；version2不需要。
+    private static final String TAG = LogUtil.COMMON_TAG + SendCmdActivity.class.getSimpleName();
     public static final int REQUEST_PERMISSION_STORAGE = 0x01;
     public static final int REQUEST_PERMISSION_CAMERA = 0x02;
     public static final String EXTRAS_TAKE_PICKERS = "TAKE";
@@ -71,12 +71,14 @@ public class ChoosePhotoActivity extends BaseActivity implements ImageDataSource
     private ImageFolderAdapter mImageFolderAdapter;    //图片文件夹的适配器
     private FolderPopUpWindow mFolderPopupWindow;  //ImageSet的PopupWindow
     private List<ImageFolder> mImageFolders;   //所有的图片文件夹
+    //    private List<ImageFolder> mSelectFolders;   //勾选的图片文件夹
     //    private ImageGridAdapter mImageGridAdapter;  //图片九宫格展示的适配器
     private boolean directPhoto = false; // 默认不是直接调取相机
     private RecyclerView mRecyclerView;
-    private ImageRecyclerAdapter mRecyclerAdapter;
+    private ImageRecyclerAdapter mRecyclerAdapter;  //具体某个文件夹下的照片的adapter.
     private ImageFolder mImageFolder;
-    private List<ImageItem> mSendImages;
+    private ArrayList<ImageItem> mSendImages;
+    private ArrayList<ImageItem> mShowImages = new ArrayList<ImageItem>();
     private int mSendIndex = 0;
     private boolean needToast = false;
     private ProgressBar mSendBar;
@@ -97,11 +99,12 @@ public class ChoosePhotoActivity extends BaseActivity implements ImageDataSource
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_choose_photo);
+        setContentView(R.layout.activity_send_cmd);
         LogUtil.d(TAG, "onCreate");
 
         imagePicker = ImagePicker.getInstance();
-        imagePicker.setMultiMode(true);
+        //为防止电脑端来不及处理接收的照片，故此处设置不允许设置多选文件夹
+        imagePicker.setMultiMode(false);
         imagePicker.clear();
 
 //        ImagePicker imagePicker = ImagePicker.getInstance();
@@ -128,10 +131,12 @@ public class ChoosePhotoActivity extends BaseActivity implements ImageDataSource
 //        mImageGridAdapter = new ImageGridAdapter(this, null);
         mImageFolderAdapter = new ImageFolderAdapter(this, null);
         mRecyclerAdapter = new ImageRecyclerAdapter(this, null);
+        mRecyclerAdapter.setCanPreview(true);
         initView();
 
         onImageSelected(0, null, false);
-        SCAN_FOLDER = FileUtil.getPicNumberFolder(true);
+//        SCAN_FOLDER = FileUtil.getPicNumberFolder(true);
+        SCAN_FOLDER = null;//scan all folder.
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN) {
             if (checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                 new ImageDataSource(this, SCAN_FOLDER, this);
@@ -146,11 +151,9 @@ public class ChoosePhotoActivity extends BaseActivity implements ImageDataSource
     private void initView() {
         mDeleteBtn = (Button) findViewById(R.id.delete_btn);
         mDeleteBtn.setOnClickListener(this);
-        mSendBtn = (Button) findViewById(R.id.next_btn);
+        mSendBtn = (Button) findViewById(R.id.send_btn);
         mSendBtn.setOnClickListener(this);
         updateBtn(false);
-        Button skipBtn = (Button) findViewById(R.id.skip_btn);
-        skipBtn.setOnClickListener(this);
         mSendBar = (ProgressBar) findViewById(R.id.send_bar);
         if (!mCompletedLoad) {
             mSendBar.setVisibility(View.VISIBLE);
@@ -267,22 +270,15 @@ public class ChoosePhotoActivity extends BaseActivity implements ImageDataSource
                 imagePicker.getSelectedImages().clear();
                 LogUtil.d(TAG, "start to print imagePicker.getSelectedImages");
                 printImage(imagePicker.getSelectedImages());
-                mRecyclerAdapter.refreshData(mImageFolder.images);
                 if (imagePicker.getSelectedImages().size() == 0) {
                     updateBtn(false);
                 }
             }
-        } else if (id == R.id.next_btn) {
-//            mSendBar.setVisibility(View.VISIBLE);
+        } else if (id == R.id.send_btn) {
+            //TODO Send cmd
+            mSendBar.setVisibility(View.VISIBLE);
 //            mSendImages = imagePicker.getSelectedImages();
-//            sendChoosePhotos();
-            Intent intent = new Intent(mContext, MeasureSetActivity.class);
-            startActivity(intent);
-            finish();
-        } else if (id == R.id.skip_btn) {
-            Intent intent = new Intent(mContext, MeasureSetActivity.class);
-            startActivity(intent);
-            finish();
+            sendFolderCmd();
         }
     }
 
@@ -326,7 +322,9 @@ public class ChoosePhotoActivity extends BaseActivity implements ImageDataSource
         } else {
             setLatestFolder();
 //            mImageGridAdapter.refreshData(imageFolders.get(0).images);
-            mRecyclerAdapter.refreshData(mImageFolder.images);
+//            mRecyclerAdapter.refreshData(mImageFolder.images);
+            getShowImages(imageFolders);
+            mRecyclerAdapter.refreshData(mShowImages);
         }
 //        mImageGridAdapter.setOnImageItemClickListener(this);
         mRecyclerAdapter.setOnImageItemClickListener(this);
@@ -338,10 +336,43 @@ public class ChoosePhotoActivity extends BaseActivity implements ImageDataSource
         mRecyclerView.setVisibility(View.VISIBLE);
     }
 
+    private List<ImageItem> getShowImages(List<ImageFolder> imageFolders) {
+        if (imageFolders == null) {
+            mShowImages.clear();
+            return null;
+        }
+        int size = imageFolders.size();
+        if (size == 0) {
+            mShowImages.clear();
+            return null;
+        }
+        ArrayList<ImageItem> items = new ArrayList<ImageItem>();
+        for (int i = 0; i < size; i++) {
+            LogUtil.d(TAG, "getShowImages.i: " + i + " ---: " + imageFolders.get(i).images.get(0).path);
+            items.add(imageFolders.get(i).images.get(0));
+        }
+        mShowImages = items;
+        return items;
+    }
+
+    private void updateSendImages(int index) {
+//        if(mImageFolder)
+    }
+
+    /**
+     * 照片的预览
+     *
+     * @param view
+     * @param imageItem
+     * @param position
+     */
     @Override
     public void onImageItemClick(View view, ImageItem imageItem, int position) {
         //根据是否有相机按钮确定位置
         position = imagePicker.isShowCamera() ? position - 1 : position;
+        //针对主界面显示为文件夹的情况, @{
+        imagePicker.setCurrentImageFolderPosition(position);
+        //@}
         if (imagePicker.isMultiMode()) {
             Intent intent = new Intent(mContext, ImagePreviewActivity.class);
             intent.putExtra(ImagePicker.EXTRA_SELECTED_IMAGE_POSITION, position);
@@ -507,6 +538,40 @@ public class ChoosePhotoActivity extends BaseActivity implements ImageDataSource
         }
     }
 
+    private void sendFolderCmd() {
+        int size = mImageFolders.size();
+        for (int i = 0; i < size; i++) {
+            ImageFolder folder = mImageFolders.get(i);
+            if (folder.checked) {
+                LogUtil.d(TAG, "choose folder: " + folder.path);
+                String parent = FileUtil.getParentFolderPath(folder.path);
+                LogUtil.d(TAG, "parent folder: " + parent);
+                //发送文件夹下存储的命令
+                File cmd = new File(parent, LogUtil.CMD_FILE_NAME);
+                try {
+                    if (cmd.isFile() && cmd.exists()) { // 判断文件是否存在
+                        InputStreamReader read = new InputStreamReader(new FileInputStream(cmd));// 考虑到编码格式
+                        BufferedReader bufferedReader = new BufferedReader(read);
+                        String lineTxt = null;
+                        while ((lineTxt = bufferedReader.readLine()) != null) {
+                            LogUtil.d(TAG, "readCMD: " + lineTxt);
+                            SocketControl.getInstance().sendMsg(lineTxt, true);
+                        }
+                        bufferedReader.close();
+                        read.close();
+                    } else {
+                        LogUtil.e(TAG, cmd + " is not exist!!");
+                    }
+                } catch (Exception e) {
+                    LogUtil.e(TAG, "read cmd failed.e: " + e);
+                }
+                //发送文件夹下对应的照片
+                mSendImages = folder.images;
+                sendChoosePhotos();
+            }
+        }
+
+    }
 
     private void sendChoosePhotos() {
         LogUtil.v(TAG, "sendChoosePhotos.send clickable: " + mSendBtn.isClickable());
@@ -520,8 +585,7 @@ public class ChoosePhotoActivity extends BaseActivity implements ImageDataSource
             });
             int index = mSendIndex;
             needToast = true;
-            //This method is deleted.
-//            SocketControl.getInstance().sendFile(mSendImages.get(index).path, mSendImages.size());
+            SocketControl.getInstance().sendFile(mSendImages.get(index).path, mSendImages.size(), true);
         }
         printImage(mSendImages);
         printImage(imagePicker.getSelectedImages());
@@ -533,40 +597,57 @@ public class ChoosePhotoActivity extends BaseActivity implements ImageDataSource
         super.onResult(state, data);
         LogUtil.d(TAG, "state: " + state + " ,needToast: " + needToast);
         if (needToast) {
-            if (SocketConstant.SEND_SUCCESS == state) {
-                mSendIndex++;
-                if (mSendIndex >= mSendImages.size()) { //send files completed.
-                    Intent intent = new Intent(mContext, MeasureSetActivity.class);
-                    startActivity(intent);
-                    finish();
-                } else {
-                    sendChoosePhotos();
-                }
-            } else {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mSendBar.setVisibility(View.GONE);
-                        ToastUtil.showToast(mContext, "发送失败，请检查连接是否正常！");
-                        updateBtn(true);
+            if (data.startsWith(LogUtil.LOG_PATH)) { //发送的是文件名
+                if (SocketConstant.SEND_SUCCESS == state) {
+                    mSendIndex++;
+                    if (mSendIndex >= mSendImages.size()) { //send files completed.
+//                    Intent intent = new Intent(mContext, MeasureSetActivity.class);
+//                    startActivity(intent);
+//                    finish();
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                mSendBar.setVisibility(View.GONE);
+                                ToastUtil.showToast(mContext, "所有照片发送完毕！");
+                                updateBtn(true);
 
+                            }
+                        });
+                    } else {
+                        sendChoosePhotos();
                     }
-                });
+                } else {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mSendBar.setVisibility(View.GONE);
+                            ToastUtil.showToast(mContext, "发送失败，请检查连接是否正常");
+                            updateBtn(true);
+
+                        }
+                    });
+                }
+            }else{//发送的是指令
+
             }
         }
     }
 
 
     private void updateBtn(boolean clickable) {
-//        if(clickable){
-        mDeleteBtn.setEnabled(clickable);
-        if (clickable) {
-            mDeleteBtn.setTextColor(getResources().getColor(R.color.general_textview_color));
-        } else {
-            mDeleteBtn.setTextColor(getResources().getColor(R.color.general_textview_grey_color));
+        updateBtn(mDeleteBtn, clickable);
+        updateBtn(mSendBtn, clickable);
+    }
+
+    private void updateBtn(Button btn, boolean clickable) {
+        if (btn != null) {
+            btn.setEnabled(clickable);
+            if (clickable) {
+                btn.setTextColor(getResources().getColor(R.color.general_textview_color));
+            } else {
+                btn.setTextColor(getResources().getColor(R.color.general_textview_grey_color));
+            }
         }
-
-
     }
 
     @Override
@@ -577,5 +658,7 @@ public class ChoosePhotoActivity extends BaseActivity implements ImageDataSource
         } else {
             updateBtn(true);
         }
+        boolean checked = mImageFolders.get(position).checked;
+        mImageFolders.get(position).checked = !checked;
     }
 }
