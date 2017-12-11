@@ -2,14 +2,16 @@ package com.android.meter.meter.http;
 
 import android.os.Handler;
 import android.os.Message;
+import android.text.TextUtils;
 
 import com.android.meter.meter.util.LogUtil;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.List;
 
-import static com.android.meter.meter.http.SocketConstant.HAS_NOT_RESPONSE;
+import static com.android.meter.meter.http.SocketConstant.COMPUTER_NOT_RESPONSE;
 
 
 /*******
@@ -83,8 +85,8 @@ public class SocketControl {
                         response(SocketConstant.CONNECT_FAIL, data);
 //                        retry(SocketConstant.SEND_FAIL, data);
                         break;
-                    case HAS_NOT_RESPONSE:
-                        response(HAS_NOT_RESPONSE, data);
+                    case COMPUTER_NOT_RESPONSE:
+                        response(COMPUTER_NOT_RESPONSE, data);
                         break;
                     default:
                         break;
@@ -180,20 +182,55 @@ public class SocketControl {
     private long mCmdSendTime = 0;
     private String mTempString;
 
+    public void sendFiles(List<String> list, boolean realSend) {
+        if (list == null || list.size() == 0) {
+            LogUtil.e(TAG, "paramater is error!!");
+            LogUtil.printStack(TAG);
+            return;
+        }
+        LogUtil.d(TAG, "sendFile.size: " + list.size());
+        for (int i = 0; i < list.size(); i++) {
+            String s = list.get(i);
+            LogUtil.d(TAG, "Will send: " + s);
+        }
+        if (realSend) {
+//            if (!mHasResponsed) {
+//                response(HANDLEING_CMD, file);
+//                return;
+//            }
+            mIsFile = true;
+            mHasResponsed = false;
+            if (isConneced()) {
+//                mSendThread.setFileCount(list.size());
+                for (int i = 0; i < list.size(); i++) {
+                    String file = list.get(i);
+                    mSendThread.sendMsg(file);
+                }
+            } else {
+                response(SocketConstant.SEND_FAIL, list.get(0), true);
+            }
+        } else {
+            for (int i = 0; i < list.size(); i++) {
+                String s = list.get(i);
+                LogUtil.saveCmd(s);
+            }
+        }
+    }
+
     public void sendFile(String file, int count, boolean realSend) {
         LogUtil.d(TAG, "sendFile: " + file + " ,count: " + count);
         if (realSend) {
-            if (!mHasResponsed) {
-                response(HAS_NOT_RESPONSE, file);
-                return;
-            }
+//            if (!mHasResponsed) {
+//                response(HANDLEING_CMD, file);
+//                return;
+//            }
             mIsFile = true;
             mHasResponsed = false;
             if (isConneced()) {
                 mSendThread.setFileCount(count);
                 mSendThread.sendMsg(file);
             } else {
-                response(SocketConstant.CONNECT_FAIL, file);
+                response(SocketConstant.SEND_FAIL, file, true);
             }
         } else {
             LogUtil.saveCmd(file);
@@ -206,39 +243,29 @@ public class SocketControl {
      * @param file  file path which want to be sent
      * @param count how many files will be sent.
      */
-    private void sendFile(String file, int count) {
-        sendFile(file, count, false);
-    }
-
-
+//    private void sendFile(String file, int count) {
+//        sendFile(file, count, false);
+//    }
     public void sendMsg(String hex, boolean realSend) {
         LogUtil.d(TAG, "sendMsg: " + hex);
         if (realSend) {
-            if (!mHasResponsed) {
-                response(HAS_NOT_RESPONSE, hex);
-                return;
-            }
+//            if (!mHasResponsed) {
+//                response(HANDLEING_CMD, hex);
+//                return;
+//            }
             mCmdSendTime = System.currentTimeMillis();
             LogUtil.d(TAG, "sendMsg.hex: " + hex + " ,time: " + mCmdSendTime + ", mSendTimes: " + mSendTimes);
             mSendTimes++;
             mTempString = hex;
             mIsFile = false;
-            if (mSendThread == null) {
+            if (!isConneced()) {
                 mHasResponsed = false;
-                mControlListener.onResult(SocketConstant.CONNECT_FAIL, null);
-                response(SocketConstant.SEND_FAIL, hex);
+                mControlListener.onResult(SocketConstant.CONNECT_FAIL, hex);
+                response(SocketConstant.SEND_FAIL, hex, true);
             } else {
-                if (mHasResponsed) {
-                    mHasResponsed = false;
-                    mHanlder.postDelayed(mRunnable, MAX_RESPONSE_MILL_TIME);
-                    mSendThread.sendMsg(hex);
-                } else {
-                    LogUtil.sendCmdResult(TAG, hex, false);
-                    mHasResponsed = false;
-                    if (mControlListener != null) {
-                        mControlListener.onResult(HAS_NOT_RESPONSE, hex);
-                    }
-                }
+                mHasResponsed = false;
+//                    mHanlder.postDelayed(mRunnable, MAX_RESPONSE_MILL_TIME);
+                mSendThread.sendMsg(hex);
             }
 
         } else {
@@ -274,13 +301,33 @@ public class SocketControl {
 
 
     private void response(int state, String data) {
+        response(state, data, false);
+    }
+
+    /**
+     * @param state
+     * @param data         当发送的是文件时，只需返回其中一个文件路径就行。
+     * @param responseSoon 是否立即反馈
+     */
+    private void response(int state, String data, boolean responseSoon) {
         LogUtil.d(TAG, "state: " + state + " ,data: " + data + ", mHasResponsed: " + mHasResponsed);
-        if (!mHasResponsed) {
-            mHasResponsed = true;
-            mSendTimes = 0;
-            mHanlder.removeCallbacksAndMessages(null);
-            if (mIHttpListener != null) {
-                mIHttpListener.onResult(state, data);
+        if (isConneced()) {
+            if (data.equals(mSendThread.getCurrentCmd())) {
+//                mHasResponsed = true;
+                mSendTimes = 0;
+                mHanlder.removeCallbacksAndMessages(null);
+                if (mIHttpListener != null) {
+                    mIHttpListener.onResult(state, data);
+                }
+            }
+        } else {
+            if (responseSoon) {
+                mHasResponsed = true;
+                mSendTimes = 0;
+                mHanlder.removeCallbacksAndMessages(null);
+                if (mIHttpListener != null) {
+                    mIHttpListener.onResult(state, data);
+                }
             }
         }
     }

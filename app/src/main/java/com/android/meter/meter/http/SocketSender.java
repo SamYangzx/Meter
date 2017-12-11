@@ -31,6 +31,7 @@ public class SocketSender extends Thread {
     private OutputStream mOutStream;   //优先使用此输出流
     private int mFileCount = 0;
     private int mFileIndex = 0;
+    private String mCurrentCmd;
 
     public SocketSender(Socket socket, IHttpListener listener) {
         mSocket = socket;
@@ -39,7 +40,6 @@ public class SocketSender extends Thread {
 
     @Override
     public void run() {
-        String msg = "";
         try {
 //            mOutStream = new BufferedWriter(new OutputStreamWriter(mSocket.getOutputStream(), "UTF-8"));
 //            BufferedReader inputReader = new BufferedReader(new InputStreamReader(System.in));
@@ -47,38 +47,50 @@ public class SocketSender extends Thread {
             mOutStream = mSocket.getOutputStream();
 //            os.write();
             while (mContinue) {
-//                    msg = inputReader.readLine();
+//                    mCurrentCmd = inputReader.readLine();
                 if (mMsgQueue.isEmpty()) {
                     continue;
                 }
-                msg = mMsgQueue.poll();
-                if (msg == null || msg == "") {
+                mCurrentCmd = mMsgQueue.poll();
+                if (mCurrentCmd == null || mCurrentCmd == "") {
                     continue;
                 }
                 if (mSocket.isClosed()) {
                     LogUtil.d(TAG, "Socket id closed!");
                     break;
                 }
-//                    mOutStream.write(msg);
+//                    mOutStream.write(mCurrentCmd);
 //                    mOutStream.newLine();
-                if (FileUtil.isFile(msg)) {
-                    sendFile(msg);
+                if (FileUtil.isFile(mCurrentCmd)) {
+                    String nextCmd = mMsgQueue.peek();
+                    if (FileUtil.isFile(nextCmd)) {
+                        mIsLatestFile = false;
+                    } else {
+                        mIsLatestFile = true;
+                    }
+                    sendFile(mCurrentCmd);
                 } else {
-                    writeMsg(msg);
+                    writeMsg(mCurrentCmd);
                 }
 //                    mOutStream.write("\0".getBytes());
 //                    writeMsg(SocketConstant.HEX_END);
                 mOutStream.flush();
-                LogUtil.sendCmdResult(TAG, msg, true);
+                LogUtil.sendCmdResult(TAG, mCurrentCmd, true);
                 if (mIHttpListener != null) {
-                    mIHttpListener.onResult(SocketConstant.SEND_SUCCESS, msg);
+                    if (FileUtil.isFile(mCurrentCmd)) {
+                        if (mIsLatestFile) {
+                            mIHttpListener.onResult(SocketConstant.SEND_SUCCESS, mCurrentCmd);
+                        }
+                    } else {
+                        mIHttpListener.onResult(SocketConstant.SEND_SUCCESS, mCurrentCmd);
+                    }
                 }
             }
         } catch (Exception e) {
-            LogUtil.sendCmdResult(TAG, msg, false);
+            LogUtil.sendCmdResult(TAG, mCurrentCmd, false);
             LogUtil.e(TAG, "e: " + e);
             if (mIHttpListener != null) {
-                mIHttpListener.onResult(SocketConstant.SEND_FAIL, msg);
+                mIHttpListener.onResult(SocketConstant.SEND_FAIL, mCurrentCmd);
             }
             resetData();
             e.printStackTrace();
@@ -127,7 +139,7 @@ public class SocketSender extends Thread {
      * @throws IOException
      */
     private void writeMsg(String data) throws IOException {
-        mIsLatestFile = false;
+//        mIsLatestFile = false;
         if (SocketConstant.WRITE_HEX) {
             mOutStream.write(StringUtil.hexString2Bytes(data));
         } else {
@@ -162,7 +174,6 @@ public class SocketSender extends Thread {
             if (mIsLatestFile) {
                 sb.append(SEPERATOR);
             }
-            mIsLatestFile = true;
             sb.append(FILE_START).append(SEPERATOR)
                     .append(ext).append(SEPERATOR)
                     .append(Long.toString(fileLength)).append(SEPERATOR)
@@ -177,7 +188,7 @@ public class SocketSender extends Thread {
                 mOutStream.write(b, 0, length);
             }
             mFileIndex++;
-            if (mFileIndex >= mFileCount) {
+            if (mIsLatestFile) {
                 mOutStream.write((SEPERATOR + TOTAL_FILE_END).getBytes());
             } else {
                 mOutStream.write((SEPERATOR + FILE_END).getBytes());
@@ -190,6 +201,11 @@ public class SocketSender extends Thread {
     private void resetData() {
         mFileCount = 0;
         mFileIndex = 0;
+    }
+
+    public String getCurrentCmd() {
+        LogUtil.d(TAG, "mCurrentCmd: " + mCurrentCmd);
+        return mCurrentCmd;
     }
 
 }

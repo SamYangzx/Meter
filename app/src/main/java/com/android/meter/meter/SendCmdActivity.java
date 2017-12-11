@@ -46,6 +46,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class SendCmdActivity extends BaseActivity implements ImageDataSource.OnImagesLoadedListener,
@@ -79,10 +80,10 @@ public class SendCmdActivity extends BaseActivity implements ImageDataSource.OnI
     private ImageFolder mImageFolder;
     private ArrayList<ImageItem> mSendImages;
     private ArrayList<ImageItem> mShowImages = new ArrayList<ImageItem>();
-    private int mSendIndex = 0;
     private boolean needToast = false;
     private ProgressBar mSendBar;
     private boolean mCompletedLoad = false;
+    private int mFolderIndex = 0;//用于标记当前正在发送哪个文件夹
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
@@ -104,7 +105,7 @@ public class SendCmdActivity extends BaseActivity implements ImageDataSource.OnI
 
         imagePicker = ImagePicker.getInstance();
         //为防止电脑端来不及处理接收的照片，故此处设置不允许设置多选文件夹
-        imagePicker.setMultiMode(false);
+//        imagePicker.setMultiMode(false);
         imagePicker.clear();
 
 //        ImagePicker imagePicker = ImagePicker.getInstance();
@@ -306,6 +307,7 @@ public class SendCmdActivity extends BaseActivity implements ImageDataSource.OnI
 
     @Override
     public void onImagesLoaded(List<ImageFolder> imageFolders) {
+        LogUtil.d(TAG, "onImagesLoaded!!");
         mCompletedLoad = true;
         runOnUiThread(new Runnable() {
             @Override
@@ -567,6 +569,8 @@ public class SendCmdActivity extends BaseActivity implements ImageDataSource.OnI
                 }
                 //发送文件夹下对应的照片
                 mSendImages = folder.images;
+                mFolderIndex = i;
+                LogUtil.d(TAG, "mFolderIndex: " + mFolderIndex);
                 sendChoosePhotos();
             }
         }
@@ -575,7 +579,7 @@ public class SendCmdActivity extends BaseActivity implements ImageDataSource.OnI
 
     private void sendChoosePhotos() {
         LogUtil.v(TAG, "sendChoosePhotos.send clickable: " + mSendBtn.isClickable());
-        if (mSendImages != null && mSendImages.size() != 0 && mSendImages.size() > mSendIndex) {
+        if (mSendImages != null && mSendImages.size() != 0) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -583,9 +587,13 @@ public class SendCmdActivity extends BaseActivity implements ImageDataSource.OnI
 
                 }
             });
-            int index = mSendIndex;
             needToast = true;
-            SocketControl.getInstance().sendFile(mSendImages.get(index).path, mSendImages.size(), true);
+            List<String> list = new ArrayList<String>();
+            int size = mSendImages.size();
+            for (int i = 0; i < size; i++) {
+                list.add(mSendImages.get(i).path);
+            }
+            SocketControl.getInstance().sendFiles(list, true);
         }
         printImage(mSendImages);
         printImage(imagePicker.getSelectedImages());
@@ -593,29 +601,28 @@ public class SendCmdActivity extends BaseActivity implements ImageDataSource.OnI
 
 
     @Override
-    public void onResult(int state, String data) {
+    public void onResult(int state, final String data) {
         super.onResult(state, data);
-        LogUtil.d(TAG, "state: " + state + " ,needToast: " + needToast);
-        if (needToast) {
+        LogUtil.d(TAG, "state: " + state + " ,data: " + data);
+//        if (needToast)
+        {
             if (data.startsWith(LogUtil.LOG_PATH)) { //发送的是文件名
-                if (SocketConstant.SEND_SUCCESS == state) {
-                    mSendIndex++;
-                    if (mSendIndex >= mSendImages.size()) { //send files completed.
-//                    Intent intent = new Intent(mContext, MeasureSetActivity.class);
-//                    startActivity(intent);
-//                    finish();
+                if (SocketConstant.SEND_SUCCESS == state || SocketConstant.COMPUTER_NOT_RESPONSE == state) {
+////                    mSendIndex++;
+//                    if (mSendIndex >= mSendImages.size()) { //send files completed.
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 mSendBar.setVisibility(View.GONE);
                                 ToastUtil.showToast(mContext, "所有照片发送完毕！");
                                 updateBtn(true);
-
+                                onFolderCmdSendSuccess(FileUtil.getParentFolderPath(FileUtil.getParentFolderPath(data)));
                             }
                         });
-                    } else {
-                        sendChoosePhotos();
-                    }
+//                        mSendIndex = 0;
+//                    } else {
+////                        sendChoosePhotos();
+//                    }
                 } else {
                     runOnUiThread(new Runnable() {
                         @Override
@@ -627,7 +634,7 @@ public class SendCmdActivity extends BaseActivity implements ImageDataSource.OnI
                         }
                     });
                 }
-            }else{//发送的是指令
+            } else {//发送的是指令
 
             }
         }
@@ -661,4 +668,35 @@ public class SendCmdActivity extends BaseActivity implements ImageDataSource.OnI
         boolean checked = mImageFolders.get(position).checked;
         mImageFolders.get(position).checked = !checked;
     }
+
+    private void onFolderCmdSendSuccess(String folder) {
+        LogUtil.d(TAG, "onFolderCmdSendSuccess.folder: " + folder);
+        FileUtil.deleteDir(folder);
+        //删除显示的图片和被选中的图片
+        for (Iterator<ImageItem> it = imagePicker.getSelectedImages().iterator(); it.hasNext(); ) {
+            ImageItem item = it.next();
+            if (item.path.startsWith(folder)) {
+                it.remove();
+                mShowImages.remove(item);
+            }
+        }
+        mRecyclerAdapter.refreshData(mShowImages);
+        //删除对应的文件夹
+        for (Iterator<ImageFolder> it = mImageFolders.iterator(); it.hasNext(); ) {
+            ImageFolder item = it.next();
+            if (item.path.startsWith(folder)) {
+                it.remove();
+            }
+        }
+        if (imagePicker.getSelectedImages().size() == 0) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    updateBtn(false);
+                }
+            });
+        }
+    }
+
+
 }

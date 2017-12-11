@@ -156,7 +156,7 @@ public class MeasureActivity extends BaseActivity {
                 case SocketConstant.RECEIVE_CHECK_FAILED:
                     ToastUtil.showToast(mContext, "电脑端未回复!");
                     break;
-                case SocketConstant.HAS_NOT_RESPONSE:
+                case SocketConstant.COMPUTER_NOT_RESPONSE:
                     ToastUtil.showToast(mContext, "上一条指令还未处理完，请等待！");
                     break;
                 case SocketConstant.CONNECT_SUCCESS:
