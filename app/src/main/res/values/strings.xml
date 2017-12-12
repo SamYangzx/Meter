@@ -230,7 +230,6 @@
     <string name="change_confirm">Change mode?</string>
     <string name="confirm">Confirm</string>
     <string name="exit_confirm">Exit application ?</string>
-    <string name="measure_title">Meter Tools</string>
     <string name="measure_title_calibrate">Calibrate</string>
     <string name="measure_title_measure">Measure</string>
     <string name="network">Network</string>

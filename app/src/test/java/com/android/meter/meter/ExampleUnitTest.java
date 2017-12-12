@@ -1,4 +1,4 @@
-package com.android.meter.meter;
+package com.android.meter;
 
 import org.junit.Test;
 

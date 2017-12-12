@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.android.meter.meter.MeasureSetActivity">
+    tools:context="com.android.meter.MeasureSetActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/measure_set_toolbar"
@@ -100,7 +100,7 @@
                 android:layout_gravity="center"
                 android:gravity="center">
 
-                <com.android.meter.meter.numberpicker.NumberPickerView
+                <com.android.meter.numberpicker.NumberPickerView
                     android:id="@+id/step_picker"
                     style="@style/PickerStyle"
                     app:npv_ItemPaddingHorizontal="5dp"
@@ -109,9 +109,9 @@
                     app:npv_TextSizeSelected="20sp"
                     app:npv_WrapSelectorWheel="false">
 
-                </com.android.meter.meter.numberpicker.NumberPickerView>
+                </com.android.meter.numberpicker.NumberPickerView>
 
-                <com.android.meter.meter.numberpicker.NumberPickerView
+                <com.android.meter.numberpicker.NumberPickerView
                     android:id="@+id/tap_picker"
                     style="@style/PickerStyle"
                     app:npv_ItemPaddingHorizontal="5dp"
@@ -120,9 +120,9 @@
                     app:npv_TextSizeSelected="20sp"
                     app:npv_WrapSelectorWheel="false">
 
-                </com.android.meter.meter.numberpicker.NumberPickerView>
+                </com.android.meter.numberpicker.NumberPickerView>
 
-                <com.android.meter.meter.numberpicker.NumberPickerView
+                <com.android.meter.numberpicker.NumberPickerView
                     android:id="@+id/jinhui_picker"
                     style="@style/PickerStyle"
                     app:npv_ItemPaddingHorizontal="5dp"
@@ -131,7 +131,7 @@
                     app:npv_TextSizeSelected="20sp"
                     app:npv_WrapSelectorWheel="false">
 
-                </com.android.meter.meter.numberpicker.NumberPickerView>
+                </com.android.meter.numberpicker.NumberPickerView>
 
             </TableRow>
 
