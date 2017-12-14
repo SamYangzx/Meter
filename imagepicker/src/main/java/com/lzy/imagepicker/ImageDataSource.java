@@ -27,7 +27,7 @@ import java.util.List;
  */
 public class ImageDataSource implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private static final String FOLDER_PATH = Environment.getExternalStorageDirectory() + File.separator + "Meter";
+    private static final String FOLDER_PATH = Environment.getExternalStorageDirectory() + File.separator + "Meter2";
 
     public static final int LOADER_ALL = 0;         //加载所有图片
     public static final int LOADER_CATEGORY = 1;    //分类加载图片

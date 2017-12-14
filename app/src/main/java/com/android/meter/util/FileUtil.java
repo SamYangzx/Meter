@@ -12,7 +12,7 @@ import static java.io.File.separatorChar;
 
 public class FileUtil {
     private static final String TAG = FileUtil.class.getSimpleName();
-    private static final String PACKAGE_FOLDER = "Meter";
+    private static final String PACKAGE_FOLDER = LogUtil.LOG_FOLDER;
     private static final String PIC_FOLDER = "PicFolder";
     private static final String PIC_SUFFIX = ".jpg";
     private static final String EXCEL_NAME = "measure.xls";

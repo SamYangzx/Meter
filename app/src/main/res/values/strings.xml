@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Meter</string>
+    <string name="app_name">Meter2.0</string>
     <string name="sample_unit">Sample unit</string>
     <string name="meter_unit">Meter unit</string>
     <string name="start">Start</string>
@@ -225,18 +225,19 @@
         <item>10</item>
 
     </string-array>
-    <string name="back_confirm">Return back?</string>
-    <string name="bluetooth">BT</string>
-    <string name="change_confirm">Change mode?</string>
-    <string name="confirm">Confirm</string>
-    <string name="exit_confirm">Exit application ?</string>
-    <string name="measure_title_calibrate">Calibrate</string>
-    <string name="measure_title_measure">Measure</string>
-    <string name="network">Network</string>
-    <string name="reset_confirm">Confirm to reset?</string>
-    <string name="save_calibrate">Save</string>
-    <string name="saved_data">Saved data</string>
     <string name="unit">Unit</string>
+    <string name="saved_data">Saved data</string>
+    <string name="measure_title">Meter</string>
+    <string name="measure_title_measure">Measure</string>
+    <string name="measure_title_calibrate">Calibrate</string>
+    <string name="bluetooth">BT</string>
+    <string name="network">Network</string>
+    <string name="confirm">Confirm</string>
+    <string name="reset_confirm">Are you sure to reset?</string>
+    <string name="back_confirm">Are you sure to return back?</string>
+    <string name="change_confirm">Sure to change mode?</string>
+    <string name="exit_confirm">Exit?</string>
+    <string name="save_calibrate">Save</string>
     <string name="measure_end">This measure end</string>
 
 

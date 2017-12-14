@@ -150,7 +150,10 @@ public class CameraActivity extends BaseActivity implements
         mCameraView = (CameraView) findViewById(R.id.camera);
         if (mCameraView != null) {
             mCameraView.addCallback(mCallback);
+        }else{
+            LogUtil.e(TAG, "mCameraView is null");
         }
+
 //        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.take_picture);
         Button fab = (Button) findViewById(R.id.take_picture);
         if (fab != null) {
@@ -184,9 +187,12 @@ public class CameraActivity extends BaseActivity implements
 
     @Override
     protected void onResume() {
+        LogUtil.d(TAG, "onResume is invoked." );
+
         super.onResume();
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
                 == PackageManager.PERMISSION_GRANTED) {
+            LogUtil.d(TAG, "Has camera permission.");
             mCameraView.start();
         } else {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA},
@@ -205,6 +211,7 @@ public class CameraActivity extends BaseActivity implements
     @Override
     protected void onPause() {
         mCameraView.stop();
+        LogUtil.d(TAG, "onPause is invoked." );
         super.onPause();
     }
 
