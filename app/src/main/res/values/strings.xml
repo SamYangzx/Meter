@@ -40,10 +40,10 @@
     <string name="not_connected">你没有连接一个设备</string>
     <string name="bt_not_enabled_leaving">蓝牙没有打开</string>
     <string name="title_bt_connecting">蓝牙连接中...</string>
-    <string name="title_connected_to">连接到: </string>
-    <string name="title_bt_connected">蓝牙OK</string>
-    <string name="title_not_bt_connected">蓝牙断开</string>
-    <string name="debug">调试</string>
+    <string name="title_connected_to" translatable="false">连接到: </string>
+    <string name="title_bt_connected" translatable="false">蓝牙OK</string>
+    <string name="title_not_bt_connected" translatable="false">蓝牙断开</string>
+    <string name="debug" translatable="false">调试</string>
     <string name="about">关于</string>
     <string name="about_msg">1.蓝牙处可以连接想要连接的蓝牙设备；
         \n2.网络设置处，输入电脑IP和端口，如果不输入，则使用默认值。请确保手机和电脑连接在同一局域网内；
@@ -225,6 +225,8 @@
         <item>10</item>
 
     </string-array>
+    <string name="measure_title">Measure</string>
+    <string name="measure_title_measure">Measure</string>
 
 
     <!--<string-array name="speed_array">-->

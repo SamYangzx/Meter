@@ -33,5 +33,6 @@
     <string name="sample_value">采样值</string>
     <string name="measure_point">测量点</string>
     <string name="warn">提示</string>
+    <string name="flash_off">off</string>
 
 </resources>

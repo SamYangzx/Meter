@@ -17,7 +17,7 @@ public class LogUtil {
 
     public static final String TAG = LogUtil.class.getSimpleName();
     public static final String COMMON_TAG = "sam/";
-    private static final String LOG_FOLDER = "Meter";
+    public static final String LOG_FOLDER = "Meter1";
     private static final String LOG_PATH = android.os.Environment.getExternalStorageDirectory()
             .getAbsolutePath() + File.separator + LOG_FOLDER;
     private static final String LOG_FILE = android.os.Environment.getExternalStorageDirectory()
