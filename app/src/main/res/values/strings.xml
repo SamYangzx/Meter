@@ -235,6 +235,7 @@
     <string name="confirm">Confirm</string>
     <string name="reset_confirm">Are you sure to reset?</string>
     <string name="back_confirm">Are you sure to return back?</string>
+    <string name="end_measure_confirm">确定结束本次测量吗？</string>
     <string name="change_confirm">Sure to change mode?</string>
     <string name="exit_confirm">Exit?</string>
     <string name="save_calibrate">Save</string>

@@ -415,8 +415,7 @@ public class MeasureActivity extends BaseActivity {
                     startSendCmdActivity();
                     break;
                 case R.id.stop_ib:
-                    SharedPreferenceUtils.setParam(mContext, Constant.SAME_PHOTO_FOLDER, false);
-                    ToastUtil.showToast(mContext, R.string.measure_end);
+                    stopDialog();
                     break;
                 case R.id.connect_ib:
                     LogUtil.v(TAG, "start connect");
@@ -485,7 +484,6 @@ public class MeasureActivity extends BaseActivity {
         return mMeasurePointArray;
     }
 
-
     protected void resetDialog() {
         final CustomToastDialog dialog = new CustomToastDialog(mContext);
         dialog.setTitle(R.string.warn);
@@ -517,6 +515,27 @@ public class MeasureActivity extends BaseActivity {
             public void onYesClick() {
                 dialog.dismiss();
                 finish();
+            }
+        });
+        dialog.setNegativeButton(R.string.cancel, new CustomToastDialog.onCancelclickListener() {
+            @Override
+            public void onNoClick() {
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+    }
+
+    private void stopDialog() {
+        final CustomToastDialog dialog = new CustomToastDialog(mContext);
+        dialog.setTitle(R.string.warn);
+        dialog.setMessage(R.string.end_measure_confirm);
+        dialog.setPositiveButton(R.string.confirm, new CustomToastDialog.onEnterclickListener() {
+            @Override
+            public void onYesClick() {
+                dialog.dismiss();
+                SharedPreferenceUtils.setParam(mContext, Constant.SAME_PHOTO_FOLDER, false);
+                ToastUtil.showToast(mContext, R.string.measure_end);
             }
         });
         dialog.setNegativeButton(R.string.cancel, new CustomToastDialog.onCancelclickListener() {
