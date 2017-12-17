@@ -252,29 +252,7 @@ public class SendCmdActivity extends BaseActivity implements ImageDataSource.OnI
             //点击返回按钮
             finish();
         } else if (id == R.id.delete_btn) {
-            ArrayList<ImageItem> imageItems = imagePicker.getSelectedImages();
-            if (imageItems != null && imageItems.size() != 0) {
-                for (ImageItem item : imageItems) {
-                    LogUtil.v(TAG, "delete: " + item.path);
-                    File file = new File(item.path);
-                    if (file.exists()) {
-                        LogUtil.v(TAG, "delete: " + file.delete());
-                        File parent = file.getParentFile();
-                        if (parent != null && parent.list().length == 0) {
-                            LogUtil.d(TAG, "delete empty folder: " + parent.getAbsolutePath() + parent.delete());
-                        }
-                    } else {
-                        LogUtil.v(TAG, item.path + "is not exist");
-                    }
-                }
-                mImageFolder.images.removeAll(imageItems);
-                imagePicker.getSelectedImages().clear();
-                LogUtil.d(TAG, "start to print imagePicker.getSelectedImages");
-                printImage(imagePicker.getSelectedImages());
-                if (imagePicker.getSelectedImages().size() == 0) {
-                    updateBtn(false);
-                }
-            }
+            deleteFolders();
         } else if (id == R.id.send_btn) {
             //TODO Send cmd
             mSendBar.setVisibility(View.VISIBLE);
@@ -540,6 +518,19 @@ public class SendCmdActivity extends BaseActivity implements ImageDataSource.OnI
         }
     }
 
+    private void deleteFolders() {
+        int size = mImageFolders.size();
+        List<String> selectedFolders = new ArrayList<String>();
+        for (int i = 0; i < size; i++) {
+            if (mImageFolders.get(i).checked) {
+                selectedFolders.add(mImageFolders.get(i).path);
+            }
+        }
+        for (String path : selectedFolders) {
+            deleteSelectedFolder(path);
+        }
+    }
+
     private void sendFolderCmd() {
         int size = mImageFolders.size();
         for (int i = 0; i < size; i++) {
@@ -610,15 +601,15 @@ public class SendCmdActivity extends BaseActivity implements ImageDataSource.OnI
                 if (SocketConstant.SEND_SUCCESS == state || SocketConstant.COMPUTER_NOT_RESPONSE == state) {
 ////                    mSendIndex++;
 //                    if (mSendIndex >= mSendImages.size()) { //send files completed.
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                mSendBar.setVisibility(View.GONE);
-                                ToastUtil.showToast(mContext, "所有照片发送完毕！");
-                                updateBtn(true);
-                                onFolderCmdSendSuccess(FileUtil.getParentFolderPath(FileUtil.getParentFolderPath(data)));
-                            }
-                        });
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mSendBar.setVisibility(View.GONE);
+                            ToastUtil.showToast(mContext, "所有照片发送完毕！");
+                            updateBtn(true);
+                            deleteSelectedFolder(FileUtil.getParentFolderPath(FileUtil.getParentFolderPath(data)));
+                        }
+                    });
 //                        mSendIndex = 0;
 //                    } else {
 ////                        sendChoosePhotos();
@@ -669,8 +660,9 @@ public class SendCmdActivity extends BaseActivity implements ImageDataSource.OnI
         mImageFolders.get(position).checked = !checked;
     }
 
-    private void onFolderCmdSendSuccess(String folder) {
-        LogUtil.d(TAG, "onFolderCmdSendSuccess.folder: " + folder);
+    private void deleteSelectedFolder(String folder) {
+        LogUtil.d(TAG, "deleteSelectedFolder.folder: " + folder);
+        //删除对应的文件夹
         FileUtil.deleteDir(folder);
         //删除显示的图片和被选中的图片
         for (Iterator<ImageItem> it = imagePicker.getSelectedImages().iterator(); it.hasNext(); ) {
