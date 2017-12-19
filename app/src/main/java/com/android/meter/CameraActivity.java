@@ -148,6 +148,41 @@ public class CameraActivity extends BaseActivity implements
         setContentView(R.layout.activity_main);
         mContext = this;
 
+    }
+
+    @Override
+    protected void onStart() {
+        initView();
+        String server = (String) SharedPreferenceUtils.getParam(mContext, SocketConstant.SAVE_IP, SocketConstant.DEFAULT_SERVER);
+        int port = (int) SharedPreferenceUtils.getParam(mContext, SocketConstant.SAVE_PORT, SocketConstant.DEFAULT_PORT);
+        SocketControl.getInstance().connect(server, port);
+        String bt = (String) SharedPreferenceUtils.getParam(mContext, BtConstant.SAVE_BT_ADDRESS, "");
+        BluetoothHelper.getBluetoothHelper(mContext).connect(bt);
+        super.onStart();
+        mSameFolder = (boolean) SharedPreferenceUtils.getParam(this, Constant.SAME_PHOTO_FOLDER, false);
+        LogUtil.d(TAG, "onStart.mSameFolder: " + mSameFolder);
+    }
+
+    @Override
+    protected void onResume() {
+        LogUtil.d(TAG, "onResume is invoked.");
+        super.onResume();
+        initCameraView();
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_GRANTED) {
+            LogUtil.d(TAG, "Has camera permission.");
+            mCameraView.start();
+            mCameraView.invalidate();
+        } else {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA},
+                    REQUEST_CAMERA_PERMISSION);
+        }
+
+        PermissionsCheckUtil.verifyStoragePermissions(mContext);
+    }
+
+    private void initView(){
+        setContentView(R.layout.activity_main);
 
 //        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.take_picture);
         Button fab = (Button) findViewById(R.id.take_picture);
@@ -168,40 +203,11 @@ public class CameraActivity extends BaseActivity implements
         }
     }
 
-    @Override
-    protected void onStart() {
-        String server = (String) SharedPreferenceUtils.getParam(mContext, SocketConstant.SAVE_IP, SocketConstant.DEFAULT_SERVER);
-        int port = (int) SharedPreferenceUtils.getParam(mContext, SocketConstant.SAVE_PORT, SocketConstant.DEFAULT_PORT);
-        SocketControl.getInstance().connect(server, port);
-        String bt = (String) SharedPreferenceUtils.getParam(mContext, BtConstant.SAVE_BT_ADDRESS, "");
-        BluetoothHelper.getBluetoothHelper(mContext).connect(bt);
-        super.onStart();
-        mSameFolder = (boolean) SharedPreferenceUtils.getParam(this, Constant.SAME_PHOTO_FOLDER, false);
-        LogUtil.d(TAG, "onStart.mSameFolder: " + mSameFolder);
-    }
-
-    @Override
-    protected void onResume() {
-        LogUtil.d(TAG, "onResume is invoked." );
-        initCameraView();
-        super.onResume();
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-                == PackageManager.PERMISSION_GRANTED) {
-            LogUtil.d(TAG, "Has camera permission.");
-            mCameraView.start();
-        } else {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA},
-                    REQUEST_CAMERA_PERMISSION);
-        }
-
-        PermissionsCheckUtil.verifyStoragePermissions(mContext);
-    }
-
-    private void initCameraView(){
+    private void initCameraView() {
         mCameraView = (CameraView) findViewById(R.id.camera);
         if (mCameraView != null) {
             mCameraView.addCallback(mCallback);
-        }else{
+        } else {
             LogUtil.e(TAG, "mCameraView is null");
         }
     }
@@ -214,9 +220,10 @@ public class CameraActivity extends BaseActivity implements
 
     @Override
     protected void onPause() {
-        mCameraView.stop();
-        LogUtil.d(TAG, "onPause is invoked." );
+        LogUtil.d(TAG, "onPause is invoked.");
         super.onPause();
+        mCameraView.stop();
+        mCameraView = null;
     }
 
     @Override
