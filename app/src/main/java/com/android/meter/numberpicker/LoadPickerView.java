@@ -1091,7 +1091,7 @@ public class LoadPickerView extends View {
         }
         mVelocityTracker.addMovement(event);
         currY = event.getY();
-        LogUtil.d(TAG, "event.getAction: " + event.getAction());
+        printD("event.getAction: " + event.getAction());
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
@@ -1107,7 +1107,7 @@ public class LoadPickerView extends View {
                 getParent().requestDisallowInterceptTouchEvent(true);
                 break;
             case MotionEvent.ACTION_MOVE:
-                LogUtil.d(TAG, "onTouchEvent.ACTION_MOVE");
+                printD("onTouchEvent.ACTION_MOVE");
                 mSpanY = downY - currY;
                 if (mOnScrollListener != null) {
                     mOnScrollListener.onScrollFling(LoadPickerView.this, calculateSpeedRatio(OnScrollListener.SCROLL_STATE_TOUCH_SCROLL));
@@ -1116,7 +1116,7 @@ public class LoadPickerView extends View {
                 if (mFlagMayPress && (-mScaledTouchSlop < mSpanY && mSpanY < mScaledTouchSlop)) {
 
                 } else {
-                    LogUtil.d(TAG, "mFlagMayPress turn to false");
+                    printD("mFlagMayPress turn to false");
                     mFlagMayPress = false;
                     mCurrDrawGlobalY = limitY((int) (downYGlobal + mSpanY));
                     calculateFirstItemParameterByGlobalY();
@@ -1125,7 +1125,7 @@ public class LoadPickerView extends View {
                 }
                 break;
             case MotionEvent.ACTION_UP:
-                LogUtil.d(TAG, "onTouchEvent.ACTION_UP mFlagMayPress: " + mFlagMayPress);
+                printD("onTouchEvent.ACTION_UP mFlagMayPress: " + mFlagMayPress);
                 if (mFlagMayPress) {
 //                    click(event);
                     reset();
@@ -1149,7 +1149,7 @@ public class LoadPickerView extends View {
                 }
                 break;
             case MotionEvent.ACTION_CANCEL:
-                LogUtil.d(TAG, "onTouchEvent.ACTION_CANCEL");
+                printD("onTouchEvent.ACTION_CANCEL");
 
                 downYGlobal = mCurrDrawGlobalY;
                 stopScrolling();
@@ -1691,7 +1691,7 @@ public class LoadPickerView extends View {
      * @return
      */
     public float calculateSpeedRatio(int mode) {
-        LogUtil.d(TAG, "calculateSpeedRatio.mode: " + mode);
+        printD("calculateSpeedRatio.mode: " + mode);
         if (OnScrollListener.SCROLL_STATE_IDLE == mode) {
             return StringUtil.big2(0f);
         } else if (OnScrollListener.SCROLL_STATE_TOUCH_SCROLL == mode) {
@@ -1722,7 +1722,7 @@ public class LoadPickerView extends View {
             float v = ((float) velocityY) / MAX_FLING_SPEED;
 
             mCycleFirstY = getUIScrollSpeed(v);
-            LogUtil.d(TAG, "v: " + v + " ,mCycleFirstY: " + mCycleFirstY);
+            printD("v: " + v + " ,mCycleFirstY: " + mCycleFirstY);
             if (v >= 1) {
                 return StringUtil.big2(1f);
             } else if (v <= -1) {
@@ -1738,7 +1738,7 @@ public class LoadPickerView extends View {
         return 0f;
     }
 
-    private static final boolean D = true;
+    private static final boolean D = false;
 
     private void printD(String msg) {
         if (D) {
@@ -1774,7 +1774,7 @@ public class LoadPickerView extends View {
     private int getUIScrollSpeed(float signedTapV) {
         int count = TAP.length;
         float didV = ((float) 1) / (count - 1);
-        LogUtil.d(TAG, "getUIScrollSpeed.signedTapV: " + signedTapV + ", didV: " + didV);
+        printD("getUIScrollSpeed.signedTapV: " + signedTapV + ", didV: " + didV);
         if (Math.abs(signedTapV) < MIN_SPEED) {
             return 0;
         }
@@ -1788,14 +1788,14 @@ public class LoadPickerView extends View {
         if (signedTapV > 0) {
             for (i = 1; i < count; i++) {
                 if (didV * i > signedTapV) {
-                    LogUtil.d(TAG, "i: " + i);
+                    printD("i: " + i);
                     return TAP[i];
                 }
             }
         } else {
             for (i = count - 2; i >= 0; i--) {
                 if (-didV * i > signedTapV) {
-                    LogUtil.d(TAG, "i: " + i);
+                    printD("i: " + i);
                     return -TAP[i + 1];
                 }
             }

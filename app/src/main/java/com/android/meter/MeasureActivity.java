@@ -365,6 +365,7 @@ public class MeasureActivity extends BaseActivity {
                     if (CALIBRATE_MODE == mMode) {
                         sendCmd(CommandUtil.getConfirmCalibrateCmd(hexStr, mMeasurePointValue), false);
                     } else {
+                        initTestData();
                         sendCmd(CommandUtil.getSocketDataCmd(getValueData(mTap, mTotalTimes, mTimes, mMeasurePointValue, mSampleTv.getText().toString())), true);
                         ExcelUtils.initExcel(FileUtil.getExcelPath(), mTitleArray);
                         int rows = 0;
@@ -666,5 +667,9 @@ public class MeasureActivity extends BaseActivity {
         msg.what = state;
         msg.obj = data;
         mHandler.sendMessage(msg);
+    }
+
+    private void initTestData(){
+        mSampleTv.setText("12.345");
     }
 }

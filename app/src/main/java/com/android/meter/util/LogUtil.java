@@ -26,7 +26,7 @@ public class LogUtil {
             .getAbsolutePath() + File.separator + LOG_FOLDER + File.separator + "log.txt";
     public static final String CMD_FILE_NAME = "cmd.txt";
 
-    private static boolean LOG_TO_FILE = false;
+    private static boolean LOG_TO_FILE = true;
 
     private static final String NEWLINE = "\r\n";
 

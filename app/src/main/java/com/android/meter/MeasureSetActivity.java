@@ -203,14 +203,14 @@ public class MeasureSetActivity extends BaseActivity {
 
             }
         }, Constant.DELAY_REFRESH_TIME);
-//        mTapPicker.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                int tap = (int) SharedPreferenceUtils.getParam(mContext, Constant.TAP, mTapArray.length / 2);
-//                mTapPicker.setPickedIndexRelativeToRaw(tap);
-//                mTap = mTapArray[tap];
-//            }
-//        }, Constant.DELAY_REFRESH_TIME);
+        mTapPicker.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                int tap = (int) SharedPreferenceUtils.getParam(mContext, Constant.TAP, mTapArray.length / 2);
+                mTapPicker.setPickedIndexRelativeToRaw(tap);
+                mTap = mTapArray[tap];
+            }
+        }, Constant.DELAY_REFRESH_TIME);
 //        mCountPicker.postDelayed(new Runnable() {
 //            @Override
 //            public void run() {
@@ -454,6 +454,7 @@ public class MeasureSetActivity extends BaseActivity {
 
             }
         });
+
         mTapPicker.refreshByNewDisplayedValues(mTapArray);
         mTapPicker.setOnValueChangedListener(new NumberPickerView.OnValueChangeListener() {
             @Override
@@ -527,7 +528,6 @@ public class MeasureSetActivity extends BaseActivity {
                     BluetoothHelper.getBluetoothHelper(mContext).sendHex(CommandUtil.getStartCmd());
 //                    BluetoothHelper.getBluetoothHelper(mContext).sendHex(CommandUtil.getCalibrateCmd(getBTUnitHexData(mMeasurePointUnit, mSampleUnit)));
                     SocketControl.getInstance().sendMsg(CommandUtil.getSocketDataCmd(getUnitData(mTap, mMeasurePointUnit, mSampleUnit)));
-
                     Intent intent = new Intent();
                     intent.putExtra(MeasureActivity.EXTRA_MEASURE_UNIT, mMeasurePointUnit);
                     intent.putExtra(MeasureActivity.EXTRA_SAMPLE_UNIT, mSampleUnit);

@@ -194,6 +194,7 @@ public class CommandUtil {
      */
     public static String getValueData(String tap, int sum, int count, String measure, String sample) {
         if (tap == null || measure == null || sample == null) {
+            LogUtil.e(TAG, "getValueData.tap: " + tap +" , measure: " + measure + " ,sample: " + sample);
             return "";
         }
         StringBuilder sb = new StringBuilder();
