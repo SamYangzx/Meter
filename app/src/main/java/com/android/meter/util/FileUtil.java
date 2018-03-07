@@ -140,10 +140,12 @@ public class FileUtil {
      * @return
      */
     public static boolean isFile(String hexOrFile) {
-        if(hexOrFile==null || hexOrFile == ""){
+        LogUtil.v(TAG, "isFile: " + hexOrFile);
+        if (hexOrFile == null || hexOrFile == "") {
             return false;
         }
         if (hexOrFile.startsWith(FileUtil.FOLDER_PATH)) {
+            LogUtil.v(TAG, "isFile!");
             return true;
         }
         return false;

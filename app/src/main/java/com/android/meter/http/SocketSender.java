@@ -21,6 +21,11 @@ import static com.android.meter.util.FileUtil.TOTAL_FILE_END;
 public class SocketSender extends Thread {
     private static final String TAG = LogUtil.COMMON_TAG + SocketSender.class.getSimpleName();
 
+    private static final boolean REAL_SEND_FILE = true;
+
+    private static final int WAIT_TIME = 100;
+    private Object LOCK = new Object();
+
     private Socket mSocket;
     private boolean mContinue = true;
     private boolean mIsLatestFile = false;
@@ -38,6 +43,8 @@ public class SocketSender extends Thread {
         mIHttpListener = listener;
     }
 
+    private boolean mIsWaiting = true;
+
     @Override
     public void run() {
         try {
@@ -48,8 +55,12 @@ public class SocketSender extends Thread {
 //            os.write();
             while (mContinue) {
 //                    mCurrentCmd = inputReader.readLine();
-                if (mMsgQueue.isEmpty()) {
-                    continue;
+                synchronized (LOCK) {
+                    if (mMsgQueue.isEmpty()) {
+                        LOCK.wait();
+                        mIsWaiting = true;
+                        LogUtil.d(TAG, "wait...");
+                    }
                 }
                 mCurrentCmd = mMsgQueue.poll();
                 if (mCurrentCmd == null || mCurrentCmd == "") {
@@ -62,11 +73,23 @@ public class SocketSender extends Thread {
 //                    mOutStream.write(mCurrentCmd);
 //                    mOutStream.newLine();
                 if (FileUtil.isFile(mCurrentCmd)) {
+                    //休眠0.1s，以便有足够时间添加后面的文件名。
+                    try {
+                        Thread.sleep(WAIT_TIME);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
                     String nextCmd = mMsgQueue.peek();
-                    if (FileUtil.isFile(nextCmd)) {
-                        mIsLatestFile = false;
-                    } else {
+                    LogUtil.d(TAG, "mCurrentCmd: " + mCurrentCmd + ", nextCmd: " + nextCmd);
+                    if (nextCmd == null || nextCmd == "") {
                         mIsLatestFile = true;
+                    } else {
+                        if (FileUtil.isFile(nextCmd)) {
+                            mIsLatestFile = false;
+                        } else {
+                            mIsLatestFile = true;
+                        }
                     }
                     sendFile(mCurrentCmd);
                 } else {
@@ -85,10 +108,11 @@ public class SocketSender extends Thread {
                         mIHttpListener.onResult(SocketConstant.SEND_SUCCESS, mCurrentCmd);
                     }
                 }
+
             }
         } catch (Exception e) {
             LogUtil.sendCmdResult(TAG, mCurrentCmd, false);
-            LogUtil.e(TAG, "e: " + e);
+            LogUtil.e(TAG, "Exception: " + e);
             if (mIHttpListener != null) {
                 mIHttpListener.onResult(SocketConstant.SEND_FAIL, mCurrentCmd);
             }
@@ -121,6 +145,12 @@ public class SocketSender extends Thread {
         if (mSocket != null) {
             LogUtil.d(TAG, "sendMsg.add: " + hexOrFile);
             mMsgQueue.offer(hexOrFile);
+            synchronized (LOCK) {
+                if (mIsWaiting) {
+                    LOCK.notify();
+                    mIsWaiting = false;
+                }
+            }
         } else {
             LogUtil.d(TAG, "sendMsg.add hexOrFile failed.");
             mIHttpListener.onResult(SocketConstant.SEND_FAIL, hexOrFile);
@@ -184,10 +214,13 @@ public class SocketSender extends Thread {
           /*发送图片文件，对应image*/
             int length;
             byte[] b = new byte[1024];
-            while ((length = is.read(b)) > 0) {
-                mOutStream.write(b, 0, length);
+            if (REAL_SEND_FILE) {
+                while ((length = is.read(b)) > 0) {
+                    mOutStream.write(b, 0, length);
+                }
             }
             mFileIndex++;
+            LogUtil.d(TAG, "sendFile.mIsLatestFile: " + mIsLatestFile);
             if (mIsLatestFile) {
                 mOutStream.write((SEPERATOR + TOTAL_FILE_END).getBytes());
             } else {
