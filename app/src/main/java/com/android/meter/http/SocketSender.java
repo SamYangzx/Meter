@@ -1,5 +1,6 @@
 package com.android.meter.http;
 
+import com.android.meter.util.Constant;
 import com.android.meter.util.FileUtil;
 import com.android.meter.util.LogUtil;
 import com.android.meter.util.StringUtil;
@@ -20,8 +21,6 @@ import static com.android.meter.util.FileUtil.TOTAL_FILE_END;
 
 public class SocketSender extends Thread {
     private static final String TAG = LogUtil.COMMON_TAG + SocketSender.class.getSimpleName();
-
-    private static final boolean REAL_SEND_FILE = true;
 
     private static final int WAIT_TIME = 100;
     private Object LOCK = new Object();
@@ -146,13 +145,11 @@ public class SocketSender extends Thread {
             LogUtil.d(TAG, "sendMsg.add: " + hexOrFile);
             mMsgQueue.offer(hexOrFile);
             synchronized (LOCK) {
-                if (mIsWaiting) {
-                    LOCK.notify();
-                    mIsWaiting = false;
-                }
+                LOCK.notifyAll();
+                mIsWaiting = false;
             }
         } else {
-            LogUtil.d(TAG, "sendMsg.add hexOrFile failed.");
+            LogUtil.e(TAG, "mSocket is null!");
             mIHttpListener.onResult(SocketConstant.SEND_FAIL, hexOrFile);
             LogUtil.sendCmdResult(TAG, hexOrFile, false);
         }
@@ -201,9 +198,6 @@ public class SocketSender extends Thread {
 
             long fileLength = f.length();
             StringBuilder sb = new StringBuilder();
-            if (mIsLatestFile) {
-                sb.append(SEPERATOR);
-            }
             sb.append(FILE_START).append(SEPERATOR)
                     .append(ext).append(SEPERATOR)
                     .append(Long.toString(fileLength)).append(SEPERATOR)
@@ -214,7 +208,7 @@ public class SocketSender extends Thread {
           /*发送图片文件，对应image*/
             int length;
             byte[] b = new byte[1024];
-            if (REAL_SEND_FILE) {
+            if (Constant.REAL_SEND_FILE) {
                 while ((length = is.read(b)) > 0) {
                     mOutStream.write(b, 0, length);
                 }

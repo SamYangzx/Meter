@@ -203,14 +203,14 @@ public class MeasureSetActivity extends BaseActivity {
 
             }
         }, Constant.DELAY_REFRESH_TIME);
-        mTapPicker.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                int tap = (int) SharedPreferenceUtils.getParam(mContext, Constant.TAP, mTapArray.length / 2);
-                mTapPicker.setPickedIndexRelativeToRaw(tap);
-                mTap = mTapArray[tap];
-            }
-        }, Constant.DELAY_REFRESH_TIME);
+//        mTapPicker.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                int tap = (int) SharedPreferenceUtils.getParam(mContext, Constant.TAP, mTapArray.length / 2);
+//                mTapPicker.setPickedIndexRelativeToRaw(tap);
+//                mTap = mTapArray[tap];
+//            }
+//        }, Constant.DELAY_REFRESH_TIME);
 //        mCountPicker.postDelayed(new Runnable() {
 //            @Override
 //            public void run() {
@@ -361,7 +361,8 @@ public class MeasureSetActivity extends BaseActivity {
         mStepArray = getResources().getStringArray(R.array.step_array);
         mTapArray = getResources().getStringArray(R.array.tap_array);
         mCountArray = getResources().getStringArray(R.array.jinhui_array);
-
+        mTap = mTapArray[0];
+        mCount = 1;
     }
 
     private void initDevice() {

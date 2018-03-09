@@ -227,7 +227,7 @@ public class MeasureActivity extends BaseActivity {
         ImageButton changeIb = (ImageButton) findViewById(R.id.measure_title_ib);
         changeIb.setOnClickListener(mListener);
 
-        ImageButton stopIb = (ImageButton)findViewById(R.id.stop_ib);
+        ImageButton stopIb = (ImageButton) findViewById(R.id.stop_ib);
         stopIb.setOnClickListener(mListener);
         ImageButton connectIb = (ImageButton) findViewById(R.id.connect_ib);
         connectIb.setOnClickListener(mListener);
@@ -669,7 +669,7 @@ public class MeasureActivity extends BaseActivity {
         mHandler.sendMessage(msg);
     }
 
-    private void initTestData(){
+    private void initTestData() {
         mSampleTv.setText("12.345");
     }
 }

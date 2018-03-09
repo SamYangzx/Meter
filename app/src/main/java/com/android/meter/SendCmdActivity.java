@@ -21,6 +21,7 @@ import android.widget.TextView;
 
 import com.android.meter.http.SocketConstant;
 import com.android.meter.http.SocketControl;
+import com.android.meter.util.Constant;
 import com.android.meter.util.FileUtil;
 import com.android.meter.util.LogUtil;
 import com.android.meter.util.ToastUtil;
@@ -536,7 +537,7 @@ public class SendCmdActivity extends BaseActivity implements ImageDataSource.OnI
         for (int i = 0; i < size; i++) {
             ImageFolder folder = mImageFolders.get(i);
             if (folder.checked) {
-                LogUtil.d(TAG, "choose folder: " + folder.path);
+                LogUtil.d(TAG, "-------send folder: " + folder.path + " begin");
                 String parent = FileUtil.getParentFolderPath(folder.path);
                 LogUtil.d(TAG, "parent folder: " + parent);
                 //发送文件夹下存储的命令
@@ -563,6 +564,7 @@ public class SendCmdActivity extends BaseActivity implements ImageDataSource.OnI
                 mFolderIndex = i;
                 LogUtil.d(TAG, "mFolderIndex: " + mFolderIndex);
                 sendChoosePhotos();
+                LogUtil.d(TAG, "-------send folder: " + folder.path + " end");
             }
         }
 
@@ -607,7 +609,9 @@ public class SendCmdActivity extends BaseActivity implements ImageDataSource.OnI
                             mSendBar.setVisibility(View.GONE);
                             ToastUtil.showToast(mContext, "所有照片发送完毕！");
                             updateBtn(true);
-                            deleteSelectedFolder(FileUtil.getParentFolderPath(FileUtil.getParentFolderPath(data)));
+                            if (!Constant.TOTAL_DEBUG) {
+                                deleteSelectedFolder(FileUtil.getParentFolderPath(FileUtil.getParentFolderPath(data)));
+                            }
                         }
                     });
 //                        mSendIndex = 0;
