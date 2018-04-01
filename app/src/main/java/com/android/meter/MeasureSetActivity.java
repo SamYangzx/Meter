@@ -427,7 +427,9 @@ public class MeasureSetActivity extends BaseActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 mSampleUnit = mUnitArrays[mUnitIndex][position];
-//                BluetoothHelper.getBluetoothHelper(mContext).sendHex(StringUtil.string2HexString(mUnitArrays[mUnitIndex][position]));
+//                BluetoothHelper.getBluetoothHelper(mContext).
+//
+// Hex(StringUtil.string2HexString(mUnitArrays[mUnitIndex][position]));
                 SharedPreferenceUtils.setParam(mContext, Constant.SAMPLE_UNIT, position);
             }
 

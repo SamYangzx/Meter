@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.android.meter"
-    android:versionCode="20103"
-    android:versionName="V2.01.03.camera">
+    android:versionCode="20104"
+    android:versionName="V2.01.04.0314">
 
     <uses-sdk android:minSdkVersion="14" />
 
