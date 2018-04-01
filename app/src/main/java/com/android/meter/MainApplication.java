@@ -15,7 +15,7 @@ public class MainApplication extends Application {
     private static final String TAG = MainApplication.class.getSimpleName();
 
     private static MainApplication sApp;
-//    private BluetoothHelper mBluetoothHelper;
+    private static boolean mIsModeA;
 
     @Override
     public void onCreate() {
@@ -30,15 +30,16 @@ public class MainApplication extends Application {
     }
 
     private void initData() {
-        //Donot need to init bt and wifi @{.
-//        String server = (String) SharedPreferenceUtils.getParam(sApp, SocketConstant.SAVE_IP, SocketConstant.DEFAULT_SERVER);
-//        int port = (int) SharedPreferenceUtils.getParam(sApp, SocketConstant.SAVE_PORT, SocketConstant.DEFAULT_PORT);
-//        SocketControl.getInstance().connect(server, port);
-//        String bt = (String) SharedPreferenceUtils.getParam(sApp, BtConstant.SAVE_BT_ADDRESS,"");
-//        BluetoothHelper.getBluetoothHelper(sApp).connect(bt);
-        //Donot need to init bt and wifi @}.
         SharedPreferenceUtils.setParam(this, Constant.SAME_PHOTO_FOLDER, false);
 
+    }
+
+    public boolean isModeA() {
+        return mIsModeA;
+    }
+
+    public void setModeA(boolean modeA) {
+        mIsModeA = modeA;
     }
 
 }

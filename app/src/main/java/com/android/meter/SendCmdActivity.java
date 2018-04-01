@@ -11,6 +11,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -597,6 +598,9 @@ public class SendCmdActivity extends BaseActivity implements ImageDataSource.OnI
     public void onResult(int state, final String data) {
         super.onResult(state, data);
         LogUtil.d(TAG, "state: " + state + " ,data: " + data);
+        if (TextUtils.isEmpty(data)) {
+            return;
+        }
 //        if (needToast)
         {
             if (data.startsWith(LogUtil.LOG_PATH)) { //发送的是文件名

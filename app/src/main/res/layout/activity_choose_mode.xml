@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_choose_mode"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.android.meter.ChooseModeActivity"
+    >
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/measure_set_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:background="@color/general_background_grey_color"
+        app:popupTheme="@style/ToolbarPopupTheme"
+        >
+
+        <TextView
+            android:id="@+id/customer_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="title"
+            android:textSize="20dp"
+            />
+    </android.support.v7.widget.Toolbar>
+
+
+    <TextView
+        android:id="@+id/measure_value_textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="100dp"
+        android:gravity="end"
+        android:paddingLeft="100dp"
+        android:paddingRight="100dp"
+        android:text="0"
+        android:textColor="@color/general_textview_color"
+        android:textSize="@dimen/measure_value_size"
+        />
+
+
+    <RelativeLayout
+        style="@style/RootLayoutStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        >
+
+        <Button
+            android:id="@+id/button_a"
+            style="@style/GeneralButtonBottomStyle"
+            android:layout_gravity="start"
+            android:text="A"
+            />
+
+        <Button
+            android:id="@+id/button_b"
+            style="@style/GeneralButtonBottomStyle"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_gravity="end"
+            android:text="B"
+            />
+    </RelativeLayout>
+
+</RelativeLayout>

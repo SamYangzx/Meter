@@ -84,7 +84,7 @@ public class BluetoothHelper {
     }
 
     public void enableBT() {
-        if (mAdapter != null) {
+        if (mAdapter != null && !mAdapter.isEnabled()) {
             mAdapter.enable();
         }
     }

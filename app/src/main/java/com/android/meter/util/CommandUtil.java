@@ -20,6 +20,7 @@ public class CommandUtil {
     public static final String CALIBRATE_CMD_CODE = "E1";
     public static final String CONFIRM_CAL_CMD_CODE = "E2";
     public static final String CHOOSE_CMD_CODE = "E3";
+    //
     public static final String UPLOCD_CMD_CODE = "E4";
     public static final String START_STOP_CMD_CODE = "E5";
     public static final String LOAD_CMD_CODE = "E6";

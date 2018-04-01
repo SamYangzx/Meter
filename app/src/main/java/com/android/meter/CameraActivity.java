@@ -153,11 +153,6 @@ public class CameraActivity extends BaseActivity implements
     @Override
     protected void onStart() {
         initView();
-        String server = (String) SharedPreferenceUtils.getParam(mContext, SocketConstant.SAVE_IP, SocketConstant.DEFAULT_SERVER);
-        int port = (int) SharedPreferenceUtils.getParam(mContext, SocketConstant.SAVE_PORT, SocketConstant.DEFAULT_PORT);
-        SocketControl.getInstance().connect(server, port);
-        String bt = (String) SharedPreferenceUtils.getParam(mContext, BtConstant.SAVE_BT_ADDRESS, "");
-        BluetoothHelper.getBluetoothHelper(mContext).connect(bt);
         super.onStart();
         mSameFolder = (boolean) SharedPreferenceUtils.getParam(this, Constant.SAME_PHOTO_FOLDER, false);
         LogUtil.d(TAG, "onStart.mSameFolder: " + mSameFolder);

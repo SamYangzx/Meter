@@ -243,7 +243,9 @@ public class StringUtil {
 
     /*******String, byte ,hex transform end************************************************/
 
-    /********array merger***********************/
+    /********
+     * array merger
+     ***********************/
     public static byte[] byteMerger(byte[] byte_1, byte[] byte_2) {
         byte[] byte_3 = new byte[byte_1.length + byte_2.length];
         System.arraycopy(byte_1, 0, byte_3, 0, byte_1.length);
@@ -285,14 +287,26 @@ public class StringUtil {
 
     public static String getStrWithoutFront0(String string) {
         String newStr = string.replaceFirst("^0*", "");
-        if(newStr== null || newStr.length() <1){
+        if (newStr == null || newStr.length() < 1) {
             return newStr;
         }
-        if(newStr.charAt(0) == '.'){
-            newStr = "0" +newStr;
+        if (newStr.charAt(0) == '.') {
+            newStr = "0" + newStr;
         }
         return newStr;
     }
 
+    /**
+     * Don't show empty unit.
+     *
+     * @param unit
+     * @return
+     */
+    public static String getFormatUnit(String unit) {
+        if (TextUtils.isEmpty(unit)) {
+            return "";
+        }
+        return "(" + unit + ")";
+    }
 
 }

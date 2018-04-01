@@ -45,7 +45,6 @@ import static com.android.meter.util.CommandUtil.getUnitData;
 
 public class MeasureSetActivity extends BaseActivity {
     private static final String TAG = LogUtil.COMMON_TAG + MeasureSetActivity.class.getSimpleName();
-    private static final int REQUEST_CONNECT_DEVICE = 1;
     public static final String EXTRA_PHOTO = "photo";
 
     private final static String mUnitArrays[][] = {
@@ -84,13 +83,8 @@ public class MeasureSetActivity extends BaseActivity {
     private Spinner mSampleUnitSp;
     private ArrayAdapter<String> mSampleAdapter;
 
-    //    private ActionBar mActionBar;
-    private Toolbar mToolbar;
-    private TextView mCustomerTitle;
-
     private String mPhotoName;
 
-    private NetworkDialog mNetworkDialog;
     private boolean firstStart = true;
 
     private int mTotalUnitIndex = 0;
@@ -100,86 +94,6 @@ public class MeasureSetActivity extends BaseActivity {
     private String mTap;
     private float mStep;
     private int mCount;
-    private Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            LogUtil.d(TAG, "msg: " + msg.what);
-            switch (msg.what) {
-                case BtConstant.MESSAGE_STATE_CHANGE:
-                    Log.i(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
-                    switch (msg.arg1) {
-                        case BluetoothHelper.STATE_CONNECTED:
-//                            setTitles("BT connected");
-//                            ToastUtil.showToast(mContext, "BT connected");
-                            updateBtTitle(getString(R.string.title_bt_connected));
-                            break;
-                        case BluetoothHelper.STATE_CONNECTING:
-//                            setTitles(R.string.title_bt_connecting);
-                            updateBtTitle(getString(R.string.title_bt_connecting));
-//                            ToastUtil.showToast(mContext, R.string.title_bt_connecting);
-                            break;
-                        case BluetoothHelper.STATE_LISTEN:
-                        case BluetoothHelper.STATE_NONE:
-                            updateBtTitle(getString(R.string.title_not_bt_connected));
-//                            setTitles(R.string.title_not_bt_connected);
-//                            ToastUtil.showToast(mContext, R.string.title_not_bt_connected);
-                            break;
-                        default:
-                            break;
-                    }
-                    break;
-                case BtConstant.MESSAGE_WRITE:
-                    byte[] writeBuf = (byte[]) msg.obj;
-                    // construct a string from the buffer
-                    String writeMessage = StringUtil.bytes2HexString(writeBuf);
-//                    mConversationArrayAdapter.add("Me:  " + writeMessage);
-                    ToastUtil.showToast(mContext, "sendString : " + writeMessage, ToastUtil.DEBUG);
-                    break;
-                case BtConstant.MESSAGE_RECEIVE_SUCCESS:
-                    byte[] readBuf = (byte[]) msg.obj;
-                    String readMessage = StringUtil.bytes2HexString(readBuf);
-                    ToastUtil.showToast(mContext, "Receive: " + readMessage, ToastUtil.DEBUG);
-                    break;
-                case BtConstant.MESSAGE_DEVICE_NAME:
-                    // save the connected device's name
-//                    mConnectedDeviceName = msg.getData().getString(DEVICE_NAME);
-//                    Toast.makeText(getApplicationContext(), "Connected to "
-//                            + mConnectedDeviceName, Toast.LENGTH_SHORT).show();
-                    break;
-                case BtConstant.MESSAGE_TOAST:
-                    Toast.makeText(getApplicationContext(), msg.getData().getString(TOAST),
-                            Toast.LENGTH_SHORT).show();
-                    break;
-                case SocketConstant.CONNECT_SUCCESS:
-//                    ToastUtil.showToast(mContext, "Socket connect success");
-                    updateWifiTitle(getString(R.string.title_wifi_connected));
-                    if (mNetworkDialog != null) {
-                        mNetworkDialog.dismiss();
-                    }
-                    break;
-                case SocketConstant.CONNECTING:
-                    updateWifiTitle(getString(R.string.title_wifi_connecting));
-                    break;
-                case SocketConstant.CONNECT_FAIL:
-//                    ToastUtil.showToast(mContext, "Socket connect fail");
-                    updateWifiTitle(getString(R.string.title_wifi_not_connected));
-                    break;
-                case SocketConstant.RECEIVE_CHECK_FAILED:
-                    ToastUtil.showToast(mContext, "电脑端未回复!");
-                    break;
-                case SocketConstant.COMPUTER_NOT_RESPONSE:
-                    ToastUtil.showToast(mContext, "上一条指令还未处理完，请等待！");
-                    break;
-                case SocketConstant.SEND_FAIL:
-                    ToastUtil.showToast(mContext, "Socket send msg fail!!");
-                    break;
-                default:
-                    ToastUtil.showToast(mContext, "接收到反馈：" + msg.what);
-                    break;
-
-            }
-        }
-    };
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -190,6 +104,7 @@ public class MeasureSetActivity extends BaseActivity {
 //        }
         setContentView(R.layout.activity_measure_set);
         mContext = this;
+        initTitle();
         initData();
         initView();
 
@@ -225,7 +140,6 @@ public class MeasureSetActivity extends BaseActivity {
     @Override
     protected void onStart() {
         LogUtil.v(TAG, "onStart");
-        initDevice();
         if (firstStart) {
             firstStart = false;
 //            if (!TextUtils.isEmpty(mPhotoName)) {
@@ -263,32 +177,6 @@ public class MeasureSetActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
-            case R.id.bluetooth_settings:
-//                ToastUtil.showToast(mContext, R.string.bluetooth);
-                Intent serverIntent = new Intent(mContext, DeviceListActivity.class);
-                startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE);
-
-                return true;
-            case R.id.ip_settings:
-                if (mNetworkDialog == null) {
-                    mNetworkDialog = new NetworkDialog(mContext);
-                }
-                mNetworkDialog.setYesOnclickListener(new NetworkDialog.onEnterclickListener() {
-                    @Override
-                    public void onYesClick() {
-//                        ToastUtil.showToast(mContext, "connect...");
-                        connectServer(mNetworkDialog.getServer(), mNetworkDialog.getIp());
-
-                    }
-                });
-                mNetworkDialog.setNoOnclickListener(new NetworkDialog.onCancelclickListener() {
-                    @Override
-                    public void onNoClick() {
-                        mNetworkDialog.cancel();
-                    }
-                });
-                mNetworkDialog.show();
-                return true;
             case R.id.unit_settings:
                 getUnitDialog().show();
                 return true;
@@ -351,8 +239,6 @@ public class MeasureSetActivity extends BaseActivity {
 //        BluetoothHelper.getBluetoothHelper(mContext).setmHandler(null);
 //        BluetoothHelper.getBluetoothHelper(mContext).setIMsgListener(null);
 //        SocketControl.getInstance().setListener(null);
-        mHandler.removeCallbacksAndMessages(null);
-        mHandler = null;
         super.onDestroy();
     }
 
@@ -363,20 +249,6 @@ public class MeasureSetActivity extends BaseActivity {
         mCountArray = getResources().getStringArray(R.array.jinhui_array);
         mTap = mTapArray[0];
         mCount = 1;
-    }
-
-    private void initDevice() {
-        BluetoothHelper.getBluetoothHelper(mContext).enableBT();
-        BluetoothHelper.getBluetoothHelper(mContext).setmHandler(mHandler);
-
-        SocketControl.getInstance().setListener(this);
-//        String server = (String) SharedPreferenceUtils.getParam(mContext, SocketConstant.SAVE_IP, SocketConstant.DEFAULT_SERVER);
-//        int port = (int) SharedPreferenceUtils.getParam(mContext, SocketConstant.SAVE_PORT, SocketConstant.DEFAULT_PORT);
-//        SocketControl.getInstance().connect(server, port);
-//        SocketControl.getInstance().sendFile(FileUtil.getPicDateFolder() + File.separator + mPhotoName);
-
-//        String btAddress = (String) SharedPreferenceUtils.getParam(mContext, BtConstant.SAVE_BT_ADDRESS, "");
-//        BluetoothHelper.getBluetoothHelper(mContext).connect(btAddress);
     }
 
     private void initViewData() {
@@ -400,12 +272,14 @@ public class MeasureSetActivity extends BaseActivity {
         }, Constant.DELAY_REFRESH_TIME);
     }
 
-    private void initView() {
-        mToolbar = (Toolbar) findViewById(R.id.measure_set_toolbar);
-        mCustomerTitle = (TextView) findViewById(R.id.customer_title);
-        setTitleTv(mCustomerTitle);
-        setSupportActionBar(mToolbar);
+    private void initTitle() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.measure_set_toolbar);
+        TextView customerTitle = (TextView) findViewById(R.id.customer_title);
+        setTitleTv(customerTitle);
+        setSupportActionBar(toolbar);
+    }
 
+    private void initView() {
         mMeasureUnitSp = (Spinner) findViewById(R.id.measure_unit_spinner);
         mMeasureUnitSp.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -501,22 +375,9 @@ public class MeasureSetActivity extends BaseActivity {
                         BluetoothHelper.getBluetoothHelper(mContext).setmHandler(mHandler);
                         BluetoothHelper.getBluetoothHelper(mContext).connect(device);
                         SharedPreferenceUtils.setParam(mContext, BtConstant.SAVE_BT_ADDRESS, device.getAddress());
-//                    BluetoothHelper.getBluetoothHelper(mContext).setIMsgListener(mIBtMsgListener);
                     }
                 }
                 break;
-//            case REQUEST_ENABLE_BT:
-//                // When the request to enable Bluetooth returns
-//                if (resultCode == Activity.RESULT_OK) {
-//                    // Bluetooth is now enabled, so set up a chat session
-//                    setupChat();
-//                } else {
-//                    // User did not enable Bluetooth or an error occured
-//                    Log.d(TAG, "BT not enabled");
-//                    Toast.makeText(this, R.string.bt_not_enabled_leaving, Toast.LENGTH_SHORT).show();
-//                    finish();
-//                }
-//                break;
             default:
                 break;
         }
@@ -550,9 +411,6 @@ public class MeasureSetActivity extends BaseActivity {
             }
         }
     };
-
-
-    private AlertDialog mUnitDialog;
 
     private AlertDialog getUnitDialog() {
         if (mUnitDialog == null) {
@@ -618,18 +476,14 @@ public class MeasureSetActivity extends BaseActivity {
         LogUtil.d(TAG, "origin String: " + s + "cmdString: " + CommandUtil.getSocketDataCmd(s));
     }
 
-    private void connectServer(String server, int port) {
-        SharedPreferenceUtils.setParam(mContext, SAVE_IP, server);
-        SharedPreferenceUtils.setParam(mContext, SAVE_PORT, port);
-        SocketControl.getInstance().connect(server, port);
-    }
-
     private void sendTest(String data) {
         SocketControl.getInstance().sendMsg(data);
     }
 
 
-    /*****This is for test**/
+    /*****
+     * This is for test
+     **/
 //    private IMsgListener mIBtMsgListener = new IMsgListener() {
 //        @Override
 //        public void received(int state, final String msg) {
@@ -637,11 +491,4 @@ public class MeasureSetActivity extends BaseActivity {
 //        }
 //    };
 
-    @Override
-    public void onResult(int state, String data) {
-        super.onResult(state, data);
-        if (mHandler != null) {
-            mHandler.sendEmptyMessage(state);
-        }
-    }
 }

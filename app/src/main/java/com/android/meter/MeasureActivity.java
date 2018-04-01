@@ -95,86 +95,6 @@ public class MeasureActivity extends BaseActivity {
     private boolean mNeedOffset = true;
     private int mInitRow = 0;
 
-    private Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-//            LogUtil.d(TAG, "msg: " + msg.what)
-            String data;
-            switch (msg.what) {
-                case BtConstant.MESSAGE_STATE_CHANGE:
-                    Log.i(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
-                    switch (msg.arg1) {
-                        case BluetoothHelper.STATE_CONNECTED:
-//                            ToastUtil.showToast(mContext, "bluetooth connected");
-//                            mDeviceStateTv.setText("Connected");
-                            updateBtTitle(getString(R.string.title_bt_connected));
-                            break;
-                        case BluetoothHelper.STATE_CONNECTING:
-//                            mDeviceStateTv.setText(R.string.title_bt_connecting);
-//                            ToastUtil.showToast(mContext, R.string.title_bt_connecting);
-                            updateBtTitle(getString(R.string.title_bt_connecting));
-                            break;
-                        case BluetoothHelper.STATE_LISTEN:
-                        case BluetoothHelper.STATE_NONE:
-//                            mDeviceStateTv.setText(R.string.title_not_bt_connected);
-//                            ToastUtil.showToast(mContext, R.string.title_not_bt_connected);
-                            updateBtTitle(getString(R.string.title_not_bt_connected));
-                            break;
-                    }
-                    break;
-                case BtConstant.MESSAGE_WRITE:
-                    byte[] writeBuf = (byte[]) msg.obj;
-                    // construct a string from the buffer
-                    String writeMessage = StringUtil.bytes2HexString(writeBuf);
-//                    mConversationArrayAdapter.add("Me:  " + writeMessage);
-                    ToastUtil.showToast(mContext, "BT sendString: " + writeMessage, ToastUtil.DEBUG);
-                    break;
-                case BtConstant.MESSAGE_RECEIVE_SUCCESS:
-//                    BluetoothHelper.getBluetoothHelper(mContext).sendHex(CommandUtil.CHECKSUM_SUCCESS_HEXCMD);
-                    byte[] readBuf = (byte[]) msg.obj;
-                    String readMessage = StringUtil.bytes2HexString(readBuf);
-//                    mSampleTv.setText(readMessage);
-                    ToastUtil.showToast(mContext, "BT receive: " + readMessage, ToastUtil.DEBUG);
-                    handlerCmd(readMessage);
-                    break;
-                case BtConstant.MESSAGE_RECEIVE_FAILED:
-                    BluetoothHelper.getBluetoothHelper(mContext).sendHex(CommandUtil.CHECKSUM_FAILED_HEXCMD);
-                    break;
-                case BtConstant.MESSAGE_DEVICE_NAME:
-                    break;
-                case BtConstant.MESSAGE_TOAST:
-                    Toast.makeText(getApplicationContext(), msg.getData().getString(TOAST),
-                            Toast.LENGTH_SHORT).show();
-                    break;
-                case SocketConstant.SEND_FAIL:
-                    ToastUtil.showToast(mContext, "Socket发送数据失败，请检查网络连接是否正常!");
-                    break;
-                case SocketConstant.RECEIVE_SUCCESS:
-                    data = (String) msg.obj;
-                    handlerCmd(data);
-                    break;
-                case SocketConstant.RECEIVE_CHECK_FAILED:
-                    ToastUtil.showToast(mContext, "电脑端未回复!");
-                    break;
-                case SocketConstant.COMPUTER_NOT_RESPONSE:
-                    ToastUtil.showToast(mContext, "上一条指令还未处理完，请等待！");
-                    break;
-                case SocketConstant.CONNECT_SUCCESS:
-                    updateWifiTitle(getString(R.string.title_wifi_connected));
-                    break;
-                case SocketConstant.CONNECTING:
-                    updateWifiTitle(getString(R.string.title_wifi_connecting));
-                    break;
-                case SocketConstant.CONNECT_FAIL:
-                    updateWifiTitle(getString(R.string.title_wifi_not_connected));
-                    break;
-                default:
-                    break;
-            }
-        }
-    };
-
-
     private TextView mTitleTv;
 
     @SuppressLint("NewApi")
@@ -216,7 +136,6 @@ public class MeasureActivity extends BaseActivity {
     protected void onDestroy() {
         LogUtil.d(TAG, "onDestroy is invoked.");
         super.onDestroy();
-//        BluetoothHelper.getBluetoothHelper(mContext).setmHandler(null);
     }
 
     private void initTitle() {
@@ -235,10 +154,6 @@ public class MeasureActivity extends BaseActivity {
 
 
     private void initData() {
-        BluetoothHelper.getBluetoothHelper(mContext).setmHandler(mHandler);
-        SocketControl.getInstance().setListener(this);
-        updateWifiTitle(SocketControl.getInstance().isConneced());
-
 //        mMeasurePointArray = getResources().getStringArray(R.array.speed_array);
         //mTimesArray = getResources().getStringArray(R.array.check_array);
         mTimesArray = new String[mTotalTimes + 1];
@@ -317,7 +232,7 @@ public class MeasureActivity extends BaseActivity {
         mEnterBtn.setOnClickListener(mListener);
         mCalcelBtn.setOnClickListener(mListener);
         mUnitTv = (TextView) findViewById(R.id.unit_tv_measure);
-        mUnitTv.setText(getFormatUnit(mSampleUnit));
+        mUnitTv.setText(StringUtil.getFormatUnit(mSampleUnit));
         mSampleTv = (TextView) findViewById(R.id.measure_value_textView);
         mLoadSpeedTv = (TextView) findViewById(R.id.load_speed_tv);
     }
@@ -569,19 +484,6 @@ public class MeasureActivity extends BaseActivity {
 //    }
 
     /**
-     * Don't show empty unit.
-     *
-     * @param unit
-     * @return
-     */
-    private String getFormatUnit(String unit) {
-        if (TextUtils.isEmpty(unit)) {
-            return "";
-        }
-        return "(" + unit + ")";
-    }
-
-    /**
      * msg origin string data.
      * changeMode if need change send method BT or http, this will be true.
      */
@@ -622,52 +524,17 @@ public class MeasureActivity extends BaseActivity {
     }
 
 
-    public void handlerCmd(String hexCmd) {
-        LogUtil.d(TAG, "handlerCmd: " + hexCmd);
-        byte[] length = StringUtil.hexString2Bytes(hexCmd.substring(2, 4));
-        int cmdLength = StringUtil.bytes2int(length);
-        String cmdType = hexCmd.substring(4, 6);
-        String content = "";
-        /**
-         * 0123456789
-         * AA12E4016368616E656C3120303030302E304EBBCC
-         *
-         */
-        if (6 + cmdLength * 2 <= hexCmd.length()) {
-            content = hexCmd.substring(6, 6 + cmdLength * 2 - 4);
-        } else {
-            LogUtil.d(TAG, "cmd length is error");
-            ToastUtil.showToast(mContext, "cmd length is error!");
-        }
-        LogUtil.d(TAG, "cmdLength: " + cmdLength + " ,cmdType: " + cmdType + " , content hex: " + content + " ,origin: " + StringUtil.hex2String(content));
-        switch (cmdType) {
-            case UPLOCD_CMD_CODE:
-                String sampleValue = "";
-                if (content.length() >= (cmdLength - 2) * 2) {
-                    sampleValue = content.substring(18);
-                    int divideIndex = StringUtil.getValueUnitIndex(sampleValue);
-                    String s = StringUtil.getStrWithoutFront0(StringUtil.hex2String(sampleValue.substring(0, divideIndex)));
-                    LogUtil.d(TAG, "without more 0: " + s);
-                    mSampleTv.setText(s);
-//                    mUnitTv.setText(getFormatUnit(StringUtil.hex2String(sampleValue.substring(divideIndex))));
-                }
-                break;
-            default:
-                break;
-        }
+    @Override
+    public void handleReceiveData(String sampleValue) {
+        super.handleReceiveData(sampleValue);
+        int divideIndex = StringUtil.getValueUnitIndex(sampleValue);
+        String s = StringUtil.getStrWithoutFront0(StringUtil.hex2String(sampleValue.substring(0, divideIndex)));
+        LogUtil.d(TAG, "without more 0: " + s);
+        mSampleTv.setText(s);
+
     }
 
     private ArrayList<ArrayList<String>> mRecordList = new ArrayList<ArrayList<String>>();
-
-
-    @Override
-    public void onResult(int state, String data) {
-        super.onResult(state, data);
-        Message msg = new Message();
-        msg.what = state;
-        msg.obj = data;
-        mHandler.sendMessage(msg);
-    }
 
     private void initTestData() {
         mSampleTv.setText("12.345");

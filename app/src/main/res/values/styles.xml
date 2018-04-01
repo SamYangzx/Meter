@@ -28,17 +28,15 @@
     </style>
 
     <style name="GeneralButtonBottomStyle">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_weight">1</item>
+        <item name="android:layout_width">@dimen/measure_button_width</item>
+        <item name="android:layout_height">@dimen/measure_button_width</item>
         <item name="android:gravity">center</item>
+        <item name="android:background">@drawable/green_circle</item>
+        <item name="android:textColor">@color/general_textview_color</item>
     </style>
 
     <style name="MeasureButtonBottomStyle" parent="@style/GeneralButtonBottomStyle">
-        <item name="android:layout_width">@dimen/measure_button_width</item>
-        <item name="android:layout_height">@dimen/measure_button_width</item>
-        <item name="android:background">@drawable/green_circle</item>
-        <item name="android:textColor">@color/general_textview_color</item>
+        <item name="android:layout_weight">1</item>
     </style>
 
     <style name="GeneralVerticalLayoutStyle">
@@ -75,4 +73,12 @@
     <style name="ChoosePhotoButtonStyle" parent="@style/android:Theme.Holo.Light">
         <item name="android:colorBackground">@color/toolbar_popup_background_color</item>
     </style>
+
+    <style name="RootLayoutStyle">
+        <item name="android:paddingBottom">@dimen/activity_vertical_margin</item>
+        <item name="android:paddingLeft">@dimen/activity_horizontal_margin</item>
+        <item name="android:paddingRight">@dimen/activity_horizontal_margin</item>
+        <item name="android:paddingTop">@dimen/activity_vertical_margin</item>
+    </style>
+
 </resources>
