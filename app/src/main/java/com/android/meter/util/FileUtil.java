@@ -12,7 +12,7 @@ import static java.io.File.separatorChar;
 
 public class FileUtil {
     private static final String TAG = FileUtil.class.getSimpleName();
-    private static final String PACKAGE_FOLDER = LogUtil.LOG_FOLDER;
+    private static String PACKAGE_FOLDER = LogUtil.LOG_FOLDER;
     private static final String PIC_FOLDER = "PicFolder";
     private static final String PIC_SUFFIX = ".jpg";
     private static final String EXCEL_NAME = "measure.xls";
@@ -21,9 +21,14 @@ public class FileUtil {
     public static final String FILE_END = "end";
     public static final String TOTAL_FILE_END = "sendend";
     //修改下面的值时要修改ImageDataSource中的FOLDER_PATH 值。
-    public static final String FOLDER_PATH = Environment.getExternalStorageDirectory() + File.separator + PACKAGE_FOLDER;
+    public static String FOLDER_PATH = Environment.getExternalStorageDirectory() + File.separator + PACKAGE_FOLDER;
 
     public static int FILE_INDEX = 1;
+
+    public static void setFolder(String packageFolder){
+        PACKAGE_FOLDER = packageFolder;
+        FOLDER_PATH = Environment.getExternalStorageDirectory() + File.separator + PACKAGE_FOLDER;
+    }
 
     public static String getDefaultDateFolder() {
         return FOLDER_PATH + File.separator + TimeUtil.getDateYearMonthDay();

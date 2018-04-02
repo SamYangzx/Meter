@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Meter2.0</string>
+    <string name="app_name">Meter3.0</string>
     <string name="sample_unit">Sample unit</string>
     <string name="meter_unit">Meter unit</string>
     <string name="start">Start</string>
@@ -36,7 +36,6 @@
 
 
     <!--bluetooth begin-->
-    <string name="send">发送</string>
     <string name="not_connected">你没有连接一个设备</string>
     <string name="bt_not_enabled_leaving">蓝牙没有打开</string>
     <string name="title_bt_connecting">蓝牙连接中...</string>
@@ -87,6 +86,11 @@
     <string name="exit_confirm">Exit?</string>
     <string name="save_calibrate">Save</string>
     <string name="measure_end">This measure end</string>
+
+    <!--ChoosePhotoActivity begin-->
+    <string name="send">Send</string>
+    <string name="next">Next</string>
+    <!--ChoosePhotoActivity end-->
 
 
 </resources>

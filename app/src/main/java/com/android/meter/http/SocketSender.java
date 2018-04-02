@@ -1,5 +1,6 @@
 package com.android.meter.http;
 
+import com.android.meter.util.CommandUtil;
 import com.android.meter.util.Constant;
 import com.android.meter.util.FileUtil;
 import com.android.meter.util.LogUtil;
@@ -33,7 +34,6 @@ public class SocketSender extends Thread {
     //    private DataOutputStream mOutStream;
 //    private BufferedWriter mOutStream;
     private OutputStream mOutStream;   //优先使用此输出流
-    private int mFileCount = 0;
     private int mFileIndex = 0;
     private String mCurrentCmd;
 
@@ -69,8 +69,12 @@ public class SocketSender extends Thread {
                     LogUtil.d(TAG, "Socket id closed!");
                     break;
                 }
-//                    mOutStream.write(mCurrentCmd);
-//                    mOutStream.newLine();
+                //一次发送所有指令结束
+                if(CommandUtil.CMD_END_FLAG.equals(mCurrentCmd)){
+                    mIHttpListener.onResult(SocketConstant.SEND_ALL_SUCCESS, mCurrentCmd);
+                    continue;
+                }
+
                 if (FileUtil.isFile(mCurrentCmd)) {
                     //休眠0.1s，以便有足够时间添加后面的文件名。
                     try {
@@ -100,6 +104,7 @@ public class SocketSender extends Thread {
                 LogUtil.sendCmdResult(TAG, mCurrentCmd, true);
                 if (mIHttpListener != null) {
                     if (FileUtil.isFile(mCurrentCmd)) {
+                        //最后一个文件时才会返回success
                         if (mIsLatestFile) {
                             mIHttpListener.onResult(SocketConstant.SEND_SUCCESS, mCurrentCmd);
                         }
@@ -153,10 +158,6 @@ public class SocketSender extends Thread {
             mIHttpListener.onResult(SocketConstant.SEND_FAIL, hexOrFile);
             LogUtil.sendCmdResult(TAG, hexOrFile, false);
         }
-    }
-
-    public void setFileCount(int count) {
-        mFileCount = count;
     }
 
     /**
@@ -226,7 +227,6 @@ public class SocketSender extends Thread {
     }
 
     private void resetData() {
-        mFileCount = 0;
         mFileIndex = 0;
     }
 

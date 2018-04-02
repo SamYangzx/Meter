@@ -15,7 +15,9 @@ public class CommandUtil {
     public static final String PLATFORM_PRE_CODE = "BB";
 
     public static final String END_CODE = "CC";
-    /********* cmdCode begin*********************/
+    /*********
+     * cmdCode begin
+     *********************/
     public static final String RESET_CMD_CODE = "E0";
     public static final String CALIBRATE_CMD_CODE = "E1";
     public static final String CONFIRM_CAL_CMD_CODE = "E2";
@@ -25,9 +27,13 @@ public class CommandUtil {
     public static final String START_STOP_CMD_CODE = "E5";
     public static final String LOAD_CMD_CODE = "E6";
     public static final String SAVE_CALIBRATE_CMD_CODE = "E7";
-    /********next code is for socket ***********************/
+    /********
+     * next code is for socket
+     ***********************/
     public static final String Socket_DATA_CMD_CODE = "EF";
-    /********************** cmdCode end*******************/
+    /**********************
+     * cmdCode end
+     *******************/
     public static final String RESPONSE_CMD_CODE = "FF";
 
 
@@ -38,11 +44,15 @@ public class CommandUtil {
     public static final String BT_HEX_SEPERATOR = "0A";
     public static final String SEPERATOR = "_";
 
-    /***constant cmd begin*/
+    //constant cmd begin
     public static final String START_CLOLLECT_HEXCMD = "BB03E500CC";
     public static final String END_CLOLLECT_HEXCMD = "BB03E501CC";
     public static final String CHECKSUM_FAILED_HEXCMD = "BB02FFFDCC";
-    /***constant cmd end*/
+    //mode a,b
+    public static final String MODE_A = "CHANGEMODE_01";
+    public static final String MODE_B = "CHANGEMODE_02";
+    public static final String CMD_END_FLAG = "CCENDEND"; //use to mask the latest cmd
+    //constant cmd end
 
     public static final String TEST_HEX_CMD = "AA05E4414243BBCC";
 
@@ -161,7 +171,7 @@ public class CommandUtil {
         return getCmdHex(PLATFORM_PRE_CODE, START_STOP_CMD_CODE, "00", true);
     }
 
-    public static String getSaveCalibrateCmd(){
+    public static String getSaveCalibrateCmd() {
         return getCmdHex(PLATFORM_PRE_CODE, SAVE_CALIBRATE_CMD_CODE, null, true);
     }
 
@@ -195,7 +205,7 @@ public class CommandUtil {
      */
     public static String getValueData(String tap, int sum, int count, String measure, String sample) {
         if (tap == null || measure == null || sample == null) {
-            LogUtil.e(TAG, "getValueData.tap: " + tap +" , measure: " + measure + " ,sample: " + sample);
+            LogUtil.e(TAG, "getValueData.tap: " + tap + " , measure: " + measure + " ,sample: " + sample);
             return "";
         }
         StringBuilder sb = new StringBuilder();

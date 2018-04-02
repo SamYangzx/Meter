@@ -19,7 +19,6 @@ public class MainApplication extends Application {
 
     @Override
     public void onCreate() {
-        LogUtil.v(TAG, "MainApplication.onCreate");
         super.onCreate();
         sApp = this;
         initData();

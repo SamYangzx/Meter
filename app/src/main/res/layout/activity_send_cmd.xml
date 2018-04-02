@@ -99,6 +99,13 @@
                 android:text="删除" />
 
             <Button
+                android:id="@+id/fast_send_btn"
+                style="@style/MeasureButtonBottomStyle"
+                android:layout_centerInParent="true"
+                android:visibility="visible"
+                android:text="快传" />
+
+            <Button
                 android:id="@+id/send_btn"
                 style="@style/MeasureButtonBottomStyle"
                 android:layout_alignParentRight="true"

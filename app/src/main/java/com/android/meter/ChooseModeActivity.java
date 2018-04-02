@@ -9,7 +9,11 @@ import android.content.Intent;
 import android.widget.TextView;
 import android.widget.Button;
 
+import com.android.meter.util.CommandUtil;
+import com.android.meter.util.FileUtil;
+import com.android.meter.util.LogUtil;
 import com.android.meter.util.StringUtil;
+import com.lzy.imagepicker.util.FlagUtils;
 
 public class ChooseModeActivity extends BaseActivity {
     private static final String TAG = ChooseModeActivity.class.getSimpleName();
@@ -38,6 +42,12 @@ public class ChooseModeActivity extends BaseActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.measure_settings_menu, menu);
         return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+//        super.onBackPressed();
+        AtyContainer.getInstance().finishAllActivity();
     }
 
     private void initTitle() {
@@ -75,6 +85,14 @@ public class ChooseModeActivity extends BaseActivity {
 
     private void chooseModeA(boolean modeA) {
         ((MainApplication) getApplication()).setModeA(modeA);
+        FlagUtils.setModeA(modeA);
+        LogUtil.setLogFolder(FlagUtils.getFolderPath());
+        FileUtil.setFolder(LogUtil.LOG_FOLDER);
+        if (FlagUtils.iSModeA()) {
+            sendCmd(CommandUtil.getSocketDataCmd(CommandUtil.MODE_A), true, true);
+        } else {
+            sendCmd(CommandUtil.getSocketDataCmd(CommandUtil.MODE_B), true, true);
+        }
         Intent intent = new Intent();
         intent.setClass(ChooseModeActivity.this, CameraActivity.class);
         startActivity(intent);

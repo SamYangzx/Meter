@@ -106,6 +106,7 @@
                 android:visibility="gone"
                 android:text="跳过" />
 
+            <!--模式A是发送，模式B是下一步-->
             <Button
                 android:id="@+id/next_btn"
                 style="@style/MeasureButtonBottomStyle"

@@ -1,5 +1,6 @@
 package com.android.meter.util;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import java.io.File;
@@ -19,11 +20,10 @@ public class LogUtil {
     public static final String COMMON_TAG = "fenghe/";
 
     //修改下面的文件夹时要注意同时修改ImageDataSource中文件路径。
-    public static final String LOG_FOLDER = "Meter2";
-    public static final String LOG_PATH = android.os.Environment.getExternalStorageDirectory()
-            .getAbsolutePath() + File.separator + LOG_FOLDER;
-    private static final String LOG_FILE = android.os.Environment.getExternalStorageDirectory()
-            .getAbsolutePath() + File.separator + LOG_FOLDER + File.separator + "log.txt";
+    public static String LOG_FOLDER;
+    public static String LOG_PATH;
+    private static String LOG_FILE;
+    private static final String LOG_FILE_NAME = "log.txt";
     public static final String CMD_FILE_NAME = "cmd.txt";
 
     private static final boolean LOG_TO_FILE = true;
@@ -38,6 +38,16 @@ public class LogUtil {
 
     private static final int LOG_LEVEL = LOG_VERBOSE;
 
+    /**
+     *
+     * @param path folder's name, not path
+     */
+    public static void setLogFolder(String path) {
+        LOG_FOLDER = path;
+        LOG_PATH = android.os.Environment.getExternalStorageDirectory()
+                .getAbsolutePath() + File.separator + LOG_FOLDER;
+        LOG_FILE = LOG_PATH + File.separator + LOG_FILE_NAME;
+    }
 
     public static void v(String tag, String msg) {
         v(tag, msg, null);
@@ -185,6 +195,9 @@ public class LogUtil {
      * @return
      **/
     private static void logtoFile(String mylogtype, String tag, String text, Throwable tr) {
+        if(TextUtils.isEmpty(LOG_PATH)){
+            return;
+        }
         Date nowtime = new Date();
         SimpleDateFormat myLogSdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         StringBuilder logText = new StringBuilder();

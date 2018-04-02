@@ -22,6 +22,7 @@ import android.widget.TextView;
 
 import com.android.meter.http.SocketConstant;
 import com.android.meter.http.SocketControl;
+import com.android.meter.util.CommandUtil;
 import com.android.meter.util.Constant;
 import com.android.meter.util.FileUtil;
 import com.android.meter.util.LogUtil;
@@ -66,8 +67,8 @@ public class SendCmdActivity extends BaseActivity implements ImageDataSource.OnI
 
     private boolean isOrigin = false;  //是否选中原图
     private View mFooterBar;     //底部栏
-    private Button mBtnOk;       //确定按钮
-    private Button mDeleteBtn, mSendBtn;
+    private Button mBtnOk;       //确定按钮,不用管
+    private Button mDeleteBtn, mSendBtn, mFastSendBtn;
     private View mllDir; //文件夹切换按钮
     private TextView mtvDir; //显示当前文件夹
     private TextView mBtnPre;      //预览按钮
@@ -154,6 +155,8 @@ public class SendCmdActivity extends BaseActivity implements ImageDataSource.OnI
     private void initView() {
         mDeleteBtn = (Button) findViewById(R.id.delete_btn);
         mDeleteBtn.setOnClickListener(this);
+        mFastSendBtn = (Button) findViewById(R.id.fast_send_btn);
+        mFastSendBtn.setOnClickListener(this);
         mSendBtn = (Button) findViewById(R.id.send_btn);
         mSendBtn.setOnClickListener(this);
         updateBtn(false);
@@ -255,11 +258,13 @@ public class SendCmdActivity extends BaseActivity implements ImageDataSource.OnI
             finish();
         } else if (id == R.id.delete_btn) {
             deleteFolders();
+        } else if (id == R.id.fast_send_btn) {
+//            mSendBar.setVisibility(View.VISIBLE);
+            sendFolderCmd(false);
         } else if (id == R.id.send_btn) {
-            //TODO Send cmd
             mSendBar.setVisibility(View.VISIBLE);
 //            mSendImages = imagePicker.getSelectedImages();
-            sendFolderCmd();
+            sendFolderCmd(true);
         }
     }
 
@@ -533,7 +538,10 @@ public class SendCmdActivity extends BaseActivity implements ImageDataSource.OnI
         }
     }
 
-    private void sendFolderCmd() {
+    /**
+     * @param isSendPhoto true will send photos.
+     */
+    private void sendFolderCmd(boolean isSendPhoto) {
         int size = mImageFolders.size();
         for (int i = 0; i < size; i++) {
             ImageFolder folder = mImageFolders.get(i);
@@ -561,13 +569,16 @@ public class SendCmdActivity extends BaseActivity implements ImageDataSource.OnI
                     LogUtil.e(TAG, "read cmd failed.e: " + e);
                 }
                 //发送文件夹下对应的照片
-                mSendImages = folder.images;
                 mFolderIndex = i;
                 LogUtil.d(TAG, "mFolderIndex: " + mFolderIndex);
-                sendChoosePhotos();
+                mSendImages = folder.images;
+                if (isSendPhoto) {
+                    sendChoosePhotos();
+                }
                 LogUtil.d(TAG, "-------send folder: " + folder.path + " end");
             }
         }
+        SocketControl.getInstance().sendMsg(CommandUtil.CMD_END_FLAG, true);
 
     }
 
@@ -601,44 +612,45 @@ public class SendCmdActivity extends BaseActivity implements ImageDataSource.OnI
         if (TextUtils.isEmpty(data)) {
             return;
         }
-//        if (needToast)
-        {
-            if (data.startsWith(LogUtil.LOG_PATH)) { //发送的是文件名
-                if (SocketConstant.SEND_SUCCESS == state || SocketConstant.COMPUTER_NOT_RESPONSE == state) {
-////                    mSendIndex++;
-//                    if (mSendIndex >= mSendImages.size()) { //send files completed.
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            mSendBar.setVisibility(View.GONE);
-                            ToastUtil.showToast(mContext, "所有照片发送完毕！");
-                            updateBtn(true);
-                            if (!Constant.TOTAL_DEBUG) {
-                                deleteSelectedFolder(FileUtil.getParentFolderPath(FileUtil.getParentFolderPath(data)));
-                            }
-                        }
-                    });
-//                        mSendIndex = 0;
-//                    } else {
-////                        sendChoosePhotos();
-//                    }
-                } else {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            mSendBar.setVisibility(View.GONE);
-                            ToastUtil.showToast(mContext, "发送失败，请检查连接是否正常");
-                            updateBtn(true);
 
-                        }
-                    });
-                }
-            } else {//发送的是指令
+        switch (state) {
+            case SocketConstant.SEND_ALL_SUCCESS:
+                handleSendCmdFinish(data);
+                break;
+            case SocketConstant.SEND_SUCCESS:
+                break;
+            default:
+                handleSendFail();
+                break;
 
-            }
         }
     }
 
+    private void handleSendCmdFinish(final String data) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mSendBar.setVisibility(View.GONE);
+                ToastUtil.showToast(mContext, "所有指令发送完毕！");
+                updateBtn(true);
+                if (!Constant.TOTAL_DEBUG) {
+                    deleteSelectedFolder(FileUtil.getParentFolderPath(FileUtil.getParentFolderPath(data)));
+                }
+            }
+        });
+    }
+
+    private void handleSendFail() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mSendBar.setVisibility(View.GONE);
+                ToastUtil.showToast(mContext, "发送失败，请检查连接是否正常");
+                updateBtn(true);
+
+            }
+        });
+    }
 
     private void updateBtn(boolean clickable) {
         updateBtn(mDeleteBtn, clickable);

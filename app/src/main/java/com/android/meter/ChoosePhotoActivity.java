@@ -63,8 +63,11 @@ public class ChoosePhotoActivity extends BaseActivity implements ImageDataSource
 
     private boolean isOrigin = false;  //是否选中原图
     private View mFooterBar;     //底部栏
-    private Button mBtnOk;       //确定按钮
-    private Button mDeleteBtn, mSendBtn;
+    private Button mChooseStateBtn;       //这个是选择图片的确认按钮，被隐藏了，并非发送或下一步按钮。
+    private Button mDeleteBtn;
+    private Button mSkipBtn;
+    private Button mNextBtn;
+
     private View mllDir; //文件夹切换按钮
     private TextView mtvDir; //显示当前文件夹
     private TextView mBtnPre;      //预览按钮
@@ -146,19 +149,19 @@ public class ChoosePhotoActivity extends BaseActivity implements ImageDataSource
     private void initView() {
         mDeleteBtn = (Button) findViewById(R.id.delete_btn);
         mDeleteBtn.setOnClickListener(this);
-        mSendBtn = (Button) findViewById(R.id.next_btn);
-        mSendBtn.setOnClickListener(this);
+        mNextBtn = (Button) findViewById(R.id.next_btn);
+        mNextBtn.setOnClickListener(this);
+        mSkipBtn = (Button) findViewById(R.id.skip_btn);
+        mSkipBtn.setOnClickListener(this);
         updateBtn(false);
-        Button skipBtn = (Button) findViewById(R.id.skip_btn);
-        skipBtn.setOnClickListener(this);
         mSendBar = (ProgressBar) findViewById(R.id.send_bar);
         if (!mCompletedLoad) {
             mSendBar.setVisibility(View.VISIBLE);
         }
 
         findViewById(R.id.btn_back).setOnClickListener(this);
-        mBtnOk = (Button) findViewById(R.id.btn_ok);
-        mBtnOk.setOnClickListener(this);
+        mChooseStateBtn = (Button) findViewById(R.id.btn_ok);
+        mChooseStateBtn.setOnClickListener(this);
         mBtnPre = (TextView) findViewById(R.id.btn_preview);
         mBtnPre.setOnClickListener(this);
         mFooterBar = findViewById(R.id.footer_bar);
@@ -166,15 +169,30 @@ public class ChoosePhotoActivity extends BaseActivity implements ImageDataSource
         mllDir.setOnClickListener(this);
         mtvDir = (TextView) findViewById(R.id.tv_dir);
         if (imagePicker.isMultiMode()) {
-            mBtnOk.setVisibility(View.VISIBLE);
+            mChooseStateBtn.setVisibility(View.VISIBLE);
             mBtnPre.setVisibility(View.VISIBLE);
         } else {
-            mBtnOk.setVisibility(View.GONE);
+            mChooseStateBtn.setVisibility(View.GONE);
             mBtnPre.setVisibility(View.GONE);
         }
         mRecyclerView.setVisibility(View.INVISIBLE);
+
+        initCustomView();
     }
 
+    /**
+     * init different view by mode.
+     */
+    private void initCustomView() {
+        if (((MainApplication) getApplication()).isModeA()) {
+            mSkipBtn.setVisibility(View.VISIBLE);
+            mNextBtn.setText(R.string.send);
+            mNextBtn.setEnabled(false);
+        } else {
+            mSkipBtn.setVisibility(View.GONE);
+            mNextBtn.setText(R.string.next);
+        }
+    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -273,13 +291,20 @@ public class ChoosePhotoActivity extends BaseActivity implements ImageDataSource
                 }
             }
         } else if (id == R.id.next_btn) {
-//            mSendBar.setVisibility(View.VISIBLE);
-//            mSendImages = imagePicker.getSelectedImages();
-//            sendChoosePhotos();
+            handleNextBtn();
+        } else if (id == R.id.skip_btn) {
             Intent intent = new Intent(mContext, MeasureSetActivity.class);
             startActivity(intent);
             finish();
-        } else if (id == R.id.skip_btn) {
+        }
+    }
+
+    private void handleNextBtn() {
+        if (((MainApplication) getApplication()).isModeA()) {
+            mSendBar.setVisibility(View.VISIBLE);
+            mSendImages = imagePicker.getSelectedImages();
+            sendChoosePhotos();
+        } else {
             Intent intent = new Intent(mContext, MeasureSetActivity.class);
             startActivity(intent);
             finish();
@@ -378,19 +403,19 @@ public class ChoosePhotoActivity extends BaseActivity implements ImageDataSource
     @Override
     public void onImageSelected(int position, ImageItem item, boolean isAdd) {
         if (imagePicker.getSelectImageCount() > 0) {
-            mBtnOk.setText(getString(R.string.ip_select_complete, imagePicker.getSelectImageCount(), imagePicker.getSelectLimit()));
-            mBtnOk.setEnabled(true);
+            mChooseStateBtn.setText(getString(R.string.ip_select_complete, imagePicker.getSelectImageCount(), imagePicker.getSelectLimit()));
+            mChooseStateBtn.setEnabled(true);
             mBtnPre.setEnabled(true);
             mBtnPre.setText(getResources().getString(R.string.ip_preview_count, imagePicker.getSelectImageCount()));
             mBtnPre.setTextColor(ContextCompat.getColor(this, R.color.ip_text_primary_inverted));
-            mBtnOk.setTextColor(ContextCompat.getColor(this, R.color.ip_text_primary_inverted));
+            mChooseStateBtn.setTextColor(ContextCompat.getColor(this, R.color.ip_text_primary_inverted));
         } else {
-            mBtnOk.setText(getString(R.string.ip_complete));
-            mBtnOk.setEnabled(false);
+            mChooseStateBtn.setText(getString(R.string.ip_complete));
+            mChooseStateBtn.setEnabled(false);
             mBtnPre.setEnabled(false);
             mBtnPre.setText(getResources().getString(R.string.ip_preview));
             mBtnPre.setTextColor(ContextCompat.getColor(this, R.color.ip_text_secondary_inverted));
-            mBtnOk.setTextColor(ContextCompat.getColor(this, R.color.ip_text_secondary_inverted));
+            mChooseStateBtn.setTextColor(ContextCompat.getColor(this, R.color.ip_text_secondary_inverted));
         }
 //        mImageGridAdapter.notifyDataSetChanged();
 //        mRecyclerAdapter.notifyItemChanged(position); // 17/4/21 fix the position while click img to preview
@@ -509,8 +534,8 @@ public class ChoosePhotoActivity extends BaseActivity implements ImageDataSource
 
 
     private void sendChoosePhotos() {
-        LogUtil.v(TAG, "sendChoosePhotos.send clickable: " + mSendBtn.isClickable());
-        if (mSendImages != null && mSendImages.size() != 0 && mSendImages.size() > mSendIndex) {
+        LogUtil.v(TAG, "sendChoosePhotos.send clickable: " + mNextBtn.isClickable());
+        if (mSendImages != null && mSendImages.size() != 0) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -518,10 +543,13 @@ public class ChoosePhotoActivity extends BaseActivity implements ImageDataSource
 
                 }
             });
-            int index = mSendIndex;
             needToast = true;
-            //This method is deleted.
-//            SocketControl.getInstance().sendFile(mSendImages.get(index).path, mSendImages.size());
+            List<String> list = new ArrayList<String>();
+            int size = mSendImages.size();
+            for (int i = 0; i < size; i++) {
+                list.add(mSendImages.get(i).path);
+            }
+            SocketControl.getInstance().sendFiles(list, true);
         }
         printImage(mSendImages);
         printImage(imagePicker.getSelectedImages());
@@ -532,16 +560,34 @@ public class ChoosePhotoActivity extends BaseActivity implements ImageDataSource
     public void onResult(int state, String data) {
         super.onResult(state, data);
         LogUtil.d(TAG, "state: " + state + " ,needToast: " + needToast);
+        /** 针对每个文件都回调的处理方法
+         if (needToast) {
+         if (SocketConstant.SEND_SUCCESS == state) {
+         mSendIndex++;
+         if (mSendIndex >= mSendImages.size()) { //send files completed.
+         Intent intent = new Intent(mContext, MeasureSetActivity.class);
+         startActivity(intent);
+         finish();
+         } else {
+         sendChoosePhotos();
+         }
+         } else {
+         runOnUiThread(new Runnable() {
+        @Override public void run() {
+        mSendBar.setVisibility(View.GONE);
+        ToastUtil.showToast(mContext, "发送失败，请检查连接是否正常！");
+        updateBtn(true);
+
+        }
+        });
+         }
+         }
+         */
         if (needToast) {
             if (SocketConstant.SEND_SUCCESS == state) {
-                mSendIndex++;
-                if (mSendIndex >= mSendImages.size()) { //send files completed.
-                    Intent intent = new Intent(mContext, MeasureSetActivity.class);
-                    startActivity(intent);
-                    finish();
-                } else {
-                    sendChoosePhotos();
-                }
+                Intent intent = new Intent(mContext, MeasureSetActivity.class);
+                startActivity(intent);
+                finish();
             } else {
                 runOnUiThread(new Runnable() {
                     @Override
@@ -549,7 +595,6 @@ public class ChoosePhotoActivity extends BaseActivity implements ImageDataSource
                         mSendBar.setVisibility(View.GONE);
                         ToastUtil.showToast(mContext, "发送失败，请检查连接是否正常！");
                         updateBtn(true);
-
                     }
                 });
             }
@@ -566,7 +611,14 @@ public class ChoosePhotoActivity extends BaseActivity implements ImageDataSource
             mDeleteBtn.setTextColor(getResources().getColor(R.color.general_textview_grey_color));
         }
 
-
+        if (((MainApplication) getApplication()).isModeA()) {
+            mNextBtn.setEnabled(clickable);
+            if (clickable) {
+                mNextBtn.setTextColor(getResources().getColor(R.color.general_textview_color));
+            } else {
+                mNextBtn.setTextColor(getResources().getColor(R.color.general_textview_grey_color));
+            }
+        }
     }
 
     @Override

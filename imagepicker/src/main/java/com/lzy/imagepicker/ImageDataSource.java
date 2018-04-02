@@ -11,6 +11,7 @@ import android.support.v4.content.Loader;
 
 import com.lzy.imagepicker.bean.ImageFolder;
 import com.lzy.imagepicker.bean.ImageItem;
+import com.lzy.imagepicker.util.FlagUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -26,8 +27,6 @@ import java.util.List;
  * ================================================
  */
 public class ImageDataSource implements LoaderManager.LoaderCallbacks<Cursor> {
-
-    private static final String FOLDER_PATH = Environment.getExternalStorageDirectory() + File.separator + "Meter2";
 
     public static final int LOADER_ALL = 0;         //加载所有图片
     public static final int LOADER_CATEGORY = 1;    //分类加载图片
@@ -81,11 +80,11 @@ public class ImageDataSource implements LoaderManager.LoaderCallbacks<Cursor> {
         imageFolders.clear();
         if (data != null) {
             ArrayList<ImageItem> allImages = new ArrayList<>();   //所有图片的集合,不分文件夹
-            while (data.moveToNext())  {
+            while (data.moveToNext()) {
                 //查询数据
                 String imageName = data.getString(data.getColumnIndexOrThrow(IMAGE_PROJECTION[0]));
                 String imagePath = data.getString(data.getColumnIndexOrThrow(IMAGE_PROJECTION[1]));
-                
+
                 File file = new File(imagePath);
                 if (!file.exists() || file.length() <= 0) {
                     continue;
@@ -113,7 +112,8 @@ public class ImageDataSource implements LoaderManager.LoaderCallbacks<Cursor> {
                 imageFolder.name = imageParentFile.getName();
                 imageFolder.path = imageParentFile.getAbsolutePath();
                 //只有Meter目录下的文件夹才需要被显示出来 @{
-                if (imageFolder.path.startsWith(FOLDER_PATH)) {
+                String chooseFolder = Environment.getExternalStorageDirectory() + File.separator + FlagUtils.getFolderPath();
+                if (imageFolder.path.startsWith(chooseFolder)) {
                     if (!imageFolders.contains(imageFolder)) {
                         ArrayList<ImageItem> images = new ArrayList<>();
                         images.add(imageItem);
@@ -149,7 +149,9 @@ public class ImageDataSource implements LoaderManager.LoaderCallbacks<Cursor> {
         System.out.println("--------");
     }
 
-    /** 所有图片加载完成的回调接口 */
+    /**
+     * 所有图片加载完成的回调接口
+     */
     public interface OnImagesLoadedListener {
         void onImagesLoaded(List<ImageFolder> imageFolders);
     }

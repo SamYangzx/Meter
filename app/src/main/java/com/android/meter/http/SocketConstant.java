@@ -8,6 +8,7 @@ public class SocketConstant {
     public static final String DEFAULT_SERVER = "192.168.5.1";
     public static final int DEFAULT_PORT = 7001;
 
+    public static final int SEND_ALL_SUCCESS = 100;
     public static final int SEND_SUCCESS = 101;
     public static final int SEND_FAIL = 102;
     public static final int CONNECT_SUCCESS = 103;

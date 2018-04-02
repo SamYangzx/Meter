@@ -12,6 +12,7 @@ import java.net.Socket;
 import java.util.List;
 
 import static com.android.meter.http.SocketConstant.COMPUTER_NOT_RESPONSE;
+import static com.android.meter.http.SocketConstant.SEND_ALL_SUCCESS;
 
 
 /*******
@@ -74,6 +75,9 @@ public class SocketControl {
 //                        break;
                     case SocketConstant.RECEIVE_CHECK_FAILED:
                         retry(SocketConstant.RECEIVE_CHECK_FAILED, data);
+                        break;
+                    case SEND_ALL_SUCCESS:
+                        response(SEND_ALL_SUCCESS, data);
                         break;
                     case SocketConstant.SEND_SUCCESS:
                         if (mIsFile) {
@@ -182,6 +186,10 @@ public class SocketControl {
     private long mCmdSendTime = 0;
     private String mTempString;
 
+    /**
+     * @param list 要发送的文件路径列表
+     * @param realSend true代表真正发送，false表示仅存储指令
+     */
     public void sendFiles(List<String> list, boolean realSend) {
         if (list == null || list.size() == 0) {
             LogUtil.e(TAG, "paramater is error!!");
@@ -217,6 +225,12 @@ public class SocketControl {
         }
     }
 
+    /**
+     * @deprecated 被遗弃，20180402后仅维护{@link #sendFiles}
+     * @param file
+     * @param count
+     * @param realSend
+     */
     public void sendFile(String file, int count, boolean realSend) {
         LogUtil.d(TAG, "sendFile: " + file + " ,count: " + count);
         if (realSend) {
@@ -227,7 +241,6 @@ public class SocketControl {
             mIsFile = true;
             mHasResponsed = false;
             if (isConneced()) {
-                mSendThread.setFileCount(count);
                 mSendThread.sendMsg(file);
             } else {
                 response(SocketConstant.SEND_FAIL, file, true);
@@ -237,15 +250,6 @@ public class SocketControl {
         }
     }
 
-    /**
-     * default will save cmd, but not send cmd.
-     *
-     * @param file  file path which want to be sent
-     * @param count how many files will be sent.
-     */
-//    private void sendFile(String file, int count) {
-//        sendFile(file, count, false);
-//    }
     public void sendMsg(String hex, boolean realSend) {
         LogUtil.d(TAG, "sendMsg: " + hex);
         if (realSend) {

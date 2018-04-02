@@ -60,6 +60,7 @@ import com.android.meter.util.SharedPreferenceUtils;
 import com.android.meter.util.TimeUtil;
 import com.google.android.cameraview.AspectRatio;
 import com.google.android.cameraview.CameraView;
+import com.lzy.imagepicker.util.FlagUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -154,7 +155,11 @@ public class CameraActivity extends BaseActivity implements
     protected void onStart() {
         initView();
         super.onStart();
-        mSameFolder = (boolean) SharedPreferenceUtils.getParam(this, Constant.SAME_PHOTO_FOLDER, false);
+        if (FlagUtils.iSModeA()) {
+            mSameFolder = false;
+        } else {
+            mSameFolder = (boolean) SharedPreferenceUtils.getParam(this, Constant.SAME_PHOTO_FOLDER, false);
+        }
         LogUtil.d(TAG, "onStart.mSameFolder: " + mSameFolder);
     }
 
@@ -176,7 +181,7 @@ public class CameraActivity extends BaseActivity implements
         PermissionsCheckUtil.verifyStoragePermissions(mContext);
     }
 
-    private void initView(){
+    private void initView() {
         setContentView(R.layout.activity_main);
 
 //        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.take_picture);
@@ -205,12 +210,6 @@ public class CameraActivity extends BaseActivity implements
         } else {
             LogUtil.e(TAG, "mCameraView is null");
         }
-    }
-
-    @Override
-    public void onBackPressed() {
-//        super.onBackPressed();
-        AtyContainer.getInstance().finishAllActivity();
     }
 
     @Override

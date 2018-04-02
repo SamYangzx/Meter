@@ -36,6 +36,7 @@ import com.android.meter.util.LogUtil;
 import com.android.meter.util.SharedPreferenceUtils;
 import com.android.meter.util.StringUtil;
 import com.android.meter.util.ToastUtil;
+import com.lzy.imagepicker.util.FlagUtils;
 
 import static com.android.meter.bluetooth.BluetoothChatActivity.TOAST;
 import static com.android.meter.http.SocketConstant.SAVE_IP;
@@ -142,13 +143,9 @@ public class MeasureSetActivity extends BaseActivity {
         LogUtil.v(TAG, "onStart");
         if (firstStart) {
             firstStart = false;
-//            if (!TextUtils.isEmpty(mPhotoName)) {
-//                SocketControl.getInstance().sendFile(FileUtil.getPicNumberFolder(true) + File.separator + mPhotoName);
-//            }
         }
         updateBtTitle(BluetoothHelper.getBluetoothHelper(mContext).getStateString());
         updateWifiTitle(SocketControl.getInstance().isConneced());
-//        setTitles(BluetoothHelper.getBluetoothHelper(mContext).getStateString());
         initViewData();
         super.onStart();
     }
@@ -187,10 +184,8 @@ public class MeasureSetActivity extends BaseActivity {
                 mDebugDialog.setYesOnclickListener(new CustomEtDialog.onEnterclickListener() {
                     @Override
                     public void onYesClick() {
-//                        test();
-
                         BluetoothHelper.getBluetoothHelper(mContext).sendHex(mDebugDialog.getMessageStr());
-                        SocketControl.getInstance().sendMsg(mDebugDialog.getMessageStr());
+                        sendCmd(mDebugDialog.getMessageStr(), true, true);
                     }
                 });
                 mDebugDialog.setNoOnclickListener(new CustomEtDialog.onCancelclickListener() {
@@ -227,10 +222,7 @@ public class MeasureSetActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-//        exitDialog();
         super.onBackPressed();
-//        BluetoothHelper.getBluetoothHelper(mContext).disconnect();
-//        SocketControl.getInstance().disconnect();
     }
 
     @Override
@@ -390,8 +382,7 @@ public class MeasureSetActivity extends BaseActivity {
             switch (v.getId()) {
                 case R.id.start_btn:
                     BluetoothHelper.getBluetoothHelper(mContext).sendHex(CommandUtil.getStartCmd());
-//                    BluetoothHelper.getBluetoothHelper(mContext).sendHex(CommandUtil.getCalibrateCmd(getBTUnitHexData(mMeasurePointUnit, mSampleUnit)));
-                    SocketControl.getInstance().sendMsg(CommandUtil.getSocketDataCmd(getUnitData(mTap, mMeasurePointUnit, mSampleUnit)));
+                    sendCmd(CommandUtil.getSocketDataCmd(getUnitData(mTap, mMeasurePointUnit, mSampleUnit)), true, FlagUtils.iSModeA());
                     Intent intent = new Intent();
                     intent.putExtra(MeasureActivity.EXTRA_MEASURE_UNIT, mMeasurePointUnit);
                     intent.putExtra(MeasureActivity.EXTRA_SAMPLE_UNIT, mSampleUnit);
@@ -404,7 +395,6 @@ public class MeasureSetActivity extends BaseActivity {
                     break;
                 case R.id.end_btn:
                     BluetoothHelper.getBluetoothHelper(mContext).sendHex(CommandUtil.getStopCmd());
-//                    ToastUtil.showToast(mContext,WifiUtil.getWifiAddress(mContext));
                     break;
                 default:
                     break;
@@ -475,20 +465,5 @@ public class MeasureSetActivity extends BaseActivity {
         s = "AX03AY04_0601_3_12.3";
         LogUtil.d(TAG, "origin String: " + s + "cmdString: " + CommandUtil.getSocketDataCmd(s));
     }
-
-    private void sendTest(String data) {
-        SocketControl.getInstance().sendMsg(data);
-    }
-
-
-    /*****
-     * This is for test
-     **/
-//    private IMsgListener mIBtMsgListener = new IMsgListener() {
-//        @Override
-//        public void received(int state, final String msg) {
-//            sendTest(msg);
-//        }
-//    };
 
 }

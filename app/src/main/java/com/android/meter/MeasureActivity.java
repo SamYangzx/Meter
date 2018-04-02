@@ -35,6 +35,7 @@ import com.android.meter.util.StringUtil;
 import com.android.meter.util.TimeUtil;
 import com.android.meter.util.ToastUtil;
 import com.android.meter.util.VibratorHelper;
+import com.lzy.imagepicker.util.FlagUtils;
 
 import java.util.ArrayList;
 
@@ -150,6 +151,13 @@ public class MeasureActivity extends BaseActivity {
         stopIb.setOnClickListener(mListener);
         ImageButton connectIb = (ImageButton) findViewById(R.id.connect_ib);
         connectIb.setOnClickListener(mListener);
+
+        if (((MainApplication) getApplication()).isModeA()) {
+            mTitleTv.setVisibility(View.VISIBLE);
+            stopIb.setVisibility(View.GONE);
+        } else {
+            mTitleTv.setVisibility(View.GONE);
+        }
     }
 
 
@@ -211,11 +219,10 @@ public class MeasureActivity extends BaseActivity {
 
             @Override
             public void onScrollFling(LoadPickerView view, final float speedRatio) {
-//                sendMsg(Float.toString(speedRatio), false);
                 byte[] ratio = new byte[1];
                 ratio[0] = (byte) (speedRatio * 100);
                 LogUtil.d(TAG, "speedRatio: " + speedRatio + " ,intRatio: " + ratio[0] + ", Integer.toString(ratio): " + StringUtil.bytes2HexString(ratio));
-                sendCmd(CommandUtil.getLoadCmd(StringUtil.bytes2HexString(ratio)), false);
+                sendCmd(CommandUtil.getLoadCmd(StringUtil.bytes2HexString(ratio)), false, true);
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -260,75 +267,26 @@ public class MeasureActivity extends BaseActivity {
             Log.d(TAG, "click----");
             switch (v.getId()) {
                 case R.id.reset_btn:
-//                    ToastUtil.showToast(mContext, getStringById(R.string.reset));
                     VibratorHelper.vibrate(mContext);
                     resetDialog();
                     break;
                 case R.id.center_btn:
-                    VibratorHelper.vibrate(mContext);
-                    if (CALIBRATE_MODE == mMode && mMeasurePointIndex > 20) { //切换到测量模式时短时间内未及时更新。@{
-                        LogUtil.d(TAG, "force calibrate!!");
-                        mMeasurePointIndex = mMeasurePointIndex - 990;
-                    }//@}
-                    String hexStr;
-//                    hexStr = Float.toHexString(Float.valueOf(mMeasurePointValue));
-//                    hexStr = StringUtil.bytes2HexString(StringUtil.int2byte(mMeasurePointIndex));
-                    hexStr = CommandUtil.getMeasurePointHexValue(mMeasurePointIndex);
-                    LogUtil.d(TAG, "mMeasurePointValue: " + mMeasurePointValue + ", mMeasurePointIndex: " + mMeasurePointIndex + ", hexStr: " + hexStr);
-//                    BluetoothHelper.getBluetoothHelper(mContext).sendHex(CommandUtil.TEST_HEX_CMD);
-//                    SocketControl.getInstance().sendMsg(CommandUtil.TEST_HEX_CMD);
-                    if (CALIBRATE_MODE == mMode) {
-                        sendCmd(CommandUtil.getConfirmCalibrateCmd(hexStr, mMeasurePointValue), false);
-                    } else {
-//                        initTestData();
-                        sendCmd(CommandUtil.getSocketDataCmd(getValueData(mTap, mTotalTimes, mTimes, mMeasurePointValue, mSampleTv.getText().toString())), true);
-                        ExcelUtils.initExcel(FileUtil.getExcelPath(), mTitleArray);
-                        int rows = 0;
-                        if (mNeedOffset) {
-                            mRecordList.clear();
-                            mRecordList.add(new Record(mMeasurePointUnit, mSampleUnit).toArrayList());
-                            mRecordList.add(new Record(TimeUtil.getDateYearMonthDayHourMinute(), "").toArrayList());
-                            ExcelUtils.writeObjListToExcel(mRecordList, FileUtil.getExcelPath(), mNeedOffset);
-                            mInitRow = ExcelUtils.getRows(FileUtil.getExcelPath());
-                            rows = mInitRow;
-                            mNeedOffset = false;
-                        } else {
-                            rows = ExcelUtils.getRows(FileUtil.getExcelPath());
-                        }
-                        Record record = new Record(mMeasurePointValue, mSampleTv.getText().toString());
-                        LogUtil.d(TAG, "mInitRow: " + mInitRow + ", mTotalTimes: " + mTotalTimes + ", mTimes: " + mTimes + " , ExcelUtils.getRows: " + rows);
-                        if (mInitRow + mTotalTimes >= rows && mTimes == 0) {
-                            mRecordList.clear();
-                            mRecordList.add(record.toArrayList());
-                            ExcelUtils.writeObjListToExcel(mRecordList, FileUtil.getExcelPath(), mNeedOffset);
-                        } else {
-                            if (mTimes == 0) {
-                                ExcelUtils.writeObjToRow(record.toArrayList(), FileUtil.getExcelPath(), mInitRow + 1);
-                            } else {
-                                ExcelUtils.writeObjToRow(record.toArrayList(), FileUtil.getExcelPath(), mInitRow + mTimes);
-                            }
-                        }
-
-                        rows = ExcelUtils.getRows(FileUtil.getExcelPath());
-                        if (mInitRow + mTotalTimes == rows) {
-                            ExcelUtils.writeObjToRow(new Record(TimeUtil.getDateYearMonthDayHourMinute(), "").toArrayList(), FileUtil.getExcelPath(), mInitRow + mTotalTimes + 1);
-                        }
-
-                    }
-//                    mTimes++;
+                    handleCenterBtn();
                     break;
                 case R.id.cancel_btn:
-//                    ToastUtil.showToast(mContext, getStringById(R.string.cancel));
                     VibratorHelper.vibrate(mContext);
                     if (MEASURE_MODE == mMode) {
                         mSampleTv.setText("0");
                     } else {
-                        sendCmd(CommandUtil.getSaveCalibrateCmd(), false);
+                        sendCmd(CommandUtil.getSaveCalibrateCmd(), false, true);
                     }
                     break;
                 case R.id.measure_title_ib:
-//                    changeModeDialog();
-                    startSendCmdActivity();
+                    if (((MainApplication) getApplication()).isModeA()) {
+                        changeModeDialog();
+                    } else {
+                        startSendCmdActivity();
+                    }
                     break;
                 case R.id.stop_ib:
                     stopDialog();
@@ -349,14 +307,74 @@ public class MeasureActivity extends BaseActivity {
 
     };
 
+    private void handleCenterBtn() {
+        VibratorHelper.vibrate(mContext);
+        if (CALIBRATE_MODE == mMode && mMeasurePointIndex > 20) { //切换到测量模式时短时间内未及时更新。@{
+            LogUtil.d(TAG, "force calibrate!!");
+            mMeasurePointIndex = mMeasurePointIndex - 990;
+        }//@}
+        String hexStr = CommandUtil.getMeasurePointHexValue(mMeasurePointIndex);
+        LogUtil.d(TAG, "mMeasurePointValue: " + mMeasurePointValue + ", mMeasurePointIndex: " + mMeasurePointIndex + ", hexStr: " + hexStr);
+        if (FlagUtils.iSModeA()) {
+            if (CALIBRATE_MODE == mMode) {
+                sendCmd(CommandUtil.getConfirmCalibrateCmd(hexStr, mMeasurePointValue), false, true);
+            } else {
+//              initTestData();
+                //此种模式要直接发送真实数据
+                SocketControl.getInstance().sendMsg(CommandUtil.getSocketDataCmd(getValueData(mTap, mTotalTimes, mTimes, mMeasurePointValue, mSampleTv.getText().toString())), true);
+            }
+        } else {
+            sendCmd(CommandUtil.getSocketDataCmd(getValueData(mTap, mTotalTimes, mTimes, mMeasurePointValue, mSampleTv.getText().toString())), true, false);
+        }
+    }
+
+    /**
+     * 存储要发送的数据到excel表格
+     */
+    private void saveDataIntoExcel() {
+        ExcelUtils.initExcel(FileUtil.getExcelPath(), mTitleArray);
+        int rows = 0;
+        if (mNeedOffset) {
+            mRecordList.clear();
+            mRecordList.add(new Record(mMeasurePointUnit, mSampleUnit).toArrayList());
+            mRecordList.add(new Record(TimeUtil.getDateYearMonthDayHourMinute(), "").toArrayList());
+            ExcelUtils.writeObjListToExcel(mRecordList, FileUtil.getExcelPath(), mNeedOffset);
+            mInitRow = ExcelUtils.getRows(FileUtil.getExcelPath());
+            rows = mInitRow;
+            mNeedOffset = false;
+        } else {
+            rows = ExcelUtils.getRows(FileUtil.getExcelPath());
+        }
+        Record record = new Record(mMeasurePointValue, mSampleTv.getText().toString());
+        LogUtil.d(TAG, "mInitRow: " + mInitRow + ", mTotalTimes: " + mTotalTimes + ", mTimes: " + mTimes + " , ExcelUtils.getRows: " + rows);
+        if (mInitRow + mTotalTimes >= rows && mTimes == 0) {
+            mRecordList.clear();
+            mRecordList.add(record.toArrayList());
+            ExcelUtils.writeObjListToExcel(mRecordList, FileUtil.getExcelPath(), mNeedOffset);
+        } else {
+            if (mTimes == 0) {
+                ExcelUtils.writeObjToRow(record.toArrayList(), FileUtil.getExcelPath(), mInitRow + 1);
+            } else {
+                ExcelUtils.writeObjToRow(record.toArrayList(), FileUtil.getExcelPath(), mInitRow + mTimes);
+            }
+        }
+
+        rows = ExcelUtils.getRows(FileUtil.getExcelPath());
+        if (mInitRow + mTotalTimes == rows) {
+            ExcelUtils.writeObjToRow(new Record(TimeUtil.getDateYearMonthDayHourMinute(), "").toArrayList(), FileUtil.getExcelPath(), mInitRow + mTotalTimes + 1);
+        }
+    }
+
     private void startSendCmdActivity() {
         Intent intent = new Intent();
         intent.setClass(MeasureActivity.this, SendCmdActivity.class);
         startActivity(intent);
     }
 
-    //change measure and calculate mode.
-   /* private void changeMode() {
+    /**
+     * change measure and calculate mode.
+     */
+    private void changeMode() {
         if (MEASURE_MODE == mMode) {
             LogUtil.d(TAG, "changeMode CALIBRATE_MODE");
             mMode = CALIBRATE_MODE;
@@ -371,13 +389,11 @@ public class MeasureActivity extends BaseActivity {
         mMeasurePointPicker.refreshByNewDisplayedValues(getMeasurePointArray(mStep));
         mMeasurePointPicker.setPickedIndexRelativeToRaw(mMeasurePointArray.length / 2);
         updateMeasurePointPicker();
-    }*/
+    }
 
     private String getStringById(int str) {
         return mContext.getResources().getString(str);
     }
-
-//    private int mPreMagnification = 1;
 
     private String[] getMeasurePointArray(float magnification) {
         if (CALIBRATE_MODE == mMode) {
@@ -463,66 +479,25 @@ public class MeasureActivity extends BaseActivity {
         dialog.show();
     }
 
-//    private void changeModeDialog() {
-//        final CustomToastDialog dialog = new CustomToastDialog(mContext);
-//        dialog.setTitle(R.string.warn);
-//        dialog.setMessage(R.string.change_confirm);
-//        dialog.setPositiveButton(R.string.confirm, new CustomToastDialog.onEnterclickListener() {
-//            @Override
-//            public void onYesClick() {
-//                dialog.dismiss();
-//                changeMode();
-//            }
-//        });
-//        dialog.setNegativeButton(R.string.cancel, new CustomToastDialog.onCancelclickListener() {
-//            @Override
-//            public void onNoClick() {
-//                dialog.dismiss();
-//            }
-//        });
-//        dialog.show();
-//    }
-
-    /**
-     * msg origin string data.
-     * changeMode if need change send method BT or http, this will be true.
-     */
-//    private void sendMsg(String msg, boolean changeMode) {
-//        LogUtil.d(TAG, "sendMsg.msg: " + msg + ", changeMode: " + changeMode);
-//        String hexCmd;
-//        if (changeMode) {
-//            if (MEASURE_MODE == mMode) {
-//                if (mFirstTime) {
-//                    hexCmd = CommandUtil.getUploadCmd(COLLECTOR_PRE_CODE, mSampleUnit);
-//                    SocketControl.getInstance().sendMsg(hexCmd);
-//                    hexCmd = CommandUtil.getUploadCmd(mMeasurePointUnit);
-//                    SocketControl.getInstance().sendMsg(hexCmd);
-//                    mFirstTime = false;
-//                }
-//                hexCmd = CommandUtil.getUploadCmd(mSampleTv.getText().toString());
-//                SocketControl.getInstance().sendMsg(hexCmd);
-//                hexCmd = CommandUtil.getUploadCmd(mMeasurePointValue);
-//                SocketControl.getInstance().sendMsg(hexCmd);
-//                hexCmd = CommandUtil.getUploadCmd(Integer.toString(mTimes));
-//                SocketControl.getInstance().sendMsg(hexCmd);
-//            } else {
-//                hexCmd = CommandUtil.getUploadCmd(mSampleTv.getText().toString());
-//                BluetoothHelper.getBluetoothHelper(mContext).sendHex(hexCmd);
-//            }
-//        } else {
-//            hexCmd = CommandUtil.getUploadCmd(CommandUtil.PLATFORM_PRE_CODE, msg);
-//            BluetoothHelper.getBluetoothHelper(mContext).sendHex(hexCmd);
-//        }
-//    }
-    private void sendCmd(String cmd, boolean socket) {
-//        LogUtil.d(TAG, "sendMsg.msg: " + cmd + ", socket: " + socket);
-        if (socket) {
-            SocketControl.getInstance().sendMsg(cmd);
-        } else {
-            BluetoothHelper.getBluetoothHelper(mContext).sendHex(cmd);
-        }
+    private void changeModeDialog() {
+        final CustomToastDialog dialog = new CustomToastDialog(mContext);
+        dialog.setTitle(R.string.warn);
+        dialog.setMessage(R.string.change_confirm);
+        dialog.setPositiveButton(R.string.confirm, new CustomToastDialog.onEnterclickListener() {
+            @Override
+            public void onYesClick() {
+                dialog.dismiss();
+                changeMode();
+            }
+        });
+        dialog.setNegativeButton(R.string.cancel, new CustomToastDialog.onCancelclickListener() {
+            @Override
+            public void onNoClick() {
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
     }
-
 
     @Override
     public void handleReceiveData(String sampleValue) {

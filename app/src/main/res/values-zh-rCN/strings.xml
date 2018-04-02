@@ -1,5 +1,11 @@
 <resources>
-    <string name="app_name">2.0计量器具显示采集器仪表测量器</string>
+    <string name="app_name">3.0计量器具显示采集器仪表测量器</string>
+
+    <!--ChoosePhotoActivity begin-->
+    <string name="send">发送</string>
+    <string name="next">下一步</string>
+    <!--ChoosePhotoActivity end-->
+
     <!--measureSetActivity begin-->
     <string name="measure_title">测量采集器</string>
     <string name="measure_title_measure">测量</string>

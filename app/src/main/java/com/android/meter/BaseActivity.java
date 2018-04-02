@@ -118,7 +118,7 @@ public class BaseActivity extends AppCompatActivity implements IHttpListener {
                     break;
                 case SocketConstant.CONNECT_SUCCESS:
                     updateWifiTitle(getString(R.string.title_wifi_connected));
-                    if(mNetworkDialog != null){
+                    if (mNetworkDialog != null) {
                         mNetworkDialog.dismiss();
                     }
                     break;
@@ -306,6 +306,18 @@ public class BaseActivity extends AppCompatActivity implements IHttpListener {
         SocketControl.getInstance().connect(server, port);
     }
 
+    /**
+     * @param cmd      hex
+     * @param socket
+     * @param realSend
+     */
+    public void sendCmd(String cmd, boolean socket, boolean realSend) {
+        if (socket) {
+            SocketControl.getInstance().sendMsg(cmd, realSend);
+        } else {
+            BluetoothHelper.getBluetoothHelper(mContext).sendHex(cmd);
+        }
+    }
 
     /**
      * 处理从蓝牙和wifi端接收的消息，目前此处理蓝牙端接收的消息。
