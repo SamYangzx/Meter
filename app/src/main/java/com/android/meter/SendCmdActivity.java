@@ -26,6 +26,7 @@ import com.android.meter.util.CommandUtil;
 import com.android.meter.util.Constant;
 import com.android.meter.util.FileUtil;
 import com.android.meter.util.LogUtil;
+import com.android.meter.util.StringUtil;
 import com.android.meter.util.ToastUtil;
 import com.lzy.imagepicker.DataHolder;
 import com.lzy.imagepicker.ImageDataSource;
@@ -574,6 +575,8 @@ public class SendCmdActivity extends BaseActivity implements ImageDataSource.OnI
                 mSendImages = folder.images;
                 if (isSendPhoto) {
                     sendChoosePhotos();
+                }else{
+                    SocketControl.getInstance().sendMsg(StringUtil.string2HexString("_" + FileUtil.TOTAL_FILE_END), true);
                 }
                 LogUtil.d(TAG, "-------send folder: " + folder.path + " end");
             }
