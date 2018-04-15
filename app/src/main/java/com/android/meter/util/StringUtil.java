@@ -287,8 +287,8 @@ public class StringUtil {
 
     public static String getStrWithoutFront0(String string) {
         String newStr = string.replaceFirst("^0*", "");
-        if (newStr == null || newStr.length() < 1) {
-            return newStr;
+        if (TextUtils.isEmpty(newStr)) {
+            return "0";
         }
         if (newStr.charAt(0) == '.') {
             newStr = "0" + newStr;

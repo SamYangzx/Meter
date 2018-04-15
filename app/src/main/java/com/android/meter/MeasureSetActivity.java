@@ -6,8 +6,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -19,7 +17,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.meter.bluetooth.BluetoothHelper;
 import com.android.meter.bluetooth.BtConstant;
@@ -49,22 +46,22 @@ public class MeasureSetActivity extends BaseActivity {
     public static final String EXTRA_PHOTO = "photo";
 
     private final static String mUnitArrays[][] = {
-            {"N", "kN", "cN", "mN", "kgf", "daN", "Lbf"},
-            {"N•m", "mN•m", "cN•m", "dN•m", "kgf•m", "kgf•cm", "Lbf•in", "Lbf•ft", "ozf•in",},
-            {"MPa", "kPa", "hPa", "Pa", "kgf/cm²", "bar", "mbar", "psi", "mmWC", "inWC", "mmHg",},
-            {"g", "mg", "kg", "t", "N", "cN", "mN"},
-            {"Pa", "mbar", "torr", "hPa"},
-            {"Pa·m³/s", "mbar·l/s", "g/a",},
-            {"km", "m", "dm", "cm", "mm", "μm", "nm", "inch", "ft"},
-            {"Ω", "kΩ", "MΩ", "GΩ",},
-            {"F", "mF", "μF", "nF", "pF"},
-            {"H", "mH", "μH"},
-            {"V", "kV", "mV", "μV"},
-            {"A", "kA", "mA", "μA"},
-            {"W", "kW", "mW"},
-            {"m3/h", "m3/min", "m3/s", "L/h", "L/min", "L/s", "mL/h", "mL/min", "mL/s", "ft3/h", "ft3/min", "ft3/s", "UKgal/s", "U.Sgal/s", "USbbl/s"},
-            {"℃", "K", "οF", "οRa", "οR"},
-            {"J"},
+            {"N", "kN", "cN", "mN", "kgf", "daN", "Lbf", ""},
+            {"N•m", "mN•m", "cN•m", "dN•m", "kgf•m", "kgf•cm", "Lbf•in", "Lbf•ft", "ozf•in", ""},
+            {"MPa", "kPa", "hPa", "Pa", "kgf/cm²", "bar", "mbar", "psi", "mmWC", "inWC", "mmHg", ""},
+            {"g", "mg", "kg", "t", "N", "cN", "mN", ""},
+            {"Pa", "mbar", "torr", "hPa", ""},
+            {"Pa·m³/s", "mbar·l/s", "g/a", ""},
+            {"km", "m", "dm", "cm", "mm", "μm", "nm", "inch", "ft", ""},
+            {"Ω", "kΩ", "MΩ", "GΩ", ""},
+            {"F", "mF", "μF", "nF", "pF", ""},
+            {"H", "mH", "μH", ""},
+            {"V", "kV", "mV", "μV", ""},
+            {"A", "kA", "mA", "μA", ""},
+            {"W", "kW", "mW", ""},
+            {"m3/h", "m3/min", "m3/s", "L/h", "L/min", "L/s", "mL/h", "mL/min", "mL/s", "ft3/h", "ft3/min", "ft3/s", "UKgal/s", "U.Sgal/s", "USbbl/s", ""},
+            {"℃", "K", "οF", "οRa", "οR", ""},
+            {"J", ""},
             {""},
     };
 
@@ -99,10 +96,6 @@ public class MeasureSetActivity extends BaseActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         LogUtil.v(TAG, "onCreate");
-//        if (getActionBar() != null) {
-//            getActionBar().setDisplayShowHomeEnabled(false);
-////            getActionBar().setBackgroundDrawable(getResources().getDrawable(R.drawable.title_background));
-//        }
         setContentView(R.layout.activity_measure_set);
         mContext = this;
         initTitle();
@@ -119,22 +112,6 @@ public class MeasureSetActivity extends BaseActivity {
 
             }
         }, Constant.DELAY_REFRESH_TIME);
-//        mTapPicker.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                int tap = (int) SharedPreferenceUtils.getParam(mContext, Constant.TAP, mTapArray.length / 2);
-//                mTapPicker.setPickedIndexRelativeToRaw(tap);
-//                mTap = mTapArray[tap];
-//            }
-//        }, Constant.DELAY_REFRESH_TIME);
-//        mCountPicker.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                int count = (int) SharedPreferenceUtils.getParam(mContext, Constant.COUNT, mCountArray.length / 2);
-//                mCountPicker.setPickedIndexRelativeToRaw(count);
-//                mCount = Integer.valueOf(mCountArray[count]);
-//            }
-//        }, Constant.DELAY_REFRESH_TIME);
 
     }
 
@@ -149,20 +126,6 @@ public class MeasureSetActivity extends BaseActivity {
         initViewData();
         super.onStart();
     }
-
-//    @Override
-//    protected void onRestart() {
-//        LogUtil.v(TAG, "onRestart");
-//        super.onRestart();
-//        if (isNeedResetHandler) {
-//            BluetoothHelper.getBluetoothHelper(mContext).setmHandler(mHandler);
-//            isNeedResetHandler = false;
-//        }
-//
-//        setTitles(BluetoothHelper.getBluetoothHelper(mContext).getStateString());
-//    }
-
-//    private boolean isNeedResetHandler = false;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -244,9 +207,6 @@ public class MeasureSetActivity extends BaseActivity {
     }
 
     private void initViewData() {
-//        mStep = Float.parseFloat(mStepArray[0]);
-//        mTap = mTapArray[0];
-//        mCount = Integer.valueOf(mCountArray[0]);
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -278,8 +238,6 @@ public class MeasureSetActivity extends BaseActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Log.d(TAG, "position: " + position + ", id: " + id);
                 mMeasurePointUnit = mUnitArrays[mUnitIndex][position];
-//                BluetoothHelper.getBluetoothHelper(mContext).sendHex(StringUtil.string2HexString(mUnitArrays[mUnitIndex][position]));
-//                BluetoothHelper.getBluetoothHelper(mContext).sendHex(CommandUtil.TEST_HEX_CMD);
                 SharedPreferenceUtils.setParam(mContext, Constant.MEASURE_UNIT, position);
             }
 
@@ -293,9 +251,6 @@ public class MeasureSetActivity extends BaseActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 mSampleUnit = mUnitArrays[mUnitIndex][position];
-//                BluetoothHelper.getBluetoothHelper(mContext).
-//
-// Hex(StringUtil.string2HexString(mUnitArrays[mUnitIndex][position]));
                 SharedPreferenceUtils.setParam(mContext, Constant.SAMPLE_UNIT, position);
             }
 
@@ -319,7 +274,6 @@ public class MeasureSetActivity extends BaseActivity {
                 Log.d(TAG, "oldVal: " + oldVal + ", newVal: " + newVal + ", Value: " + mStepArray[newVal]);
                 mStep = Float.parseFloat(mStepArray[newVal]);
                 SharedPreferenceUtils.setParam(mContext, Constant.STEP, newVal);
-//                BluetoothHelper.getBluetoothHelper(mContext).sendString(mStepArray[newVal] + " unit");
 
             }
         });
@@ -381,7 +335,6 @@ public class MeasureSetActivity extends BaseActivity {
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.start_btn:
-                    BluetoothHelper.getBluetoothHelper(mContext).sendHex(CommandUtil.getStartCmd());
                     sendCmd(CommandUtil.getSocketDataCmd(getUnitData(mTap, mMeasurePointUnit, mSampleUnit)), true, FlagUtils.iSModeA());
                     Intent intent = new Intent();
                     intent.putExtra(MeasureActivity.EXTRA_MEASURE_UNIT, mMeasurePointUnit);
@@ -442,22 +395,18 @@ public class MeasureSetActivity extends BaseActivity {
 
     private void updateSpinnerArray(int position) {
         mUnitIndex = position;
-        mMeasureAdapter = new ArrayAdapter<String>(mContext, android.R.layout.simple_spinner_item, mUnitArrays[position]);
-//        mMeasureAdapter = new ArrayAdapter<String>(mContext, R.layout.custom_spiner_text_item, mUnitArrays[position]);
+        mMeasureAdapter = new ArrayAdapter<String>(mContext, R.layout.custom_spiner_text_item, mUnitArrays[position]);
 //        mMeasureAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mMeasureAdapter.setDropDownViewResource(R.layout.custom_spinner_dropdown_itrm);
         mMeasureUnitSp.setAdapter(mMeasureAdapter);
 
-        mSampleAdapter = new ArrayAdapter<String>(mContext, android.R.layout.simple_spinner_item, mUnitArrays[position]);
+        mSampleAdapter = new ArrayAdapter<String>(mContext, R.layout.custom_spiner_text_item, mUnitArrays[position]);
 //        mSampleAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mSampleAdapter.setDropDownViewResource(R.layout.custom_spinner_dropdown_itrm);
         mSampleUnitSp.setAdapter(mSampleAdapter);
     }
 
-//    private boolean isContinue = true;
-
     private void test() {
-//        mClient = new SocketControl(SocketConstant.DEFAULT_SERVER, SocketConstant.DEFAULT_PORT, mHttpListener);
         SocketControl.getInstance().sendMsg("AA12E4016368616E656C3120303030302E304EBBCC");
 
         String s = "AM03AN04_kN_N";

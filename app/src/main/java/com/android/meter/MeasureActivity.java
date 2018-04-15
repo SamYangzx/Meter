@@ -41,6 +41,7 @@ import java.util.ArrayList;
 
 import static com.android.meter.bluetooth.BluetoothChatActivity.TOAST;
 import static com.android.meter.util.CommandUtil.UPLOCD_CMD_CODE;
+import static com.android.meter.util.CommandUtil.getUnitData;
 import static com.android.meter.util.CommandUtil.getValueData;
 
 public class MeasureActivity extends BaseActivity {
@@ -61,7 +62,6 @@ public class MeasureActivity extends BaseActivity {
 
     private String[] mLoadArray = new String[Constant.LINES_COUNT];
     private String[] mTimesArray;
-    private Context mContext;
 
     private NumberPickerView mMeasurePointPicker;
     private LoadPickerView mLoadPicker;
@@ -104,7 +104,6 @@ public class MeasureActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_measure);
-        mContext = this;
         initTitle();
 
         mMeasurePointUnit = getIntent().getStringExtra(EXTRA_MEASURE_UNIT);
@@ -162,8 +161,6 @@ public class MeasureActivity extends BaseActivity {
 
 
     private void initData() {
-//        mMeasurePointArray = getResources().getStringArray(R.array.speed_array);
-        //mTimesArray = getResources().getStringArray(R.array.check_array);
         mTimesArray = new String[mTotalTimes + 1];
         mTimesArray[0] = "——>";
         for (int i = 1; i < mTotalTimes + 1; i++) {
@@ -187,6 +184,7 @@ public class MeasureActivity extends BaseActivity {
             @Override
             public void run() {
                 BluetoothHelper.getBluetoothHelper(mContext).sendHex(CommandUtil.getCalibrateCmd(CommandUtil.getBTUnitHexData(mMeasurePointUnit, mSampleUnit)));
+                BluetoothHelper.getBluetoothHelper(mContext).sendHex(CommandUtil.getStartCmd());
             }
         }, GENERAL_DELAY_TIME);
     }
@@ -397,19 +395,8 @@ public class MeasureActivity extends BaseActivity {
 
     private String[] getMeasurePointArray(float magnification) {
         if (CALIBRATE_MODE == mMode) {
-//            mMeasurePointArray = new String[21];
-//            for (int i = 0; i <= 20; i++) {
-//                mMeasurePointArray[i] = StringUtil.getNumber(magnification * (i - 10));
-////            LogUtil.d(TAG, "i: " + mMeasurePointArray[i]);
-//            }
-
             mMeasurePointArray = mTempCalculArray;
         } else {
-//            mMeasurePointArray = new String[2001];
-//            for (int i = 0; i <= 2000; i++) {
-//                mMeasurePointArray[i] = StringUtil.getNumber(magnification * (i - 1000));
-////            LogUtil.d(TAG, "i: " + mMeasurePointArray[i]);
-//            }
             mMeasurePointArray = mTempMeaseureArray;
         }
         LogUtil.d(TAG, "mMeasurePointArray.length: " + mMeasurePointArray.length);
