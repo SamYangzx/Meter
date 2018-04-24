@@ -303,33 +303,6 @@ public class MeasureSetActivity extends BaseActivity {
         mEndBtn.setOnClickListener(mListener);
     }
 
-
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        LogUtil.d(TAG, "onActivityResult " + resultCode);
-        switch (requestCode) {
-            case REQUEST_CONNECT_DEVICE:
-                // When DeviceListActivity returns with a device to connect
-                if (resultCode == AppCompatActivity.RESULT_OK) {
-                    // Get the device MAC address
-                    String address = data.getExtras()
-                            .getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
-                    // Get the BLuetoothDevice object
-
-                    BluetoothDevice device = BluetoothHelper.getBluetoothHelper(mContext).getBluetoothAdapter().getRemoteDevice(address);
-                    if (device != null) {
-                        // Attempt to connect to the device
-                        BluetoothHelper.getBluetoothHelper(mContext).setmHandler(mHandler);
-                        BluetoothHelper.getBluetoothHelper(mContext).connect(device);
-                        SharedPreferenceUtils.setParam(mContext, BtConstant.SAVE_BT_ADDRESS, device.getAddress());
-                    }
-                }
-                break;
-            default:
-                break;
-        }
-    }
-
-
     private View.OnClickListener mListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {

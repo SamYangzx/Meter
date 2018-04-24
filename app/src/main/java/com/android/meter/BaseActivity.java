@@ -2,6 +2,7 @@ package com.android.meter;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -223,6 +224,33 @@ public class BaseActivity extends AppCompatActivity implements IHttpListener {
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        LogUtil.d(TAG, "onActivityResult " + resultCode);
+        switch (requestCode) {
+            case REQUEST_CONNECT_DEVICE:
+                // When DeviceListActivity returns with a device to connect
+                if (resultCode == AppCompatActivity.RESULT_OK) {
+                    // Get the device MAC address
+                    String address = data.getExtras()
+                            .getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
+                    // Get the BLuetoothDevice object
+
+                    BluetoothDevice device = BluetoothHelper.getBluetoothHelper(mContext).getBluetoothAdapter().getRemoteDevice(address);
+                    if (device != null) {
+                        // Attempt to connect to the device
+                        BluetoothHelper.getBluetoothHelper(mContext).setmHandler(mHandler);
+                        BluetoothHelper.getBluetoothHelper(mContext).connect(device);
+                        SharedPreferenceUtils.setParam(mContext, BtConstant.SAVE_BT_ADDRESS, device.getAddress());
+                    }
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
     private void initData() {
         BluetoothHelper.getBluetoothHelper(mContext).enableBT();
         BluetoothHelper.getBluetoothHelper(mContext).setmHandler(mHandler);
@@ -236,6 +264,11 @@ public class BaseActivity extends AppCompatActivity implements IHttpListener {
         updateWifiTitle(SocketControl.getInstance().isConneced());
     }
 
+    /**
+     * 如果想要在activity中更新蓝牙和wifi状态，必须调用此函数设置title TextView.
+     *
+     * @param textView
+     */
     void setTitleTv(TextView textView) {
         mTitle = textView;
     }
