@@ -52,7 +52,7 @@ public class MeasureSetActivity extends BaseActivity {
             {"g", "mg", "kg", "t", "N", "cN", "mN", ""},
             {"Pa", "mbar", "torr", "hPa", ""},
             {"Pa·m³/s", "mbar·l/s", "g/a", ""},
-            {"km", "m", "dm", "cm", "mm", "μm", "nm", "inch", "ft", ""},
+            {"km", "m", "dm", "cm", "mm", "μm", "nm", "inch", "ft", "mm/s", "m/s", "km/h", "mm/min", ""},
             {"Ω", "kΩ", "MΩ", "GΩ", ""},
             {"F", "mF", "μF", "nF", "pF", ""},
             {"H", "mH", "μH", ""},

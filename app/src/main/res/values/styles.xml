@@ -35,6 +35,11 @@
         <item name="android:textColor">@color/general_textview_color</item>
     </style>
 
+    <style name="ChooseModeButtonBottomStyle" parent="@style/GeneralButtonBottomStyle">
+        <item name="android:layout_width">@dimen/choose_mode_button_width</item>
+        <item name="android:layout_height">@dimen/choose_mode_button_width</item>
+    </style>
+
     <style name="MeasureButtonBottomStyle" parent="@style/GeneralButtonBottomStyle">
         <item name="android:layout_weight">1</item>
     </style>

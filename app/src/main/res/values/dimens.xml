@@ -32,6 +32,10 @@
     <dimen name="general_button_width">50dp</dimen>
     <dimen name="general_button_hight">50dp</dimen>
 
+    <!--ChooseModeActivity begin-->
+    <dimen name="choose_mode_button_width">90dp</dimen>
+    <!--ChooseModeActivity end-->
+
     <!--MeasureSetActivity begin-->
     <dimen name="measure_settings_button_width">75dp</dimen>
     <dimen name="measure_settings_horizontal_padding">25dp</dimen>

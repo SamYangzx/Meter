@@ -34,7 +34,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="150dp"
         android:gravity="end"
         android:paddingLeft="100dp"
         android:paddingRight="100dp"
@@ -55,14 +55,14 @@
 
         <Button
             android:id="@+id/button_a"
-            style="@style/GeneralButtonBottomStyle"
+            style="@style/ChooseModeButtonBottomStyle"
             android:layout_gravity="start"
             android:text="A"
             />
 
         <Button
             android:id="@+id/button_b"
-            style="@style/GeneralButtonBottomStyle"
+            style="@style/ChooseModeButtonBottomStyle"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
