@@ -36,11 +36,25 @@
         android:layout_alignParentTop="true"
         android:layout_marginTop="150dp"
         android:gravity="end"
-        android:paddingLeft="100dp"
-        android:paddingRight="100dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="70dp"
         android:text="0"
         android:textColor="@color/general_textview_color"
         android:textSize="@dimen/measure_value_size"
+        />
+
+    <TextView
+        android:id="@+id/measure_unit_textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/measure_value_textView"
+        android:gravity="end"
+        android:paddingLeft="20dp"
+        android:paddingRight="50dp"
+        android:text=""
+        android:textColor="@color/general_textview_color"
+        android:textSize="@dimen/measure_unit_size_mode"
         />
 
 
@@ -61,6 +75,15 @@
             />
 
         <Button
+            android:id="@+id/button_reset"
+            style="@style/ChooseModeButtonBottomStyle"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center"
+            android:text="@string/reset"
+            />
+
+        <Button
             android:id="@+id/button_b"
             style="@style/ChooseModeButtonBottomStyle"
             android:layout_alignParentEnd="true"
@@ -69,6 +92,7 @@
             android:layout_gravity="end"
             android:text="B"
             />
+
     </RelativeLayout>
 
 </RelativeLayout>

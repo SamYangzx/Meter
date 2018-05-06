@@ -262,7 +262,6 @@ public class MeasureActivity extends BaseActivity {
     private View.OnClickListener mListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            Log.d(TAG, "click----");
             switch (v.getId()) {
                 case R.id.reset_btn:
                     VibratorHelper.vibrate(mContext);
@@ -422,7 +421,6 @@ public class MeasureActivity extends BaseActivity {
             }
         });
         dialog.show();
-
     }
 
     private void backDialog() {

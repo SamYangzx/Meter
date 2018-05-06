@@ -9,18 +9,23 @@ import android.content.Intent;
 import android.widget.TextView;
 import android.widget.Button;
 
+import com.android.meter.bluetooth.BluetoothHelper;
+import com.android.meter.general_ui.CustomToastDialog;
 import com.android.meter.util.CommandUtil;
 import com.android.meter.util.FileUtil;
 import com.android.meter.util.LogUtil;
 import com.android.meter.util.StringUtil;
+import com.android.meter.util.ToastUtil;
 import com.lzy.imagepicker.util.FlagUtils;
 
 public class ChooseModeActivity extends BaseActivity {
     private static final String TAG = ChooseModeActivity.class.getSimpleName();
 
     private TextView mSampleTv;
+    private TextView mSampleUnitTv;
     private Button mABtn;
     private Button mBBtn;
+    private Button mResetBtn;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -59,10 +64,13 @@ public class ChooseModeActivity extends BaseActivity {
 
     private void initView() {
         mSampleTv = (TextView) findViewById(R.id.measure_value_textView);
+        mSampleUnitTv = (TextView) findViewById(R.id.measure_unit_textView);
         mABtn = (Button) findViewById(R.id.button_a);
         mABtn.setOnClickListener(mListener);
         mBBtn = (Button) findViewById(R.id.button_b);
         mBBtn.setOnClickListener(mListener);
+        mResetBtn = (Button) findViewById(R.id.button_reset);
+        mResetBtn.setOnClickListener(mListener);
     }
 
     private View.OnClickListener mListener = new View.OnClickListener() {
@@ -77,6 +85,8 @@ public class ChooseModeActivity extends BaseActivity {
                 case R.id.button_b:
                     chooseModeA(false);
                     break;
+                case R.id.button_reset:
+                    resetDialog();
                 default:
                     break;
             }
@@ -98,13 +108,35 @@ public class ChooseModeActivity extends BaseActivity {
         startActivity(intent);
     }
 
+    protected void resetDialog() {
+        final CustomToastDialog dialog = new CustomToastDialog(mContext);
+        dialog.setTitle(R.string.warn);
+        dialog.setMessage(R.string.reset_confirm);
+        dialog.setPositiveButton(R.string.confirm, new CustomToastDialog.onEnterclickListener() {
+            @Override
+            public void onYesClick() {
+                dialog.dismiss();
+                ToastUtil.showToast(mContext, R.string.reset);
+                BluetoothHelper.getBluetoothHelper(mContext).sendHex(CommandUtil.getResetCmd());
+            }
+        });
+        dialog.setNegativeButton(R.string.cancel, new CustomToastDialog.onCancelclickListener() {
+            @Override
+            public void onNoClick() {
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+    }
+
     @Override
     public void handleReceiveData(String sampleValue) {
         super.handleReceiveData(sampleValue);
         int divideIndex = StringUtil.getValueUnitIndex(sampleValue);
         String s = StringUtil.getStrWithoutFront0(StringUtil.hex2String(sampleValue.substring(0, divideIndex)));
         String unit = StringUtil.getFormatUnit(StringUtil.hex2String(sampleValue.substring(divideIndex)));
-        mSampleTv.setText(s + unit);
+        mSampleTv.setText(s);
+        mSampleUnitTv.setText(unit);
     }
 
 }

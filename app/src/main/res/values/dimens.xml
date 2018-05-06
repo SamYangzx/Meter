@@ -34,6 +34,7 @@
 
     <!--ChooseModeActivity begin-->
     <dimen name="choose_mode_button_width">90dp</dimen>
+    <dimen name="measure_unit_size_mode">30sp</dimen>
     <!--ChooseModeActivity end-->
 
     <!--MeasureSetActivity begin-->
