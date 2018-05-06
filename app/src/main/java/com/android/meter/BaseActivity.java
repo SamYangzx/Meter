@@ -56,6 +56,7 @@ public class BaseActivity extends AppCompatActivity implements IHttpListener {
     String mBtStr = "", mWifiStr = "";
     TextView mTitle;
     Context mContext;
+    Context mAppContext;
 
     NetworkDialog mNetworkDialog;
     AlertDialog mUnitDialog;
@@ -96,7 +97,7 @@ public class BaseActivity extends AppCompatActivity implements IHttpListener {
                     handlerCmd(readMessage);
                     break;
                 case BtConstant.MESSAGE_RECEIVE_FAILED:
-                    BluetoothHelper.getBluetoothHelper(mContext).sendHex(CommandUtil.CHECKSUM_FAILED_HEXCMD);
+                    BluetoothHelper.getBluetoothHelper(mAppContext).sendHex(CommandUtil.CHECKSUM_FAILED_HEXCMD);
                     break;
                 case BtConstant.MESSAGE_DEVICE_NAME:
                     break;
@@ -141,6 +142,7 @@ public class BaseActivity extends AppCompatActivity implements IHttpListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_base);
         mContext = this;
+        mAppContext = (MainApplication)getApplication();
         // 添加Activity到堆栈
         AtyContainer.getInstance().addActivity(this);
 
@@ -189,7 +191,7 @@ public class BaseActivity extends AppCompatActivity implements IHttpListener {
                     public void onYesClick() {
 //                        test();
 
-                        BluetoothHelper.getBluetoothHelper(mContext).sendHex(mDebugDialog.getMessageStr());
+                        BluetoothHelper.getBluetoothHelper(mAppContext).sendHex(mDebugDialog.getMessageStr());
                         SocketControl.getInstance().sendMsg(mDebugDialog.getMessageStr());
                     }
                 });
@@ -237,12 +239,12 @@ public class BaseActivity extends AppCompatActivity implements IHttpListener {
                             .getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
                     // Get the BLuetoothDevice object
 
-                    BluetoothDevice device = BluetoothHelper.getBluetoothHelper(mContext).getBluetoothAdapter().getRemoteDevice(address);
+                    BluetoothDevice device = BluetoothHelper.getBluetoothHelper(mAppContext).getBluetoothAdapter().getRemoteDevice(address);
                     if (device != null) {
                         // Attempt to connect to the device
-                        BluetoothHelper.getBluetoothHelper(mContext).setmHandler(mHandler);
-                        BluetoothHelper.getBluetoothHelper(mContext).connect(device);
-                        SharedPreferenceUtils.setParam(mContext, BtConstant.SAVE_BT_ADDRESS, device.getAddress());
+                        BluetoothHelper.getBluetoothHelper(mAppContext).setmHandler(mHandler);
+                        BluetoothHelper.getBluetoothHelper(mAppContext).connect(device);
+                        SharedPreferenceUtils.setParam(mAppContext, BtConstant.SAVE_BT_ADDRESS, device.getAddress());
                     }
                 }
                 break;
@@ -252,14 +254,14 @@ public class BaseActivity extends AppCompatActivity implements IHttpListener {
     }
 
     private void initData() {
-        BluetoothHelper.getBluetoothHelper(mContext).enableBT();
-        BluetoothHelper.getBluetoothHelper(mContext).setmHandler(mHandler);
+        BluetoothHelper.getBluetoothHelper(mAppContext).enableBT();
+        BluetoothHelper.getBluetoothHelper(mAppContext).setmHandler(mHandler);
         SocketControl.getInstance().setListener(this);
-        String server = (String) SharedPreferenceUtils.getParam(mContext, SocketConstant.SAVE_IP, SocketConstant.DEFAULT_SERVER);
-        int port = (int) SharedPreferenceUtils.getParam(mContext, SocketConstant.SAVE_PORT, SocketConstant.DEFAULT_PORT);
+        String server = (String) SharedPreferenceUtils.getParam(mAppContext, SocketConstant.SAVE_IP, SocketConstant.DEFAULT_SERVER);
+        int port = (int) SharedPreferenceUtils.getParam(mAppContext, SocketConstant.SAVE_PORT, SocketConstant.DEFAULT_PORT);
         SocketControl.getInstance().connect(server, port);
-        String bt = (String) SharedPreferenceUtils.getParam(mContext, BtConstant.SAVE_BT_ADDRESS, "");
-        BluetoothHelper.getBluetoothHelper(mContext).connect(bt);
+        String bt = (String) SharedPreferenceUtils.getParam(mAppContext, BtConstant.SAVE_BT_ADDRESS, "");
+        BluetoothHelper.getBluetoothHelper(mAppContext).connect(bt);
 
         updateWifiTitle(SocketControl.getInstance().isConneced());
     }
@@ -328,14 +330,15 @@ public class BaseActivity extends AppCompatActivity implements IHttpListener {
     @Override
     protected void onDestroy() {
         mHandler.removeCallbacksAndMessages(null);
+        mHandler = null;
         super.onDestroy();
         // 结束Activity&从栈中移除该Activity
         AtyContainer.getInstance().removeActivity(this);
     }
 
     public void connectServer(String server, int port) {
-        SharedPreferenceUtils.setParam(mContext, SAVE_IP, server);
-        SharedPreferenceUtils.setParam(mContext, SAVE_PORT, port);
+        SharedPreferenceUtils.setParam(mAppContext, SAVE_IP, server);
+        SharedPreferenceUtils.setParam(mAppContext, SAVE_PORT, port);
         SocketControl.getInstance().connect(server, port);
     }
 
@@ -348,7 +351,7 @@ public class BaseActivity extends AppCompatActivity implements IHttpListener {
         if (socket) {
             SocketControl.getInstance().sendMsg(cmd, realSend);
         } else {
-            BluetoothHelper.getBluetoothHelper(mContext).sendHex(cmd);
+            BluetoothHelper.getBluetoothHelper(mAppContext).sendHex(cmd);
         }
     }
 

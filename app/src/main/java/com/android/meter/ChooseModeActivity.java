@@ -117,7 +117,7 @@ public class ChooseModeActivity extends BaseActivity {
             public void onYesClick() {
                 dialog.dismiss();
                 ToastUtil.showToast(mContext, R.string.reset);
-                BluetoothHelper.getBluetoothHelper(mContext).sendHex(CommandUtil.getResetCmd());
+                BluetoothHelper.getBluetoothHelper(mAppContext).sendHex(CommandUtil.getResetCmd());
             }
         });
         dialog.setNegativeButton(R.string.cancel, new CustomToastDialog.onCancelclickListener() {

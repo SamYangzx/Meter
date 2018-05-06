@@ -65,7 +65,6 @@ public class MeasureSetActivity extends BaseActivity {
             {""},
     };
 
-    private Context mContext;
     private String[] mStepArray;
     private String[] mTapArray;
     private String[] mCountArray;
@@ -97,7 +96,6 @@ public class MeasureSetActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         LogUtil.v(TAG, "onCreate");
         setContentView(R.layout.activity_measure_set);
-        mContext = this;
         initTitle();
         initData();
         initView();
@@ -106,7 +104,7 @@ public class MeasureSetActivity extends BaseActivity {
             @Override
             public void run() {
 //                Log.d(TAG, "mStepArray.length / 2: " + mStepArray.length / 2);
-                int step = (int) SharedPreferenceUtils.getParam(mContext, Constant.STEP, mStepArray.length / 2);
+                int step = (int) SharedPreferenceUtils.getParam(mAppContext, Constant.STEP, mStepArray.length / 2);
                 mStepPicker.setPickedIndexRelativeToRaw(step);
                 mStep = Float.valueOf(mStepArray[step]);
 
@@ -121,7 +119,7 @@ public class MeasureSetActivity extends BaseActivity {
         if (firstStart) {
             firstStart = false;
         }
-        updateBtTitle(BluetoothHelper.getBluetoothHelper(mContext).getStateString());
+        updateBtTitle(BluetoothHelper.getBluetoothHelper(mAppContext).getStateString());
         updateWifiTitle(SocketControl.getInstance().isConneced());
         initViewData();
         super.onStart();
@@ -147,7 +145,7 @@ public class MeasureSetActivity extends BaseActivity {
                 mDebugDialog.setYesOnclickListener(new CustomEtDialog.onEnterclickListener() {
                     @Override
                     public void onYesClick() {
-                        BluetoothHelper.getBluetoothHelper(mContext).sendHex(mDebugDialog.getMessageStr());
+                        BluetoothHelper.getBluetoothHelper(mAppContext).sendHex(mDebugDialog.getMessageStr());
                         sendCmd(mDebugDialog.getMessageStr(), true, true);
                     }
                 });
@@ -210,10 +208,10 @@ public class MeasureSetActivity extends BaseActivity {
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                mTotalUnitIndex = (int) SharedPreferenceUtils.getParam(mContext, Constant.TOTAL_UNIT, 0);
+                mTotalUnitIndex = (int) SharedPreferenceUtils.getParam(mAppContext, Constant.TOTAL_UNIT, 0);
                 LogUtil.d(TAG, "mTotalUnitIndex: " + mTotalUnitIndex);
-                final int measureIndex = (int) SharedPreferenceUtils.getParam(mContext, Constant.MEASURE_UNIT, 0);
-                final int sampleIndex = (int) SharedPreferenceUtils.getParam(mContext, Constant.SAMPLE_UNIT, 0);
+                final int measureIndex = (int) SharedPreferenceUtils.getParam(mAppContext, Constant.MEASURE_UNIT, 0);
+                final int sampleIndex = (int) SharedPreferenceUtils.getParam(mAppContext, Constant.SAMPLE_UNIT, 0);
 
                 updateSpinnerArray(mTotalUnitIndex);
                 mMeasurePointUnit = mUnitArrays[mTotalUnitIndex][measureIndex];
@@ -238,7 +236,7 @@ public class MeasureSetActivity extends BaseActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Log.d(TAG, "position: " + position + ", id: " + id);
                 mMeasurePointUnit = mUnitArrays[mUnitIndex][position];
-                SharedPreferenceUtils.setParam(mContext, Constant.MEASURE_UNIT, position);
+                SharedPreferenceUtils.setParam(mAppContext, Constant.MEASURE_UNIT, position);
             }
 
             @Override
@@ -251,7 +249,7 @@ public class MeasureSetActivity extends BaseActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 mSampleUnit = mUnitArrays[mUnitIndex][position];
-                SharedPreferenceUtils.setParam(mContext, Constant.SAMPLE_UNIT, position);
+                SharedPreferenceUtils.setParam(mAppContext, Constant.SAMPLE_UNIT, position);
             }
 
             @Override
@@ -273,7 +271,7 @@ public class MeasureSetActivity extends BaseActivity {
             public void onValueChange(NumberPickerView picker, int oldVal, int newVal) {
                 Log.d(TAG, "oldVal: " + oldVal + ", newVal: " + newVal + ", Value: " + mStepArray[newVal]);
                 mStep = Float.parseFloat(mStepArray[newVal]);
-                SharedPreferenceUtils.setParam(mContext, Constant.STEP, newVal);
+                SharedPreferenceUtils.setParam(mAppContext, Constant.STEP, newVal);
 
             }
         });
@@ -283,7 +281,7 @@ public class MeasureSetActivity extends BaseActivity {
             @Override
             public void onValueChange(NumberPickerView picker, int oldVal, int newVal) {
                 mTap = mTapArray[newVal];
-                SharedPreferenceUtils.setParam(mContext, Constant.TAP, newVal);
+                SharedPreferenceUtils.setParam(mAppContext, Constant.TAP, newVal);
             }
         });
 
@@ -293,7 +291,7 @@ public class MeasureSetActivity extends BaseActivity {
             public void onValueChange(NumberPickerView picker, int oldVal, int newVal) {
                 Log.d(TAG, "oldVal: " + oldVal + ", newVal: " + newVal + ", Value: " + mCountArray[newVal]);
                 mCount = Integer.valueOf(mCountArray[newVal]);
-                SharedPreferenceUtils.setParam(mContext, Constant.COUNT, newVal);
+                SharedPreferenceUtils.setParam(mAppContext, Constant.COUNT, newVal);
             }
         });
 
@@ -308,7 +306,6 @@ public class MeasureSetActivity extends BaseActivity {
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.start_btn:
-                    sendCmd(CommandUtil.getSocketDataCmd(getUnitData(mTap, mMeasurePointUnit, mSampleUnit)), true, FlagUtils.iSModeA());
                     Intent intent = new Intent();
                     intent.putExtra(MeasureActivity.EXTRA_MEASURE_UNIT, mMeasurePointUnit);
                     intent.putExtra(MeasureActivity.EXTRA_SAMPLE_UNIT, mSampleUnit);
@@ -320,7 +317,7 @@ public class MeasureSetActivity extends BaseActivity {
                     startActivity(intent);
                     break;
                 case R.id.end_btn:
-                    BluetoothHelper.getBluetoothHelper(mContext).sendHex(CommandUtil.getStopCmd());
+                    BluetoothHelper.getBluetoothHelper(mAppContext).sendHex(CommandUtil.getStopCmd());
                     break;
                 default:
                     break;
@@ -338,7 +335,7 @@ public class MeasureSetActivity extends BaseActivity {
                         public void onClick(DialogInterface dialog, int which) {
                             updateSpinnerArray(which);
 
-                            SharedPreferenceUtils.setParam(mContext, Constant.TOTAL_UNIT, which);
+                            SharedPreferenceUtils.setParam(mAppContext, Constant.TOTAL_UNIT, which);
                         }
                     }).create();
         }

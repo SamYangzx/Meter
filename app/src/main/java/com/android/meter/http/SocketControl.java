@@ -251,7 +251,7 @@ public class SocketControl {
     }
 
     public void sendMsg(String hex, boolean realSend) {
-        LogUtil.d(TAG, "sendMsg: " + hex);
+        LogUtil.d(TAG, "sendMsg: " + hex + " ,realSend: " + realSend);
         if (realSend) {
 //            if (!mHasResponsed) {
 //                response(HANDLEING_CMD, hex);

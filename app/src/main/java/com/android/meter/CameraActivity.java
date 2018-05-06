@@ -135,7 +135,7 @@ public class CameraActivity extends BaseActivity implements
 //                        intent.putExtra(MeasureSetActivity.EXTRA_PHOTO, mPhotoName);
                             mPhotoName = "";
                         }
-                        SharedPreferenceUtils.setParam(mContext, Constant.SAME_PHOTO_FOLDER, true);
+                        SharedPreferenceUtils.setParam(mAppContext, Constant.SAME_PHOTO_FOLDER, true);
                         startActivity(intent);
                     }
                     break;
@@ -158,7 +158,7 @@ public class CameraActivity extends BaseActivity implements
         if (FlagUtils.iSModeA()) {
             mSameFolder = false;
         } else {
-            mSameFolder = (boolean) SharedPreferenceUtils.getParam(this, Constant.SAME_PHOTO_FOLDER, false);
+            mSameFolder = (boolean) SharedPreferenceUtils.getParam(mAppContext, Constant.SAME_PHOTO_FOLDER, false);
         }
         LogUtil.d(TAG, "onStart.mSameFolder: " + mSameFolder);
     }

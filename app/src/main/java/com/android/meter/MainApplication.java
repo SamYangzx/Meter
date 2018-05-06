@@ -30,7 +30,6 @@ public class MainApplication extends Application {
 
     private void initData() {
         SharedPreferenceUtils.setParam(this, Constant.SAME_PHOTO_FOLDER, false);
-
     }
 
     public boolean isModeA() {

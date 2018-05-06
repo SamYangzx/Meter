@@ -103,6 +103,7 @@ public class MeasureActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        LogUtil.i(TAG, "onCreate");
         setContentView(R.layout.activity_measure);
         initTitle();
 
@@ -183,8 +184,9 @@ public class MeasureActivity extends BaseActivity {
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                BluetoothHelper.getBluetoothHelper(mContext).sendHex(CommandUtil.getCalibrateCmd(CommandUtil.getBTUnitHexData(mMeasurePointUnit, mSampleUnit)));
-                BluetoothHelper.getBluetoothHelper(mContext).sendHex(CommandUtil.getStartCmd());
+                BluetoothHelper.getBluetoothHelper(mAppContext).sendHex(CommandUtil.getCalibrateCmd(CommandUtil.getBTUnitHexData(mMeasurePointUnit, mSampleUnit)));
+                BluetoothHelper.getBluetoothHelper(mAppContext).sendHex(CommandUtil.getStartCmd());
+                sendCmd(CommandUtil.getSocketDataCmd(getUnitData(mTap, mMeasurePointUnit, mSampleUnit)), true, FlagUtils.iSModeA());
             }
         }, GENERAL_DELAY_TIME);
     }
@@ -290,12 +292,12 @@ public class MeasureActivity extends BaseActivity {
                     break;
                 case R.id.connect_ib:
                     LogUtil.v(TAG, "start connect");
-                    String server = (String) SharedPreferenceUtils.getParam(mContext, SocketConstant.SAVE_IP, SocketConstant.DEFAULT_SERVER);
-                    int port = (int) SharedPreferenceUtils.getParam(mContext, SocketConstant.SAVE_PORT, SocketConstant.DEFAULT_PORT);
+                    String server = (String) SharedPreferenceUtils.getParam(mAppContext, SocketConstant.SAVE_IP, SocketConstant.DEFAULT_SERVER);
+                    int port = (int) SharedPreferenceUtils.getParam(mAppContext, SocketConstant.SAVE_PORT, SocketConstant.DEFAULT_PORT);
                     SocketControl.getInstance().connect(server, port);
 
-                    String btAddress = (String) SharedPreferenceUtils.getParam(mContext, BtConstant.SAVE_BT_ADDRESS, "");
-                    BluetoothHelper.getBluetoothHelper(mContext).connect(btAddress);
+                    String btAddress = (String) SharedPreferenceUtils.getParam(mAppContext, BtConstant.SAVE_BT_ADDRESS, "");
+                    BluetoothHelper.getBluetoothHelper(mAppContext).connect(btAddress);
                     break;
                 default:
                     break;
@@ -411,7 +413,7 @@ public class MeasureActivity extends BaseActivity {
             public void onYesClick() {
                 dialog.dismiss();
                 ToastUtil.showToast(mContext, R.string.reset);
-                BluetoothHelper.getBluetoothHelper(mContext).sendHex(CommandUtil.getResetCmd());
+                BluetoothHelper.getBluetoothHelper(mAppContext).sendHex(CommandUtil.getResetCmd());
             }
         });
         dialog.setNegativeButton(R.string.cancel, new CustomToastDialog.onCancelclickListener() {
@@ -451,7 +453,7 @@ public class MeasureActivity extends BaseActivity {
             @Override
             public void onYesClick() {
                 dialog.dismiss();
-                SharedPreferenceUtils.setParam(mContext, Constant.SAME_PHOTO_FOLDER, false);
+                SharedPreferenceUtils.setParam(mAppContext, Constant.SAME_PHOTO_FOLDER, false);
                 ToastUtil.showToast(mContext, R.string.measure_end);
             }
         });
