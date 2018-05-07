@@ -490,7 +490,7 @@ public class BluetoothHelper {
             while (true) {
                 try {
                     byteCount = mmInStream.read(preByte);
-                    LogUtil.d(TAG, "origin head: " + StringUtil.bytes2HexString(preByte));
+                    LogUtil.v(TAG, "origin head: " + StringUtil.bytes2HexString(preByte));
                     if (!(byteCount == 1 && CommandUtil.COLLECTOR_PRE_CODE.equals(StringUtil.bytes2HexString(preByte)))) {
                         continue;
                     }

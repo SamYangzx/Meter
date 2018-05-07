@@ -147,7 +147,7 @@ public class StringUtil {
             return "";
         }
         String r = bytes2String(hexString2Bytes(hex));
-        LogUtil.d(TAG, "hex2String generate string: " + r);
+        LogUtil.v(TAG, "hex2String generate string: " + r);
         return r;
     }
 

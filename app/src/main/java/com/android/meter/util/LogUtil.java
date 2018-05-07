@@ -36,7 +36,7 @@ public class LogUtil {
     private static final int LOG_WARN = 3;
     private static final int LOG_ERROR = 4;
 
-    private static final int LOG_LEVEL = LOG_VERBOSE;
+    private static final int LOG_LEVEL = LOG_DEBUG;
 
     /**
      *

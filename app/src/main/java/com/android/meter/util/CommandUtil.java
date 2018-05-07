@@ -110,7 +110,7 @@ public class CommandUtil {
             result ^= data[i];
 //            LogUtil.d(TAG, "getChecksum.i: " + i + " + result: " + result);
         }
-        LogUtil.d(TAG, "result: " + result);
+        LogUtil.v(TAG, "result: " + result);
         return result;
     }
 

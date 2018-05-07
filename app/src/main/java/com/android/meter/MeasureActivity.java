@@ -181,9 +181,11 @@ public class MeasureActivity extends BaseActivity {
         mNeedOffset = true;
 
         //若立刻发送指令，蓝牙端有时数据会接收不到。
+        LogUtil.d(TAG, "mHanlder is invoked");
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
+                LogUtil.d(TAG, "postDelayed.run");
                 BluetoothHelper.getBluetoothHelper(mAppContext).sendHex(CommandUtil.getCalibrateCmd(CommandUtil.getBTUnitHexData(mMeasurePointUnit, mSampleUnit)));
                 BluetoothHelper.getBluetoothHelper(mAppContext).sendHex(CommandUtil.getStartCmd());
                 sendCmd(CommandUtil.getSocketDataCmd(getUnitData(mTap, mMeasurePointUnit, mSampleUnit)), true, FlagUtils.iSModeA());
@@ -491,7 +493,7 @@ public class MeasureActivity extends BaseActivity {
         super.handleReceiveData(sampleValue);
         int divideIndex = StringUtil.getValueUnitIndex(sampleValue);
         String s = StringUtil.getStrWithoutFront0(StringUtil.hex2String(sampleValue.substring(0, divideIndex)));
-        LogUtil.d(TAG, "without more 0: " + s);
+        LogUtil.v(TAG, "without more 0: " + s);
         mSampleTv.setText(s);
 
     }

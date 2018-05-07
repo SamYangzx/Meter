@@ -27,7 +27,7 @@ import com.android.meter.http.IHttpListener;
 import com.android.meter.http.SocketConstant;
 import com.android.meter.http.SocketControl;
 import com.android.meter.util.CommandUtil;
-import com.android.meter.util.Constant;
+import com.android.meter.util.WeakHandler;
 import com.android.meter.util.LogUtil;
 import com.android.meter.util.SharedPreferenceUtils;
 import com.android.meter.util.StringUtil;
@@ -35,7 +35,9 @@ import com.android.meter.util.ToastUtil;
 
 import android.os.Handler;
 import android.widget.Toast;
+import android.os.Looper;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,24 +63,30 @@ public class BaseActivity extends AppCompatActivity implements IHttpListener {
     NetworkDialog mNetworkDialog;
     AlertDialog mUnitDialog;
 
-    Handler mHandler = new Handler() {
+    static class MyHandler extends WeakHandler<BaseActivity> {
+        MyHandler(BaseActivity activity) {
+            super(Looper.getMainLooper(), activity);
+        }
+
         @Override
-        public void handleMessage(Message msg) {
-//            LogUtil.d(TAG, "msg: " + msg.what)
+        protected void handleMsg(Message msg, @NonNull BaseActivity activity) {
+            if (activity == null) {
+                return;
+            }
             String data;
             switch (msg.what) {
                 case BtConstant.MESSAGE_STATE_CHANGE:
                     Log.i(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
                     switch (msg.arg1) {
                         case BluetoothHelper.STATE_CONNECTED:
-                            updateBtTitle(getString(R.string.title_bt_connected));
+                            activity.updateBtTitle(activity.getString(R.string.title_bt_connected));
                             break;
                         case BluetoothHelper.STATE_CONNECTING:
-                            updateBtTitle(getString(R.string.title_bt_connecting));
+                            activity.updateBtTitle(activity.getString(R.string.title_bt_connecting));
                             break;
                         case BluetoothHelper.STATE_LISTEN:
                         case BluetoothHelper.STATE_NONE:
-                            updateBtTitle(getString(R.string.title_not_bt_connected));
+                            activity.updateBtTitle(activity.getString(R.string.title_not_bt_connected));
                             break;
                     }
                     break;
@@ -86,63 +94,70 @@ public class BaseActivity extends AppCompatActivity implements IHttpListener {
                     byte[] writeBuf = (byte[]) msg.obj;
                     // construct a string from the buffer
                     String writeMessage = StringUtil.bytes2HexString(writeBuf);
-                    ToastUtil.showToast(mContext, "BT sendString: " + writeMessage, ToastUtil.DEBUG);
+                    ToastUtil.showToast(activity.mContext, "BT sendString: " + writeMessage, ToastUtil.DEBUG);
                     break;
                 case BtConstant.MESSAGE_RECEIVE_SUCCESS:
 //                    BluetoothHelper.getBluetoothHelper(mContext).sendHex(CommandUtil.CHECKSUM_SUCCESS_HEXCMD);
                     byte[] readBuf = (byte[]) msg.obj;
                     String readMessage = StringUtil.bytes2HexString(readBuf);
 //                    mSampleTv.setText(readMessage);
-                    ToastUtil.showToast(mContext, "BT receive: " + readMessage, ToastUtil.DEBUG);
-                    handlerCmd(readMessage);
+                    ToastUtil.showToast(activity.mContext, "BT receive: " + readMessage, ToastUtil.DEBUG);
+                    activity.handlerCmd(readMessage);
                     break;
                 case BtConstant.MESSAGE_RECEIVE_FAILED:
-                    BluetoothHelper.getBluetoothHelper(mAppContext).sendHex(CommandUtil.CHECKSUM_FAILED_HEXCMD);
+                    BluetoothHelper.getBluetoothHelper(activity.mAppContext).sendHex(CommandUtil.CHECKSUM_FAILED_HEXCMD);
                     break;
                 case BtConstant.MESSAGE_DEVICE_NAME:
                     break;
                 case BtConstant.MESSAGE_TOAST:
-                    Toast.makeText(mContext, msg.getData().getString(TOAST),
+                    Toast.makeText(activity.mContext, msg.getData().getString(TOAST),
                             Toast.LENGTH_SHORT).show();
                     break;
                 case SocketConstant.SEND_FAIL:
-                    ToastUtil.showToast(mContext, "Socket发送数据失败，请检查网络连接是否正常!");
+                    ToastUtil.showToast(activity.mContext, "Socket发送数据失败，请检查网络连接是否正常!");
                     break;
                 case SocketConstant.RECEIVE_SUCCESS:
                     data = (String) msg.obj;
-                    handlerCmd(data);
+                    activity.handlerCmd(data);
                     break;
                 case SocketConstant.RECEIVE_CHECK_FAILED:
-                    ToastUtil.showToast(mContext, "电脑端未回复!");
+                    ToastUtil.showToast(activity.mContext, "电脑端未回复!");
                     break;
                 case SocketConstant.COMPUTER_NOT_RESPONSE:
-                    ToastUtil.showToast(mContext, "上一条指令还未处理完，请等待！");
+                    ToastUtil.showToast(activity.mContext, "上一条指令还未处理完，请等待！");
                     break;
                 case SocketConstant.CONNECT_SUCCESS:
-                    updateWifiTitle(getString(R.string.title_wifi_connected));
-                    if (mNetworkDialog != null) {
-                        mNetworkDialog.dismiss();
+                    activity.updateWifiTitle(activity.getString(R.string.title_wifi_connected));
+                    if (activity.mNetworkDialog != null) {
+                        activity.mNetworkDialog.dismiss();
                     }
                     break;
                 case SocketConstant.CONNECTING:
-                    updateWifiTitle(getString(R.string.title_wifi_connecting));
+                    activity.updateWifiTitle(activity.getString(R.string.title_wifi_connecting));
                     break;
                 case SocketConstant.CONNECT_FAIL:
-                    updateWifiTitle(getString(R.string.title_wifi_not_connected));
+                    activity.updateWifiTitle(activity.getString(R.string.title_wifi_not_connected));
                     break;
                 default:
                     break;
             }
         }
-    };
 
+    }
+
+    MyHandler mHandler;
+
+    private void initHandler() {
+        mHandler = new MyHandler(this);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_base);
+        LogUtil.i(TAG, "onCreate: " + getClass().getName());
         mContext = this;
-        mAppContext = (MainApplication)getApplication();
+        mAppContext = (MainApplication) getApplication();
         // 添加Activity到堆栈
         AtyContainer.getInstance().addActivity(this);
 
@@ -254,6 +269,7 @@ public class BaseActivity extends AppCompatActivity implements IHttpListener {
     }
 
     private void initData() {
+        initHandler();
         BluetoothHelper.getBluetoothHelper(mAppContext).enableBT();
         BluetoothHelper.getBluetoothHelper(mAppContext).setmHandler(mHandler);
         SocketControl.getInstance().setListener(this);
@@ -329,8 +345,8 @@ public class BaseActivity extends AppCompatActivity implements IHttpListener {
 
     @Override
     protected void onDestroy() {
+        LogUtil.i(TAG, "onDestroy: " + getClass().getName());
         mHandler.removeCallbacksAndMessages(null);
-        mHandler = null;
         super.onDestroy();
         // 结束Activity&从栈中移除该Activity
         AtyContainer.getInstance().removeActivity(this);

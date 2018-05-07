@@ -307,6 +307,7 @@ public class MeasureSetActivity extends BaseActivity {
             switch (v.getId()) {
                 case R.id.start_btn:
                     Intent intent = new Intent();
+                    LogUtil.i(TAG, "startActivity");
                     intent.putExtra(MeasureActivity.EXTRA_MEASURE_UNIT, mMeasurePointUnit);
                     intent.putExtra(MeasureActivity.EXTRA_SAMPLE_UNIT, mSampleUnit);
                     intent.putExtra(MeasureActivity.EXTRA_STEP, mStep);
