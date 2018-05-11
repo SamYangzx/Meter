@@ -3,10 +3,6 @@ package com.android.meter.util;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-/**
- * Created by fenghe on 2017/9/28.
- */
-
 public class SharedPreferenceUtils {
     /**
      * 保存在手机里面的文件名

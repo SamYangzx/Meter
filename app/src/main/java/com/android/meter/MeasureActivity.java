@@ -457,6 +457,7 @@ public class MeasureActivity extends BaseActivity {
                 dialog.dismiss();
                 SharedPreferenceUtils.setParam(mAppContext, Constant.SAME_PHOTO_FOLDER, false);
                 ToastUtil.showToast(mContext, R.string.measure_end);
+                FlagUtils.setmIsNeedSaveCmd(false);
             }
         });
         dialog.setNegativeButton(R.string.cancel, new CustomToastDialog.onCancelclickListener() {

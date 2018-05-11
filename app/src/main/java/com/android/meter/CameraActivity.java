@@ -357,6 +357,9 @@ public class CameraActivity extends BaseActivity implements
                     }
 
                     refreshGallery(file);
+                    if (!FlagUtils.iSModeA()) {
+                        FlagUtils.setmIsNeedSaveCmd(true);
+                    }
                 }
             });
 

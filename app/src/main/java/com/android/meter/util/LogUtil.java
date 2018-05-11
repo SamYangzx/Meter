@@ -3,6 +3,8 @@ package com.android.meter.util;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.lzy.imagepicker.util.FlagUtils;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -16,8 +18,8 @@ import java.util.Date;
 
 public class LogUtil {
 
-    public static final String TAG = LogUtil.class.getSimpleName();
     public static final String COMMON_TAG = "fenghe/";
+    public static final String TAG = COMMON_TAG + LogUtil.class.getSimpleName();
 
     //修改下面的文件夹时要注意同时修改ImageDataSource中文件路径。
     public static String LOG_FOLDER;
@@ -39,7 +41,6 @@ public class LogUtil {
     private static final int LOG_LEVEL = LOG_DEBUG;
 
     /**
-     *
      * @param path folder's name, not path
      */
     public static void setLogFolder(String path) {
@@ -118,6 +119,10 @@ public class LogUtil {
     }
 
     public static void saveCmd(String text) {
+        if (!FlagUtils.iSNeedSaveCmd()) {
+            Log.w(TAG, "do not need save cmd");
+            return;
+        }
         StringBuilder logText = new StringBuilder();
         logText.append(text).append(NEWLINE);
 
@@ -195,7 +200,7 @@ public class LogUtil {
      * @return
      **/
     private static void logtoFile(String mylogtype, String tag, String text, Throwable tr) {
-        if(TextUtils.isEmpty(LOG_PATH)){
+        if (TextUtils.isEmpty(LOG_PATH)) {
             return;
         }
         Date nowtime = new Date();
