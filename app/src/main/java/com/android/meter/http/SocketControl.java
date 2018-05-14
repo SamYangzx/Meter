@@ -45,7 +45,7 @@ public class SocketControl {
     private IHttpListener mControlListener = new IHttpListener() {
         @Override
         public void onResult(int state, String data) {
-            LogUtil.d(TAG, "state: " + state + " ,data: " + data);
+            LogUtil.i(TAG, "mControlListener.state: " + state + " ,data: " + data);
             if (mIHttpListener != null) {
                 switch (state) {
                     case SocketConstant.CONNECT_SUCCESS:
@@ -54,6 +54,7 @@ public class SocketControl {
                         mIHttpListener.onResult(state, data);
                         break;
                     case SocketConstant.RECEIVE_SUCCESS:
+                        LogUtil.d(TAG, "mHasResponsed: " + mHasResponsed + ", mIsFile: " + mIsFile);
                         if (mHasResponsed) {
                             mIHttpListener.onResult(SocketConstant.RECEIVE_SUCCESS, data);
                             break;
@@ -187,7 +188,7 @@ public class SocketControl {
     private String mTempString;
 
     /**
-     * @param list 要发送的文件路径列表
+     * @param list     要发送的文件路径列表
      * @param realSend true代表真正发送，false表示仅存储指令
      */
     public void sendFiles(List<String> list, boolean realSend) {
@@ -226,10 +227,10 @@ public class SocketControl {
     }
 
     /**
-     * @deprecated 被遗弃，20180402后仅维护{@link #sendFiles}
      * @param file
      * @param count
      * @param realSend
+     * @deprecated 被遗弃，20180402后仅维护{@link #sendFiles}
      */
     public void sendFile(String file, int count, boolean realSend) {
         LogUtil.d(TAG, "sendFile: " + file + " ,count: " + count);

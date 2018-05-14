@@ -19,7 +19,7 @@ import java.util.Date;
 public class LogUtil {
 
     public static final String COMMON_TAG = "fenghe/";
-    public static final String TAG = COMMON_TAG + LogUtil.class.getSimpleName();
+    public static final String TAG = LogUtil.class.getSimpleName();
 
     //修改下面的文件夹时要注意同时修改ImageDataSource中文件路径。
     public static String LOG_FOLDER;

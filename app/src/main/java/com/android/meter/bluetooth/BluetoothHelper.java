@@ -572,6 +572,9 @@ public class BluetoothHelper {
         }
     }
 
+    public boolean isConnected() {
+        return (mConnectedThread != null) && (mConnectedThread.mmSocket != null) && (mConnectedThread.mmSocket.isConnected());
+    }
 
     public void disconnect() {
         LogUtil.d(TAG, "disconnect is invoked.");

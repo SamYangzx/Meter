@@ -51,7 +51,7 @@ import static com.android.meter.util.CommandUtil.UPLOCD_CMD_CODE;
  * 基类，显示wifi, 蓝牙状态，添加接收数据后的接口。
  */
 public class BaseActivity extends AppCompatActivity implements IHttpListener {
-    private static final String TAG = BaseActivity.class.getSimpleName();
+    private static final String TAG = LogUtil.COMMON_TAG + "BaseActivity";
 
     public static final int REQUEST_CONNECT_DEVICE = 1;
 
@@ -70,13 +70,15 @@ public class BaseActivity extends AppCompatActivity implements IHttpListener {
 
         @Override
         protected void handleMsg(Message msg, @NonNull BaseActivity activity) {
+            LogUtil.d(TAG, "handleMsg.msg: " + msg.what);
             if (activity == null) {
+                LogUtil.e(TAG, "activity == null!!!");
                 return;
             }
             String data;
             switch (msg.what) {
                 case BtConstant.MESSAGE_STATE_CHANGE:
-                    Log.i(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
+                    LogUtil.i(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
                     switch (msg.arg1) {
                         case BluetoothHelper.STATE_CONNECTED:
                             activity.updateBtTitle(activity.getString(R.string.title_bt_connected));
@@ -127,10 +129,8 @@ public class BaseActivity extends AppCompatActivity implements IHttpListener {
                     ToastUtil.showToast(activity.mContext, "上一条指令还未处理完，请等待！");
                     break;
                 case SocketConstant.CONNECT_SUCCESS:
+                    LogUtil.d(TAG, "activity.mNetworkDialog : " + activity.mNetworkDialog );
                     activity.updateWifiTitle(activity.getString(R.string.title_wifi_connected));
-                    if (activity.mNetworkDialog != null) {
-                        activity.mNetworkDialog.dismiss();
-                    }
                     break;
                 case SocketConstant.CONNECTING:
                     activity.updateWifiTitle(activity.getString(R.string.title_wifi_connecting));
@@ -148,6 +148,7 @@ public class BaseActivity extends AppCompatActivity implements IHttpListener {
     MyHandler mHandler;
 
     private void initHandler() {
+        LogUtil.d(TAG, "initHandler--");
         mHandler = new MyHandler(this);
     }
 
@@ -175,15 +176,15 @@ public class BaseActivity extends AppCompatActivity implements IHttpListener {
 
                 return true;
             case R.id.ip_settings:
-                if (mNetworkDialog == null) {
+//                if (mNetworkDialog == null) { //
                     mNetworkDialog = new NetworkDialog(mContext);
-                }
+//                }
                 mNetworkDialog.setYesOnclickListener(new NetworkDialog.onEnterclickListener() {
                     @Override
                     public void onYesClick() {
 //                        ToastUtil.showToast(mContext, "connect...");
                         connectServer(mNetworkDialog.getServer(), mNetworkDialog.getIp());
-
+                        mNetworkDialog.dismiss();
                     }
                 });
                 mNetworkDialog.setNoOnclickListener(new NetworkDialog.onCancelclickListener() {
@@ -275,9 +276,13 @@ public class BaseActivity extends AppCompatActivity implements IHttpListener {
         SocketControl.getInstance().setListener(this);
         String server = (String) SharedPreferenceUtils.getParam(mAppContext, SocketConstant.SAVE_IP, SocketConstant.DEFAULT_SERVER);
         int port = (int) SharedPreferenceUtils.getParam(mAppContext, SocketConstant.SAVE_PORT, SocketConstant.DEFAULT_PORT);
-        SocketControl.getInstance().connect(server, port);
+        if(!SocketControl.getInstance().isConneced()){
+            SocketControl.getInstance().connect(server, port);
+        }
         String bt = (String) SharedPreferenceUtils.getParam(mAppContext, BtConstant.SAVE_BT_ADDRESS, "");
-        BluetoothHelper.getBluetoothHelper(mAppContext).connect(bt);
+        if (!BluetoothHelper.getBluetoothHelper(mAppContext).isConnected()) {
+            BluetoothHelper.getBluetoothHelper(mAppContext).connect(bt);
+        }
 
         updateWifiTitle(SocketControl.getInstance().isConneced());
     }
@@ -337,6 +342,7 @@ public class BaseActivity extends AppCompatActivity implements IHttpListener {
      */
     @Override
     public void onResult(int state, String data) {
+        LogUtil.i(TAG, "onResult.state: " + state + " ,data: " + data);
         Message msg = new Message();
         msg.what = state;
         msg.obj = data;

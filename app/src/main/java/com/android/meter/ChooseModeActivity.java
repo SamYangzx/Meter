@@ -101,7 +101,7 @@ public class ChooseModeActivity extends BaseActivity {
         if (FlagUtils.iSModeA()) {
             sendCmd(CommandUtil.getSocketDataCmd(CommandUtil.MODE_A), true, true);
         } else {
-            sendCmd(CommandUtil.getSocketDataCmd(CommandUtil.MODE_B), true, true);
+            sendCmd(CommandUtil.getSocketDataCmd(CommandUtil.MODE_B), true, false);
         }
         Intent intent = new Intent();
         intent.setClass(ChooseModeActivity.this, CameraActivity.class);

@@ -46,7 +46,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.android.meter.bluetooth.BluetoothHelper;
 import com.android.meter.bluetooth.BtConstant;
 import com.android.meter.camera.AspectRatioFragment;
 import com.android.meter.http.SocketConstant;
