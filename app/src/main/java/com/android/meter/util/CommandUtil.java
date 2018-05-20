@@ -10,6 +10,7 @@ import android.util.Log;
 
 public class CommandUtil {
     private static final String TAG = LogUtil.COMMON_TAG + CommandUtil.class.getSimpleName();
+    private static final boolean DEBUG = false;
 
     public static final String COLLECTOR_PRE_CODE = "AA";
     public static final String PLATFORM_PRE_CODE = "BB";
@@ -67,6 +68,7 @@ public class CommandUtil {
      * @param hex        if originData is hex ,this value should be true; else this value is false.
      * @return
      */
+
     private static String getCmdHex(String pre, String cmdCode, String originData, boolean hex) {
         StringBuilder sb = new StringBuilder();
         if (originData == null) {
@@ -87,9 +89,10 @@ public class CommandUtil {
             lengthS = Integer.toHexString(length);
         }
         check = getChecksum(lengthS + cmdCode + hexData);
-        Log.w(TAG, "originData: " + originData + " ,lengths: " + lengthS + " , cmdCode: " + cmdCode + " ,hexData: " + hexData + " ,check: " + check);
         sb.append(pre).append(lengthS).append(cmdCode).append(hexData).append(check).append(END_CODE);
-        Log.w(TAG, "getCmdHex: " + sb.toString());
+        if (DEBUG) {
+            Log.w(TAG, "getCmdHex: " + sb.toString());
+        }
         return sb.toString();
     }
 
@@ -110,7 +113,9 @@ public class CommandUtil {
             result ^= data[i];
 //            LogUtil.d(TAG, "getChecksum.i: " + i + " + result: " + result);
         }
-        LogUtil.v(TAG, "result: " + result);
+        if(DEBUG){
+            LogUtil.v(TAG, "result: " + result);
+        }
         return result;
     }
 
@@ -189,7 +194,7 @@ public class CommandUtil {
      */
     public static String getUnitData(String tap, String measureUnit, String sampleUnit) {
         if (tap == null || measureUnit == null || sampleUnit == null) {
-            LogUtil.d(TAG, "tap: " + tap + " ,measure: " + measureUnit + ", sampleUnit: " + sampleUnit);
+            LogUtil.e(TAG, "tap: " + tap + " ,measure: " + measureUnit + ", sampleUnit: " + sampleUnit);
             return "";
         }
         StringBuilder sb = new StringBuilder();

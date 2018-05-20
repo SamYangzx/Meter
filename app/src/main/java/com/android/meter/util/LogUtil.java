@@ -57,26 +57,12 @@ public class LogUtil {
     public static void v(String tag, String msg, Throwable tr) {
 //        tag = appendTag(tag);
         if (LOG_LEVEL <= LOG_VERBOSE) {
-            Log.v(tag, msg, tr);
+            Log.w(tag, msg, tr);
         }
         if (LOG_TO_FILE) {
             logtoFile("V", tag, msg, tr);
         }
     }
-
-//    public static void d(String tag, String msg) {
-//        d(tag, msg, null);
-//    }
-
-//    public static void d(String tag, String msg, Throwable tr) {
-//        tag = appendTag(tag);
-//        if (LOG_LEVEL <= LOG_DEBUG) {
-//            Log.d(tag, msg, tr);
-//        }
-//        if (LOG_TO_FILE) {
-//            logtoFile("D", tag, msg, tr);
-//        }
-//    }
 
     public static void i(String tag, String msg) {
         i(tag, msg, null);
@@ -85,7 +71,7 @@ public class LogUtil {
     public static void i(String tag, String msg, Throwable tr) {
 //        tag = appendTag(tag);
         if (LOG_LEVEL <= LOG_INFO) {
-            Log.i(tag, msg, tr);
+            Log.w(tag, msg, tr);
         }
         if (LOG_TO_FILE) {
             logtoFile("I", tag, msg, tr);

@@ -119,8 +119,6 @@ public class MeasureSetActivity extends BaseActivity {
         if (firstStart) {
             firstStart = false;
         }
-        updateBtTitle(BluetoothHelper.getBluetoothHelper(mAppContext).getStateString());
-        updateWifiTitle(SocketControl.getInstance().isConneced());
         initViewData();
         super.onStart();
     }

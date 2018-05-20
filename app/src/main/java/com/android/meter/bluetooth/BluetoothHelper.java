@@ -44,11 +44,6 @@ public class BluetoothHelper {
     public static final int STATE_CONNECTED = 3;
 
     private Context mContext;
-//    private IMsgListener mIMsgListener;
-//
-//    public void setIMsgListener(IMsgListener iMsgListener) {
-//        mIMsgListener = iMsgListener;
-//    }
 
     private BluetoothHelper(Context context) {
         this(context, null);

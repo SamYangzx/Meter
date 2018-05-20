@@ -19,7 +19,7 @@ import com.android.meter.util.ToastUtil;
 import com.lzy.imagepicker.util.FlagUtils;
 
 public class ChooseModeActivity extends BaseActivity {
-    private static final String TAG = ChooseModeActivity.class.getSimpleName();
+    private static final String TAG = LogUtil.COMMON_TAG + "ChooseModeActivity";
 
     private TextView mSampleTv;
     private TextView mSampleUnitTv;
@@ -131,7 +131,6 @@ public class ChooseModeActivity extends BaseActivity {
 
     @Override
     public void handleReceiveData(String sampleValue) {
-        super.handleReceiveData(sampleValue);
         int divideIndex = StringUtil.getValueUnitIndex(sampleValue);
         String s = StringUtil.getStrWithoutFront0(StringUtil.hex2String(sampleValue.substring(0, divideIndex)));
         String unit = StringUtil.getFormatUnit(StringUtil.hex2String(sampleValue.substring(divideIndex)));
