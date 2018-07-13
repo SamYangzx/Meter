@@ -24,6 +24,8 @@
     <!--measureSetActivity end-->
 
     <!--measureActivity begin-->
+    <string name="change_mode">模式切换</string>
+    <string name="send_cmd">发送指令</string>
     <string name="cancel">取消</string>
     <string name="center">确定</string>
     <string name="times">第n次</string>

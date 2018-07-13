@@ -28,7 +28,7 @@ public class LogUtil {
     private static final String LOG_FILE_NAME = "log.txt";
     public static final String CMD_FILE_NAME = "cmd.txt";
 
-    private static final boolean LOG_TO_FILE = true;
+    private static final boolean LOG_TO_FILE = false;
 
     private static final String NEWLINE = "\r\n";
 

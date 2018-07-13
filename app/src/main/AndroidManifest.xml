@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.android.meter"
           android:versionCode="30105"
-          android:versionName="V3.01.05.0706">
+          android:versionName="V3.01.05.0713">
 
     <uses-sdk android:minSdkVersion="14"/>
 

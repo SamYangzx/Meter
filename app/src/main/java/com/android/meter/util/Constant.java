@@ -7,7 +7,7 @@ package com.android.meter.util;
 public class Constant {
     //总调试控制开关
     public static final boolean TOTAL_DEBUG = true;
-    public static final boolean REAL_SEND_FILE = true;
+    public static final boolean REAL_SEND_FILE = true; //是否真正发送文件
 
     public static final int DELAY_REFRESH_TIME = 15;
     public static final int LINES_COUNT = 21; //should be an odd number.

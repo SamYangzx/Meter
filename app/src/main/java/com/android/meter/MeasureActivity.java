@@ -10,16 +10,20 @@ import android.os.Message;
 import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.support.v7.widget.Toolbar;
 
 import com.android.meter.bluetooth.BluetoothHelper;
 import com.android.meter.bluetooth.BtConstant;
 import com.android.meter.excel.ExcelUtils;
 import com.android.meter.excel.Record;
+import com.android.meter.general_ui.CustomEtDialog;
 import com.android.meter.general_ui.CustomToastDialog;
 import com.android.meter.http.SocketConstant;
 import com.android.meter.http.SocketControl;
@@ -134,13 +138,42 @@ public class MeasureActivity extends BaseActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.measure_menu, menu);
+        MenuItem menuItem = menu.findItem(R.id.mode_settings);
+        if (((MainApplication) getApplication()).isModeA()) {
+            menuItem.setTitle(R.string.change_mode);
+        } else {
+            menuItem.setTitle(R.string.send_cmd);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.mode_settings:
+                if (((MainApplication) getApplication()).isModeA()) {
+                    changeModeDialog();
+                } else {
+                    startSendCmdActivity();
+                }
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
     protected void onDestroy() {
         LogUtil.d(TAG, "onDestroy is invoked.");
         super.onDestroy();
     }
 
     private void initTitle() {
-//        Toolbar toolbar = (Toolbar) findViewById(R.id.measure_toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.measure_toolbar);
         mTitleTv = (TextView) findViewById(R.id.measure_title_tv);
         mDeviceStateTv = (TextView) findViewById(R.id.device_state_tv);
         setTitleTv(mDeviceStateTv);
@@ -158,6 +191,7 @@ public class MeasureActivity extends BaseActivity {
         } else {
             mTitleTv.setVisibility(View.GONE);
         }
+        setSupportActionBar(toolbar);
     }
 
 
