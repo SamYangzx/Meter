@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.android.meter"
-          android:versionCode="30105"
-          android:versionName="V3.01.05.0713">
+          android:versionCode="30106"
+          android:versionName="V3.01.06.1021">
 
     <uses-sdk android:minSdkVersion="14"/>
 

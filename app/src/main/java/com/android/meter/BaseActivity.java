@@ -342,7 +342,7 @@ public class BaseActivity extends AppCompatActivity implements IHttpListener {
      */
     @Override
     public void onResult(int state, String data) {
-        LogUtil.i(TAG, "onResult.state: " + state + " ,data: " + data);
+        LogUtil.i(TAG, "onResult wifi socket state: " + state + " ,data: " + data);
         Message msg = new Message();
         msg.what = state;
         msg.obj = data;

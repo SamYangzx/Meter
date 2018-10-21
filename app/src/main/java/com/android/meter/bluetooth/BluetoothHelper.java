@@ -65,6 +65,10 @@ public class BluetoothHelper {
 
     public void setmHandler(Handler handler) {
         LogUtil.d(TAG, "setmHandler is invoked. handler: " + handler);
+        //如果是同一个handler，就不要执行下面的操作，以免移除了未执行的任务。 20181021
+        if (mHandler == handler) {
+            return;
+        }
         if (mHandler != null) {
             mHandler.removeCallbacksAndMessages(null);
             mHandler = null;
@@ -176,13 +180,15 @@ public class BluetoothHelper {
      *
      * @param device The BluetoothDevice to connect
      */
-    public synchronized void connect(BluetoothDevice device) {
-        LogUtil.d(TAG, "connect to: " + device);
+    public synchronized void connect(final BluetoothDevice device) {
+        LogUtil.d(TAG, "start to connect to: " + device + ", mState: " + mState);
         if (device == null) {
             LogUtil.d(TAG, "device == null");
             setState(STATE_NONE);
             return;
         }
+
+        int currentState = mState;
 
         // Cancel any thread attempting to make a connection
         if (mState == STATE_CONNECTING) {
@@ -200,17 +206,24 @@ public class BluetoothHelper {
             }
         }
 
-
         // Cancel any thread currently running a connection
         if (mConnectedThread != null) {
             mConnectedThread.cancel();
             mConnectedThread = null;
         }
 
-        // Start the thread to connect with the given device
-        mConnectThread = new ConnectThread(device);
-        mConnectThread.start();
-        setState(STATE_CONNECTING);
+        if (currentState != STATE_CONNECTED) {
+            connectDevice(device);
+        } else {
+            if (mHandler != null) {
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        BluetoothHelper.this.connectDevice(device);
+                    }
+                }, 500); //debug time。如果之前已经处于连接状态，此时需要断开连接过一段时间后才能连接上。
+            }
+        }
     }
 
 
@@ -368,7 +381,6 @@ public class BluetoothHelper {
                         switch (mState) {
                             case STATE_LISTEN:
                             case STATE_CONNECTING:
-
                                 connected(socket, socket.getRemoteDevice());
                                 break;
                             case STATE_NONE:
@@ -426,6 +438,7 @@ public class BluetoothHelper {
             try {
                 mmSocket.connect();
             } catch (IOException e) {
+                LogUtil.e(TAG, "mmSocket.connect.IOException: " + e);
                 connectionFailed();
 
                 try {
@@ -578,5 +591,12 @@ public class BluetoothHelper {
         }
     }
 
+    private void connectDevice(BluetoothDevice device) {
+        // Start the thread to connect with the given device'
+        LogUtil.v(TAG, "connectDevice.device: " + device);
+        mConnectThread = new ConnectThread(device);
+        mConnectThread.start();
+        setState(STATE_CONNECTING);
+    }
 
 }
